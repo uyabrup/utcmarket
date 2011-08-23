@@ -1,0 +1,215 @@
+<?php
+// $Id: globalredirect.test,v 1.1.2.5 2010/05/28 22:59:43 njt1982 Exp $
+
+define('ERROR_MESSAGE',     'ERROR<br />Expected Path: !expected_path<br />Expected Status Code: !expected_status<br />Location: !location<br />Status: !status');
+define('SUCCESS_MESSAGE', 'SUCCESS<br />Expected Path: !expected_path<br />Expected Status Code: !expected_status<br />Location: !location<br />Status: !status');
+
+/**
+ * @file
+ * Global Redirect functionality tests
+ */
+
+class GlobalRedirectTestCase extends DrupalWebTestCase {
+
+
+  function setUp() {
+    $modules = array_merge(func_get_args(), array('path', 'globalredirect'));
+    call_user_func_array(array($this, 'parent::setUp'), $modules);
+
+    // Create a user
+    $user = $this->drupalCreateUser(array(
+      'access content',
+      'create page content',
+      'create url aliases',
+    ));
+    $this->drupalLogin($user);
+
+    // Create a dummy node
+    $node = array(
+      'type' => 'page',
+      'title' => 'Test Page Node',
+      'path' => 'test-node',
+    );
+
+    // Save the node
+    $node = $this->drupalCreateNode($node);
+
+    // Create an alias for the create story path - this is used in the "redirect with permissions testing" test.
+    path_set_alias('node/add/story', 'add-node-story');
+  }
+
+  protected function _globalredirect_batch_test() {
+    // If menu checking is enabled, set to TRUE - otherwise FALSE
+    $menu_check = variable_get('globalredirect_menu_check', GLOBALREDIRECT_FEATURE_DISABLED) === GLOBALREDIRECT_MENU_CHECK_ENABLED;
+
+    // If menu checking is enabled, set to TRUE - otherwise FALSE
+    $deslash_check = variable_get('globalredirect_deslash', GLOBALREDIRECT_DESLASH_ENABLED) === GLOBALREDIRECT_DESLASH_ENABLED;
+
+    // If menu checking is enabled, set to TRUE - otherwise FALSE
+    $clean_check = variable_get('globalredirect_nonclean2clean', GLOBALREDIRECT_NONCLEAN2CLEAN_ENABLED) === GLOBALREDIRECT_NONCLEAN2CLEAN_ENABLED;
+
+    // TODO - Refactor to just an array or test_path settings. Don't use the request as the key, its too limiting.
+
+    // Array of request => "array of expected data" pairs.
+    // The array must have a return-code key (with a numeric HTTP code as a value (eg 301 or 200).
+    // The array may also have an expected-path key with a value representing the expected path. If this is ommitted, the request is passed through url().
+    $test_paths = array(
+      // "" is the frontpage. Should NOT redirect. -- Test for normal requests
+      array(
+        'request' => '',
+        'return-code' => 200,
+        'expected-path' => '',
+      ),
+
+      // "node" is the default frontpage. Should redirect to base path. --- Test for frontpage redirect
+      array(
+        'request' => 'node',
+        'return-code' => 301,
+        'expected-path' => '',
+      ),
+
+      // "node/1" has been defined above as having an alias ("test-node"). Should 301 redirect to the alias. --- Test for source path request on aliased path
+      array(
+        'request' => 'node/1',
+        'return-code' => 301,
+      ),
+
+      // "node/add/story" has an alias, however the redirect depends on the menu_check setting --- Test for access request to secured url
+      array(
+        'request' => 'node/add/story',
+        'return-code' => $menu_check ? 403 : 301,
+      ),
+
+      // "user/[uid]/" has no alias, but the redirect depends on the $deslash_check setting --- Test for deslashing redirect
+      array(
+        'request' => 'user/'. $this->loggedInUser->uid .'/',
+        'return-code' => $deslash_check ? 301 : 200,
+        'expected-path' => 'user/'. $this->loggedInUser->uid,
+      ),
+
+      // NonClean to Clean check 1... --- This should always redirect as we're requesting an aliased path in unaliased form (albeit also unclean)
+      array(
+        'request' => url('<front>', array('absolute' => TRUE)),
+        'options' => array('query' => array('q' => 'node/1'), 'external' => TRUE),
+        'return-code' => 301,
+        'expected-path' => 'test-node',
+      ),
+
+      // NonClean to Clean check 2... --- This may or may not redirect, depending on the state of $clean_check as we're requesting an unaliased path
+      array(
+        'request' => url('<front>', array('absolute' => TRUE)),
+        'options' => array('query' => array('q' => 'node/add/page'), 'external' => TRUE),
+        'return-code' => $clean_check ? 301 : 200,
+        'expected-path' => $clean_check ? 'node/add/page' : '?q=node/add/page',
+      ),
+    );
+
+
+    // Foreach of the above, lets check they redirect correctly
+    foreach ($test_paths as $path) {
+      $path['options'] = isset($path['options']) ? $path['options'] + array('absolute' => TRUE) : array('absolute' => TRUE);
+
+      $request_path = url($path['request'], $path['options'] + array('alias' => TRUE));
+
+
+      // Display a message tellingthe user what we're testing
+      $this->pass(t('Requesting: !path', array('!path' => $request_path)));
+
+      // Do a HEAD request (don't care about the body). The alias=>TRUE is to tell Drupal not to lookup the alias - this is a raw request.
+      $this->drupalHead($request_path, array('alias' => TRUE));
+
+
+      // Grab the headers from the request
+      $headers = $this->drupalGetHeaders(TRUE);
+
+
+      // Build a nice array of results
+      $result = array(
+        '!expected_status' => $path['return-code'],
+        '!location' => isset($headers[0]['location']) ? $headers[0]['location'] : 'N/A',
+        '!status' => $headers[0][':status'],
+      );
+
+
+      // If the expected result is not a redirect, then there is no expected path in the location header.
+      if ($path['return-code'] != 301) {
+        $result['!expected_path'] = 'N/A';
+      }
+      else {
+        //$url_options = $path['options'];
+        $url_options = array('absolute' => TRUE);
+
+        if (isset($path['expected-path'])) {
+          // If we have an expected path provided, use this and tell url() not to do an alias lookup
+          $expected = $path['expected-path'];
+          $url_options['alias'] = TRUE;
+        }
+        else {
+          // Otherwise set the path to the request and let url() do an alias lookup.
+          $expected = $path['request'];
+        }
+        $result['!expected_path'] = url($expected, $url_options);
+      }
+
+
+      // First test - is the status as expected? (Note: The expected status must be cast to string for strpos to work)
+      if (strpos($result['!status'], (string)$result['!expected_status']) !== FALSE) {
+        // Ok, we have a status and the status contains the appropriate response code (eg, 200, 301, 403 or 404).
+
+        // Next test (if expected return code is 301) - is the location set, and is it as expected?
+        if ($result['!expected_status'] == 301 && $result['!location'] == $result['!expected_path']) {
+          // We have redirect and ended up in the right place - a PASS!!!
+          $this->pass(t(SUCCESS_MESSAGE, $result), 'GlobalRedirect');
+        }
+        elseif ($result['!expected_status'] != 301) {
+          // We weren't supposed to redirect - this is good!
+          $this->pass(t(SUCCESS_MESSAGE, $result), 'GlobalRedirect');
+        }
+        else {
+          // In this case either the return-code or the returned location is unexpected
+          $this->fail(t(ERROR_MESSAGE, $result), 'GlobalRedirect');
+          $this->fail('<pre>'. print_r($headers, TRUE) .'</pre>');
+        }
+      }
+      else {
+        // The status either wasn't present or was not as expected
+        $this->fail(t(ERROR_MESSAGE, $result), 'GlobalRedirect');
+        $this->fail('<pre>'. print_r($headers, TRUE) .'</pre>');
+      }
+    }
+  }
+}
+
+
+class GlobalRedirectTestCaseDefault extends GlobalRedirectTestCase {
+  function getInfo() {
+    return array(
+      'name' => '1. Global Redirect - Default Settings',
+      'description' => 'Ensure that Global Redirect functions correctly',
+      'group' => 'Global Redirect',
+    );
+  }
+  function testGlobalRedirect() {
+    variable_set('globalredirect_deslash', GLOBALREDIRECT_DESLASH_ENABLED);
+    variable_set('globalredirect_menu_check', GLOBALREDIRECT_FEATURE_DISABLED);
+    variable_set('globalredirect_nonclean2clean', GLOBALREDIRECT_NONCLEAN2CLEAN_ENABLED);
+    $this->_globalredirect_batch_test();
+  }
+}
+
+
+class GlobalRedirectTestCaseConfigAlpha extends GlobalRedirectTestCase {
+  function getInfo() {
+    return array(
+      'name' => '2. Global Redirect - Config Alpha',
+      'description' => 'Ensure that Global Redirect functions correctly',
+      'group' => 'Global Redirect',
+    );
+  }
+  function testGlobalRedirect() {
+    variable_set('globalredirect_deslash', GLOBALREDIRECT_FEATURE_DISABLED);
+    variable_set('globalredirect_menu_check', GLOBALREDIRECT_MENU_CHECK_ENABLED);
+    variable_set('globalredirect_nonclean2clean', GLOBALREDIRECT_FEATURE_DISABLED);
+    $this->_globalredirect_batch_test();
+  }
+}

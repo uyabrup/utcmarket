@@ -1,0 +1,1176 @@
+<?php
+// $cml_nodesadd=0;
+// $cml_nodestitle=0;
+// $cml_nodeprice=0;
+
+// TODO:
+/*
+
+*/
+ 
+ define('CML_VER', '2.08');
+ define('CML_DEBUG', TRUE);
+ /**
+ * Implementation of hook_perm().
+ */
+function cmlservice_perm() {
+  return array('administer cmlservice', 'cml import add');
+}
+/**
+ * Implementation of hook_menu().
+ *
+ */
+function cmlservice_menu() {
+
+  $items['admin/store/products/cmlservice'] = array(
+    'title' => 'CMLService',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer cmlservice'),
+    'page callback' => 'cmlservice_page',
+    'weight' => 10,
+    'file' => 'cmlservice.admin.inc',
+  );
+  
+  $items['admin/store/products/cmlservice/batch/%'] = array( // Stepping
+    'title' => 'CML batch support',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer cmlservice'),
+    'page callback' => 'cmlservice_stepping',
+    'page arguments' => array(5),
+  );
+
+  $items['admin/store/settings/cml'] = array(
+    'title' => t('CML settings'),
+    'description' => t('1c CML settings'),
+    'access callback' => 'user_access',
+    'access arguments' => array('administer cmlservice'),
+    'page callback' => 'cml_settings',
+    'file' => 'cmlservice.admin.inc',
+  );
+  
+  return $items;
+}
+/**
+* put your comment there...
+* 
+* @param mixed $xml
+* @param mixed $id_map
+*/
+function props_create($xml,$id_map){
+	if (!isset($xml->Свойства)){
+		return $id_map;
+	}
+	foreach ($xml->Свойства->СвойствоНоменклатуры as $props_data) {
+		$id_map = vocab_create($id_map,$props_data->Наименование,$props_data->Ид);
+	}
+	return $id_map;
+}
+/**
+* put your comment there...
+* 
+* @param mixed $id_map
+* @param mixed $props_id
+* @param mixed $props_v
+*/
+function props_value($id_map, $props_id, $props_v){	
+	$vid = isset($id_map['vocabularies'][(string)$props_id]) ? $id_map['vocabularies'][(string)$props_id] : 1;
+  $result = db_query("SELECT tid FROM {term_data} WHERE name = '%s' AND vid = %d", $props_v,$vid);
+  if (mysqli_num_rows($result)) {
+		return db_result($result);
+	}else {
+		db_query("INSERT INTO {term_data} ( vid, name, description) VALUES ( %d, '%s', '%s')",  $vid, tutf($props_v), tutf(""));
+		$tid = db_last_insert_id('term_data', 'tid');
+    db_query("INSERT IGNORE INTO {term_hierarchy} (tid, parent) VALUES (%d, %d)", $tid , 0);
+		return $tid;
+  }
+}
+/**
+* put your comment there...
+* 
+* @param mixed $xml
+* @param mixed $id_map
+*/
+function groups_create($xml,$id_map){
+	if (!isset($xml->Группы)){
+		return $id_map;
+	}
+	foreach ($xml->Группы->Группа as $category_data) {
+//		echo $category_data->Наименование.'<br/>';
+        $categories = array();
+        $new_categories = array();
+        $name =(string)$category_data->Наименование;
+		    $vid = isset($id_map['vocabularies'][cmlservice_get_vocab_name()]) ? $id_map['vocabularies'][cmlservice_get_vocab_name()] : 1;
+        $result = db_query("SELECT tid FROM {term_data} WHERE name = '%s' AND vid = %d", $name,$vid);
+        if (mysqli_num_rows($result)) {
+          $id_map['categories'][(string)$category_data->Ид] = db_result($result);
+        }
+        else {
+          db_query("INSERT INTO {term_data} ( vid, name, description) VALUES ( %d, '%s', '%s')", $vid, tutf($category_data->Наименование), tutf(""));
+		      $tid = db_last_insert_id('term_data', 'tid');
+          //$tid = db_next_id('{term_data}_tid');
+          $id_map['categories'][(string)$category_data->Ид] = $tid;
+          $new_categories[] = $tid;
+        }
+		
+        if (in_array($id_map['categories'][(string)$category_data->Ид], $new_categories)) {
+          $parent = 0;
+          $parent = (string)$xml->Ид;
+          if (isset($id_map['categories'][$parent])) {
+           db_query("INSERT IGNORE INTO {term_hierarchy} (tid, parent) VALUES (%d, %d)", $id_map['categories'][(string)$category_data->Ид], $id_map['categories'][$parent]);
+          }
+          else{
+           db_query("INSERT IGNORE INTO {term_hierarchy} (tid, parent) VALUES (%d, %d)", $id_map['categories'][(string)$category_data->Ид], 0);
+          }
+        }
+		$id_map = groups_create($category_data,$id_map);
+	}
+	return $id_map;
+}
+/**
+* put your comment there...
+* 
+* @param mixed $id_map
+* @param mixed $name1
+* @param mixed $id1
+*/
+function vocab_create($id_map,$name1,$id1=0){
+	 //$name = 'Классификатор';
+	 $name = $name1;
+	 $result = db_query("SELECT vid FROM {vocabulary} WHERE name = '%s'", $name);
+	 if (mysqli_num_rows($result)){
+		$vid = db_result($result);
+		$id_map['vocabularies'][(string)$name] = $vid;
+		$id_map['vocabularies'][(string)$id1] = $vid;
+	 }
+	 else {
+	   $vocab = array(
+	     'name' => tutf($name),
+	     'description' => tutf($name),
+	     'relations' => 0,
+	     'hierarchy' => 2, 
+	     'multiple' => 0, 
+	     'required' => 0, 
+	     'tags' => 0, 
+	     'weight' => 0, 
+	   );
+     $vocab['nodes'][(string)'story'] = true;
+     $vocab['nodes'][(string)'product'] = true;
+	   taxonomy_save_vocabulary($vocab);
+	   $vid = db_result(db_query("SELECT vid FROM {vocabulary} WHERE name = '%s'", $name));
+	   $id_map['vocabularies'][(string)$name] = $vid;
+	   $id_map['vocabularies'][(string)$id1] = $vid;
+	 }
+	 return $id_map;
+}
+/**
+* put your comment there...
+* 
+* @param mixed $id_map
+* @param mixed $id1
+*/
+function vocab_getname($id_map,$id1=0){
+	$vid = isset($id_map['vocabularies'][(string)$id1]) ? $id_map['vocabularies'][(string)$id1] : 1;
+	$name = db_result(db_query("SELECT name FROM {vocabulary} WHERE vid = '%s'", $vid));
+	return $name;
+}
+/**
+* put your comment there...
+* 
+* @param mixed $vname
+*/
+function prop_type($vname){
+	$type = 0;
+	
+	$pos = strpos($vname, "(b)");
+	if ($pos !== false) {
+		$type = 1 ;
+	}
+	return $type;
+}
+/**
+* put your comment there...
+* 
+* @param mixed $vname
+* @return mixed
+*/
+function clear_name($vname){
+	$vname = str_replace("(b)", "", $vname);
+	return $vname;
+}
+/**
+* put your comment there...
+* 
+* @param mixed $xml
+* @param mixed $id_map
+* @param mixed $flags
+*/
+function cmlservice_products_create($system_path, $options){
+	global $user, $base_path;
+	//global $cml_nodesadd, $cml_nodestitle;  
+  
+  $faile_name = $system_path . '/import.xml';
+  $xml = simplexml_load_file($faile_name); // drupal_get_path('module', 'cmlservice')
+  if(!$xml) return FALSE;  
+  
+  if($options['update_all']){
+    $id_map = array('vocabularies' => array(), 'categories' => array(), 'products' => array());
+    $vocabulary_name = cmlservice_get_vocab_name();
+    $id_map = vocab_create($id_map, $vocabulary_name);
+    $id_map = groups_create($xml->Классификатор, $id_map);
+    $id_map = props_create($xml->Классификатор, $id_map);		
+  }
+  
+  $products = array();
+	foreach ($xml->Каталог->Товары->Товар as $product_data) {
+    $products[] = str_replace(array("\r\n", "\n", "\r", "\t"), '', $product_data->asXML());
+	}
+  unset($xml);
+  
+  $_SESSION['cmlservice_options']['id_map'] = $id_map;
+  
+  if($products){
+    $product_use_picture = cmlservice_get_product_staus();
+    switch($_SESSION['cmlservice_options_type']){
+      case 'batch':
+         cmlservice_products_create_batch($products, $product_use_picture, $options);
+      break;
+      case 'cron':
+         cmlservice_products_create_cron($products, $product_use_picture, $options);
+      break;
+    }
+  }
+  return $products;
+}
+/**
+* put your comment there...
+* 
+*/
+function cmlservice_get_vocab_name(){
+  static $vocabulary_name;
+  if($vocabulary_name) return $vocabulary_name;
+  if(module_exists('uc_catalog')){
+    $cat_id = variable_get('uc_catalog_vid', 0);
+    $catalog = taxonomy_vocabulary_load($cat_id);
+    $vocabulary_name = $catalog->name;
+  }else{
+    $vocabulary_name = 'Классификатор';
+  }
+  return $vocabulary_name;
+}
+/**
+* put your comment there...
+* 
+* @param mixed $products
+* @param mixed $options
+*/
+function cmlservice_products_create_batch($products, $product_use_picture = FALSE, $options){
+  global $base_url;
+  $operations = array();
+  foreach($products as $product){
+    $operations[] = array('cmlservice_product_create', array($product, $product_use_picture, $options));
+  }
+  $operations = array_reverse($operations, TRUE);
+
+  $batch = array(
+    'operations' => $operations,
+    'title' => 'Import products data',
+    'init_message' => 'Starting importing products data.',
+    'error_message' => 'Error during importing products data.',
+    'finished' => 'cmlservice_products_import_finished',
+    //'results' => array('update_all'),
+  );
+  batch_set($batch);
+  batch_process($base_url .'/admin/store/products/cmlservice/batch/step2');
+}
+/**
+* put your comment there...
+* 
+* @param mixed $products
+* @param mixed $options
+*/
+function cmlservice_products_create_cron($products, $product_use_picture = FALSE, $options){
+  foreach ($products as $nid => $product) {
+    cmlservice_schedule_set('product_create', 'cmlservice_product_create', $nid, array($product, $product_use_picture, $options));
+  }
+}
+/**
+* put your comment there...
+* 
+* @param mixed $product_string
+* @param mixed $options
+* @param mixed $context
+*/
+function cmlservice_product_create($product_string, $product_use_picture = FALSE, $options, &$context){
+   global $base_path, $user;
+  
+  $update_all = (bool)$options['update_all'];
+  if($update_all){
+    $update_title = $update_description = $update_picture = $update_all;
+  }else{  
+    $update_title = (bool)$options['update_title'];
+    $update_description = (bool)$options['update_description'];
+    $update_picture = (bool)$options['$update_picture']; 
+  }
+  $product_enabled = (bool)$options['product_enabled'];
+  $force_replace = (bool)$options['force_replace'];
+  $product_data = new SimpleXMLElement($product_string);  
+  if(!is_object($product_data)){
+   return; // TODO:// написать ругательство  
+  }  
+  list($guid1, $guid2) = explode('#', (string)$product_data->Ид); // Guids  
+  if(!$guid2) $guid2 = "";
+  $nid = db_result(db_query("SELECT pid FROM {cml_data} WHERE `guid1` = '%s' AND `guid2` = '%s'", $guid1, $guid2));
+  
+  $title = cmlservice_get_product_title($product_data);
+  
+  if($nid){
+     $product = node_load($nid);
+    if ($force_replace || ($product->title != $title)){
+      $change = TRUE;  
+    }
+    if ($product->title != $title){
+      $change = TRUE;
+    }   
+  }elseif($update_all){
+    $product = new stdClass();
+    $product->created = time();
+    $product->guid1 = $guid1;
+    $product->guid2 = $guid2;
+    $product->unique_hash = md5($guid1);
+    $product->type = 'product';
+    $product->uid = $user->uid ? $user->uid : 1;
+    $product->name = $user->name ? $user->name : 'admin';
+    $product->format = 1; // Форматируется
+    $product->revision = false; //log
+    $product->promote = 0;
+    $product->shippable = variable_get('uc_product_shippable_'. $product->type, 1);
+    $change = true;    
+  }
+  
+  if($change){
+    
+    $product->status = $product_enabled;
+    
+    // Загрузка наименования
+    if($update_title) $product->title = $title;
+    
+    // Загрузка артикла
+    if ($update_all && isset($product_data->Артикул))
+      $product->model = tutf($product_data->Артикул); // TODO: Сделать проверку на уже существующий
+    
+    // Загрузка описания
+    if($update_description && isset($product_data->Описание))
+        $product->body = tutf($product_data->Описание);
+
+    // Привязка к каталогу
+    if($update_all && isset($product_data->Группы->Ид)){
+    $id_map = $_SESSION['cmlservice_options']['id_map']; // Список категорий 
+    if($id_map && $id_map['categories'] && is_array($id_map['categories'])){        
+        $product->taxonomy = array();              
+        foreach($product_data->Группы->Ид as $properties){
+          if($tid = $id_map['categories'][ (string)$properties ]){
+            $term = taxonomy_get_term($tid);
+            $product->taxonomy[$term->tid] = $term;
+          }
+        }
+      }
+    }
+        
+    // Загрузка картинки
+    if($update_picture && $product_use_picture){
+      $img_path = (string)$product_data->Картинка;
+      if($img_path){
+        $filepath = '.' . $base_path . variable_get('cml_data_path','') . '/' . $img_path;
+        if(CML_DEBUG) watchdog('cmlservice', t('Try create imagefield picture @pic', array('@pic' => $filepath)), array(), WATCHDOG_DEBUG);
+        if (file_exists($filepath)) {
+          if(!cmlservice_create_imagefield($product, $filepath, FALSE))
+            $context['results'][] = t('Can`t create imagefield from source path @pic', array('@pic' => $filepath));
+        }
+      }
+    }
+    
+    // загрузка реквизитов
+    if($update_all && isset($product_data->ЗначенияРеквизитов->ЗначениеРеквизита))
+    foreach ($product_data->ЗначенияРеквизитов->ЗначениеРеквизита as $fields_data) {    
+      if($fields_data->Значение){
+        switch ($fields_data->Наименование) {
+          case 'Вес';
+            $product->weight = (float)$fields_data->Значение;
+          break;
+          case 'Длина';
+            $product->length = (float)$fields_data->Значение;
+          break;
+          case 'Ширина';
+            $product->width = (float)$fields_data->Значение;
+          break; 
+          case 'Высота';
+            $product->height = (float)$fields_data->Значение;
+          break;
+        }
+      }
+    }    
+
+    if(!$nid)
+      $product->log = t('Insert product %node% from XML.',array('%node%'=>$product->title));       
+    else
+      $product->log = t('Update product %node% from XML.',array('%node%'=>$product->title));
+      
+    node_save($product);    
+    $context['message'] = $product->log;    
+    $context['results'][] = $product->log;
+    
+    //uc_stock_set($product->model, $qty);
+    
+  }
+}
+/**
+* put your comment there...
+* 
+* @param mixed $dom
+*/
+function cmlservice_get_product_title(&$dom){
+  foreach ($dom->ЗначенияРеквизитов->ЗначениеРеквизита as $fields_data) {    
+  if($fields_data->Значение){
+    switch ($fields_data->Наименование) {
+      case 'Полное наименование':
+        return tutf($fields_data->Значение);
+      break;
+    }
+  }
+  }
+  return tutf($dom->Наименование);
+}
+
+function tutf($content){
+  return html_entity_decode((string)$content, ENT_QUOTES, "UTF-8");
+}
+/**
+* put your comment there...
+* 
+* @param mixed $node
+* @param mixed $path_source
+* @param mixed $remove_source
+*/
+function cmlservice_create_imagefield(&$node, $path_source = '', $remove_source = FALSE){
+  global $cml_imgs;
+  
+  // Занесение картинки в
+  $file = new stdClass();          
+  $_path_source = $path_source;
+  $node->field_image_cache = array();
+  // Обработчик картинки
+  $file->filename = strtolower(preg_replace('~[^a-z_\-\.\d]~i', '', basename($path_source)));
+  $file->filepath = $path_source;
+  $path_destanation = file_create_path().'/'.$file->filename;          
+  if(!file_exists($path_destanation) && file_check_directory(dirname($path_destanation), true)){          
+    if(CML_DEBUG) watchdog('cmlservice', t('Try copy from @from to @pic', array('@from' => $path_source, '@pic' => $path_destanation)), array(), WATCHDOG_DEBUG);     
+    file_copy($file, $path_destanation, TRUE);
+    if($path_source){  
+      //$file->filepath = $path_destanation;
+      $info = image_get_info($file->filepath);
+      if(!isset($info)) return FALSE;
+      $file->filemime = $info['mime_type'];
+      $file->filesize = $info['file_size'];
+      $file->uid = $node->uid;
+      $file->status = FILE_STATUS_PERMANENT;
+      $file->timestamp = time();
+      drupal_write_record('files', $file);
+      if(!isset($file->fid)) return FALSE;
+      $_file = array();
+      foreach($file as $name=>$option){
+          $_file[$name] = $option;
+      }
+      $node->field_image_cache[] = $_file;
+      $cml_imgs++;   
+    }else return FALSE;
+  }else{
+    if(CML_DEBUG) watchdog('cmlservice', t('Find picture @pic', array('@pic' => $path_destanation)), array(), WATCHDOG_DEBUG);
+    $file->filepath = $path_destanation;
+    $info = image_get_info($path_destanation);
+    if(!isset($info)) return FALSE;
+    $file->filemime = $info['mime_type'];
+    $file->filesize = $info['file_size'];
+    $file->uid = $node->uid;
+    $file->status = FILE_STATUS_PERMANENT;
+    $file->timestamp = time();
+    drupal_write_record('files', $file);
+    if(!isset($file->fid)) return FALSE;
+    $_file = array();
+    foreach($file as $name=>$option){
+        $_file[$name] = $option;
+    }
+    $node->field_image_cache[] = $_file; 
+    $node->skip_filefield_delete = TRUE; // Не удалять предыдущий файл
+    $cml_imgs++;
+  }
+  if($remove_source)@unlink($_path_source);
+  return TRUE;
+}
+/**
+* put your comment there...
+* 
+* @param mixed $success
+* @param mixed $results
+* @param mixed $operations
+*/
+function cmlservice_products_import_finished($success, $results, $operations){
+  //if($success) flag_remove('update_all');
+  if ($success) {
+    // Here we do something meaningful with the results.
+    $message = count($results) .' processed.';
+    $message .= theme('item_list', $results);
+  }
+  else {
+    // An error occurred.
+    // $operations contains the operations that remained unprocessed.
+    $error_operation = reset($operations);
+    $message = t('An error occurred while processing %error_operation with arguments: @arguments', array('%error_operation' => $error_operation[0], '@arguments' => print_r($error_operation[1], TRUE)));
+  }
+  drupal_set_message($message);
+}
+/**
+* put your comment there...
+* 
+* @param mixed $xml
+* @param mixed $id_map
+*/
+function cmlservice_offers_create($system_path, $flags){
+  global $cml_nodeprice;
+  
+  $xml = simplexml_load_file($system_path . '/offers.xml');
+  $offers = array();
+  foreach($xml->ПакетПредложений->Предложения->Предложение as $offer_data) {  
+    list($guid1, $guid2) = explode('#', (string)$offer_data->Ид);   
+    $nid = db_result(db_query("SELECT pid FROM {cml_data} WHERE `guid1` = '%s' AND `guid2` = '%s'", $guid1, $guid2));
+    if($nid){
+       $offers[$nid] = str_replace(array("\r\n", "\n", "\r", "\t"), '', $offer_data->asXML());
+    }
+  }
+  unset($xml);
+  if($offers)
+  switch($_SESSION['cmlservice_options_type']){
+    case 'batch':
+       cmlservice_offers_create_batch($offers);
+    break;
+    case 'cron':
+       cmlservice_offers_create_cron($offers);
+    break;
+  }
+}
+/**
+* put your comment there...
+* 
+* @param mixed $offers
+*/
+function cmlservice_offers_create_batch($offers){
+  global $base_url;
+  $operations = array();
+  foreach($offers as $nid => $offer){
+    $operations[] = array('cmlservice_offer_create', array($nid, $offer));
+  }
+  $operations = array_reverse($operations, TRUE);
+
+  $batch = array(
+    'operations' => $operations,
+    'title' => 'Import offers data',
+    'init_message' => 'Starting importing offers data.',
+    'error_message' => 'Error during importing offers data.',
+    'finished' => 'cmlservice_offers_import_finished',
+    //'results' => array('update_all'),
+  );
+  batch_set($batch);
+  batch_process($base_url . '/admin/store/products/cmlservice/batch/step3');
+}
+/**
+* put your comment there...
+* 
+* @param mixed $offers
+*/
+function cmlservice_offers_create_cron($offers){
+  foreach($offers as $nid => $offer){
+    cmlservice_schedule_set('offer_create', 'cmlservice_offer_create', $nid, array($nid, $offer));
+  }
+}
+/**
+* put your comment there...
+* 
+* @param mixed $nid
+* @param mixed $offer_string
+*/
+function cmlservice_offer_create($nid, $offer_string, &$context){
+  //global $cml_nodeprice;
+  
+  $offer_data = new SimpleXMLElement($offer_string);
+  
+  if(!is_object($offer_data)) return; // TODO:// написать ругательство
+  
+  if (isset($offer_data->Цены)){
+  $change = false;
+  $product = node_load($nid);
+  foreach ($offer_data->Цены->Цена as $price_data) {
+    $price="";
+    $price = (int)str_replace(" ", "", (float)$price_data->ЦенаЗаЕдиницу);
+    if ((float)$product->sell_price == $price) {
+      //
+    }else{
+      //$cml_nodeprice++;            
+      if(variable_get('cml_product_altered_price', FALSE)){
+        $price_context = array(
+          'revision' => 'altered',
+          'type' => 'product',
+          'class' => array(
+            'product',
+          ),
+          'subject' => array(
+            'node' => $product,
+          ),
+        );
+        $options = array('label' => FALSE);
+        $price = uc_price($price, $price_context, $options);
+      }            
+      $product->sell_price = $price;
+      $change = true;
+    }
+    break;
+  }
+  if ($change) {
+    node_save($product);
+    
+    $context['message'] = t('The price of %product has updated', array('%product' => $product->title));
+    
+    $context['results'][] = $context['message']; //$node->log; //$product->nid;
+  }
+  }
+}
+/**
+* put your comment there...
+* 
+* @param mixed $success
+* @param mixed $results
+* @param mixed $operations
+*/
+function cmlservice_offers_import_finished($success, $results, $operations){
+  //if($success) flag_remove('update_all');
+  if ($success) {
+    // Here we do something meaningful with the results.
+    $message = count($results) .' processed.';
+    $message .= theme('item_list', $results);
+  }
+  else {
+    // An error occurred.
+    // $operations contains the operations that remained unprocessed.
+    $error_operation = reset($operations);
+    $message = t('An error occurred while processing %error_operation with arguments: @arguments', array('%error_operation' => $error_operation[0], '@arguments' => print_r($error_operation[1], TRUE)));
+  }
+  drupal_set_message($message);
+}
+/**
+* put your comment there...
+* 
+* @param mixed $values
+*/
+function cmlservice_add($values) {
+  global $base_path; //, $base_url;
+    
+  //$system_path = './' . $base_path . variable_get('cml_data_path', drupal_get_path('module', 'cmlservice'));
+  //$_SESSION['cmlservice_batch_values_flags'] = $values; // Сохранение данных запуска для Stepping функции
+  $_SESSION['cmlservice_options'] = array(
+    'values_flags' => ($flags = isset($values['flags']) ? $values['flags'] : array()),
+    'system_path' =>'.' . $base_path . variable_get('cml_data_path', drupal_get_path('module', 'cmlservice')),
+  );
+  
+  //$_SESSION['cmlservice_options']['values_flags']['type_of_run'] = ($values['force_batch'] ? 'batch' : 'batch'); // simple, batch, cron
+  $_SESSION['cmlservice_options_type'] = ($values['force_batch'] ? 'batch' : 'batch');
+  
+  /*if((bool)($flags['delete_all']) && cmlservice_node_delete_all($flags)){   
+       return TRUE; // никогда не должен срабатывать
+  }else drupal_goto($base_url . '/admin/store/products/cmlservice/batch/step1'); // инициализирует степинг*/
+  
+  if((bool)($flags['delete_all'])) cmlservice_stepping('step0');
+  else cmlservice_stepping('step1');
+
+  return TRUE;
+}
+/**
+* put your comment there...
+* 
+* @param mixed $step
+* @param mixed $options
+*/
+function cmlservice_stepping($step, $options = array()){
+  global $base_path;
+  $values = $options ? $options : $_SESSION['cmlservice_options'];    
+  $flags = isset($values['values_flags']) ? $values['values_flags'] : array();
+  
+  /**
+  * Предварительная подготовка флагов
+  */
+  foreach($flags as $flag => $isset){
+    if(!$isset) unset($flags[$flag]);
+    else $flags[$flag] = (bool)$flags[$flag];
+  }
+
+  if($flags){
+  
+    if($step == 'step0' && $flags['delete_all'])
+    if(!cmlservice_node_delete_all($flags)){
+      $step = 'step1';
+    } 
+
+    if($step == 'step1' && ($flags['update_all'] || $flags['update_title'] || $flags['update_description'] || $flags['update_picture']))
+    if(cmlservice_products_create($values['system_path'], $flags)){
+      return TRUE; // никогда не должен срабатывать
+    }  
+    
+    if($step == 'step2' && ($flags['update_all'] || $flags['update_price']))
+    if(cmlservice_offers_create($values['system_path'], $flags)){
+      return TRUE; // никогда не должен срабатывать
+    }
+    
+    if(cmlservice_import_finished($values['system_path'], $flags)){
+      return TRUE; // никогда не должен срабатывать
+    }
+  
+  }
+  
+  drupal_goto('/admin/store/products/cmlservice');
+}
+/**
+* put your comment there...
+* 
+* @param mixed $nid
+*/
+function cmlservice_node_delete($nid){
+  db_query("DELETE FROM {cml_data} WHERE pid = %d", $nid);
+}
+/**
+* put your comment there...
+* 
+* @param mixed $force_batch
+*/
+function cmlservice_node_delete_all($flags){
+  $result = db_query("SELECT pid FROM {cml_data}");
+  $rows = 0;
+  $products = array();
+  while ($row = db_fetch_array($result)) {
+    //node_delete($row['pid']);
+    $products[] = $row['pid'];
+    //$rows += db_affected_rows();
+  }
+  if($products)
+  switch($_SESSION['cmlservice_options_type']){
+    case 'batch':
+       cmlservice_product_delete_batch($products);
+    break;
+    case 'cron':
+       cmlservice_product_delete_cron($products);
+    break;
+  }
+  return $products;   
+}
+/**
+* put your comment there...
+* 
+* @param mixed $products
+*/
+function cmlservice_product_delete_batch($products) {
+  global $base_url;
+
+  $operations = array();
+  // Set the installed version so updates start at the correct place.
+  foreach ($products as $pid) {
+    $operations[] = array('cmlservice_product_delete', array($pid));
+  }
+  
+  $operations = array_reverse($operations, TRUE);
+
+  $batch = array(
+    'operations' => $operations,
+    'title' => 'Clear all products data',
+    'init_message' => 'Starting clearing all product data',
+    'error_message' => 'Error during clearing product data.',
+    'finished' => 'cmlservice_product_delete_finished',
+    //'results' => array('delete_all'),
+  );
+  batch_set($batch);
+  batch_process($base_url .'/admin/store/products/cmlservice/batch/step1');
+}
+/**
+* put your comment there...
+* 
+* @param mixed $products
+*/
+function cmlservice_product_delete_cron($products) {
+  // Set the installed version so updates start at the correct place.
+  foreach ($products as $pid) {
+    cmlservice_schedule_set('product_delete', 'cmlservice_product_delete', $pid, array($pid));
+  }
+}
+/**
+* put your comment there...
+* 
+* @param mixed $pid
+*/
+function cmlservice_product_delete($pid, &$context){  
+  node_delete($pid);    
+  $context['message'] = t('The product of nid %nid has delete', array('%nid' => $pid));    
+  $context['results'][] = $context['message']; //$node->log; //$product->nid;    
+}
+/**
+* put your comment there...
+* 
+* @param mixed $success
+* @param mixed $results
+* @param mixed $operations
+*/
+function cmlservice_product_delete_finished($success, $results, $operations){
+  //if($success) flag_remove('delete_all');
+  if ($success) {
+    // Here we do something meaningful with the results.
+    $message = count($results) .' processed.';
+    $message .= theme('item_list', $results);
+  }
+  else {
+    // An error occurred.
+    // $operations contains the operations that remained unprocessed.
+    $error_operation = reset($operations);
+    $message = t('An error occurred while processing %error_operation with arguments: @arguments', array('%error_operation' => $error_operation[0], '@arguments' => print_r($error_operation[1], TRUE)));
+  }
+  drupal_set_message($message);
+}
+/**
+ * Implementation of hook_nodeapi()
+ * 
+ * @param mixed $node
+ * @param mixed $op
+ * @param mixed $arg3
+ * @param mixed $arg4
+ */
+function cmlservice_nodeapi(&$node, $op, $arg3, $arg4) {
+  if (uc_product_is_product($node->type)) {
+    switch ($op) {
+      //case 'save';
+      //case 'update';
+      case 'insert';
+        if (!@db_query("INSERT INTO {cml_data} (`guid1`, `guid2`, `pid`, `unique_hash`) 
+        VALUES ('%s', '%s', %d, '%s')", $node->guid1, $node->guid2, $node->nid, (string)$node->unique_hash)){
+          //db_query("UPDATE {cml_data} SET `amount`=%d WHERE `unique_hash` = '%s'", (string)$node->unique_hash);
+        }
+      break;
+      case 'delete':
+        cmlservice_node_delete($node->nid);
+      break;
+    }
+  }
+}
+
+/*
+function cmlservice_genGUID($uid) {
+  $guid = db_result(db_query("SELECT guid FROM {cml_user} WHERE uid = '%s'", $uid)); 
+  if($guid){
+    return $guid;
+  }else{
+  //e.g. output: 372472a2-d557-4630-bc7d-bae54c934da1
+   //word*2-, word-, (w)ord-, (w)ord-, word*3
+   $guid = "";
+   for ($i=1;$i<=16;$i++) {
+      $b = (int)rand(0,0xff);
+      if ($i == 7) { $b &= 0x0f; $b |= 0x40; } // version 4 (random)
+      if ($i == 9) { $b &= 0x3f; $b |= 0x80; } // variant
+      $guid .= sprintf("%02s", base_convert($b,10,16));
+      if ($i == 4 || $i == 6 || $i == 8 || $i == 10) { $guid .= '-'; }
+   }
+   db_query("INSERT INTO {cml_user} (uid, guid) VALUES (%d, '%s')", $uid, $guid);
+   
+   return $guid;
+  }
+}*/
+/**
+* Implementation of hook_order().
+*  
+* @param mixed $op
+* @param mixed $order
+* @param mixed $edit
+*/
+function cmlservice_order($op, $order, $edit){
+  if($op=='save'){  // update , total
+    cmlservice_create_orders($op, $order);
+  }
+}
+/**
+* Сoздание заявки по хуку
+*  
+* @param mixed $op
+* @param mixed $orders
+*/
+function cmlservice_create_orders($op, $orders){
+    global $user, $base_path;
+    
+    // создание файла ордера
+    $timechange = time();
+    /*$no_spaces = '<?xml version="1.0" encoding="UTF-8"?>
+              <КоммерческаяИнформация ВерсияСхемы="2.04" ДатаФормирования="' . date ( 'Y-m-d', $timechange ) . 'T' . date ( 'H:m:s', $timechange ) . '"></КоммерческаяИнформация>';
+    */
+    $no_spaces = '<?xml version="1.0" encoding="windows-1251"?> 
+    <КоммерческаяИнформация ВерсияСхемы="'.CML_VER.'" ДатаФормирования="' . date ( 'Y-m-d', $timechange ) . 'T' . date ( 'H:m:s', $timechange ) . '" ФорматДаты="ДФ=yyyy-MM-dd; ДЛФ=DT" 
+    ФорматВремени="ДФ=ЧЧ:мм:сс; ДЛФ=T" РазделительДатаВремя="T" ФорматСуммы="ЧЦ=18; ЧДЦ=2; ЧРД=." ФорматКоличества="ЧЦ=18; ЧДЦ=2; ЧРД=."></КоммерческаяИнформация>';    
+    $xml = new SimpleXMLElement ( @iconv('utf-8', 'windows-1251', $no_spaces) );
+    
+    $_orders = array();
+    if(!is_array($orders)) $_orders[] = $orders;
+    foreach($_orders as $order){
+      if(!is_object($order)) continue;
+      
+      $current_order = uc_order_load($order->order_id);
+      
+      // Создание ордеров
+      $doc = $xml->addChild ( "Документ" );
+
+      // Шапка
+      $doc->addChild ( "Ид", $current_order->order_id );
+      $doc->addChild ( "Номер", $current_order->order_id );
+      $doc->addChild ( "Дата", date ( 'Y-m-d', $current_order->created ) );
+      $doc->addChild ( "ХозОперация", "Заказ товара" );
+      $doc->addChild ( "Роль", "Продавец" );
+      $doc->addChild ( "Валюта", 'руб.' ); //variable_get('uc_currency_code', 'RUB') );  // с прайса               
+      $doc->addChild ( "Курс", 1 );
+      $doc->addChild ( "Сумма", $current_order->order_total );
+      
+      // Контрагенты
+      $k1 = $doc->addChild ( 'Контрагенты' );
+        $k1_1 = $k1->addChild ( 'Контрагент' );
+          $k1_2 = $k1_1->addChild ( "Ид", '1#admin#bitrix bitrix tedj-tWyi67ktj56uiW' );
+          $FIO = $order->billing_last_name . " " . $order->billing_first_name; //. " " . $order->middle_name;
+          $k1_2 = $k1_1->addChild ( "Наименование", $FIO );
+          $k1_2 = $k1_1->addChild ( "ПолноеНаименование", t('Order') . " " . $FIO ); 
+          $k1_2 = $k1_1->addChild ( "Имя", $order->billing_first_name );
+          $k1_2 = $k1_1->addChild ( "Фамилия", $order->billing_last_name );
+          $k1_2 = $k1_1->addChild ( "Роль", "Покупатель" );
+      
+      $doc->addChild ( "Время", date ( 'H:m:s', $current_order->created ) );
+      // Комментарий
+      // Скидки
+
+      $t1 = $doc->addChild ( 'Товары' );
+      foreach($order->products as $product){      
+        $t1_1 = $t1->addChild ( 'Товар' );
+        $cid = cmlservice_get_pid($product->nid);
+        $t1_2 = $t1_1->addChild ( "Ид", $cid );
+        $t1_2 = $t1_1->addChild ( "ИдКаталога", 'FUTURE-1C-CATALOG' );
+        // ИдКаталога
+        $t1_2 = $t1_1->addChild ( "Наименование", $product->title );
+        // <БазоваяЕдиница Код="796" НаименованиеПолное="Штука" МеждународноеСокращение="PCE">шт</БазоваяЕдиница>
+        $t1_2 = $t1_1->addChild ( "ЦенаЗаЕдиницу", (double)$product->price );
+        $t1_2 = $t1_1->addChild ( "Количество", $product->qty );
+        $total = $product->qty*(double)$product->price;
+        $t1_2 = $t1_1->addChild ( "Сумма", $total );
+        
+        $t1_2 = $t1_1->addChild ( "ЗначенияРеквизитов" );
+          $t1_3 = $t1_2->addChild ( "ЗначениеРеквизита" );
+            $t1_4 = $t1_3->addChild ( "Наименование", "ВидНоменклатуры" );
+            $t1_4 = $t1_3->addChild ( "Значение", "Товар" );
+        //$t1_2 = $t1_1->addChild ( "ЗначенияРеквизитов" );
+          //$t1_3 = $t1_2->addChild ( "ЗначениеРеквизита" );
+            $t1_4 = $t1_3->addChild ( "Наименование", "ТипНоменклатуры" );
+            $t1_4 = $t1_3->addChild ( "Значение", "Товар" );
+      }
+      
+      //$t1 = $doc->addChild ( "ЗначенияРеквизитов" );
+          //$t1_1 = $t1->addChild ( "ЗначениеРеквизита" );
+    }
+        
+    $body = $xml->asXML();
+    
+    unset($xml);
+    
+    /*if (function_exists('iconv')) {
+      $body = @iconv('utf-8', 'windows-1251', $body);
+    }*/
+
+    $path = '.' . $base_path . variable_get('cml_data_path','');
+    $handle = fopen($path.'/order_'.$order->order_id.'.xml', 'w');
+    fwrite($handle, $body);
+    fclose($handle);
+    
+    if(file_exists($path.'/order_'.$order->order_id.'.xml')){
+      variable_set('last_conducted_order_1c', $order->order_id); 
+    }
+}
+/**
+* put your comment there...
+* 
+* @param mixed $pid
+*/
+function cmlservice_get_pid($pid){
+  $sql="SELECT `guid1`, `guid2` FROM {cml_data} WHERE `pid`=%d";
+  $data = db_fetch_object(db_query($sql, $pid));
+  return $data->guid1 . ($data->guid2 ? '#' . $data->guid2 : '');
+}
+/**
+* put your comment there...
+* 
+* @param mixed $force
+*/
+function cmlservice_get_product_staus($force = FALSE){
+  static $status = array();
+  if($status && !$force) return $status;
+  $status = uc_product_store_status();
+  if($status[0]['status'] == 'warning' && $status[0]['title'] == 'Images'){
+    drupal_set_message(tutf($status[0]['desc']), 'cmlservice');
+    if(CML_DEBUG) watchdog('cmlservice', tutf($status[0]['desc']), array(), WATCHDOG_WARNING);
+    return FALSE;
+  }
+  return TRUE;
+}
+/**
+* put your comment there...
+* 
+* @param mixed $flag_name
+*/
+function cmlservice_flag_remove($flag_name){
+  global $base_path;
+  $system_path = '.' . $base_path . variable_get('cml_data_path', drupal_get_path('module', 'cmlservice'));
+  if(file_exists($system_path .'/'. $flag_name . '.flg'))
+  unlink($system_path .'/'. $flag_name . '.flg');
+}
+/**
+* put your comment there...
+* 
+* @param mixed $options
+*/
+function cmlservice_import_finished($system_path, $flags){
+  foreach($flags as $flag => $isset){
+    if($isset) cmlservice_flag_remove($flag);
+  }
+  variable_set('cmlservice_tasks_set', FALSE);
+}
+/**
+* put your comment there...
+* 
+*/
+function cmlservice_cron() {
+  global $base_path;
+  /*
+  $flags = cmlservice_get_flags();
+  
+  if($flags && !variable_get('cmlservice_tasks_set', FALSE)){
+    
+    variable_set('cmlservice_tasks_set', TRUE);
+    
+    variable_set('job_schedule_num', 1000);
+    
+    // Выставляем флаг работы и даем задания cmlservice_schedule_set()
+    $options = array(
+      'values_flags' => $flags,
+      'system_path' =>'./' . $base_path . variable_get('cml_data_path', drupal_get_path('module', 'cmlservice')),
+    );
+    $_SESSION['cmlservice_options_type'] = 'cron'; // simple, batch, cron
+    cmlservice_set_cron_tasks($options);
+  }*/
+}
+/**
+* put your comment there...
+* 
+* @param mixed $id
+* @param mixed $callback
+* @param mixed $data
+*/
+function cmlservice_schedule_set($type, $callback, $id, $data = array()) {
+    $job = array(
+      'callback' => $callback,
+      'type' => $type,
+      'id' => $id,
+      'data' => $data,
+      //'period' => 100,
+      'periodic' => FALSE,
+    );
+    job_scheduler()->set($job);
+}
+/**
+* put your comment there...
+* 
+* @param mixed $id
+* @param mixed $callback
+* @param mixed $data
+*/
+function cmlservice_schedule_remove($type, $callback, $id) {
+    $job = array(
+      'callback' => $callback,
+      'type' => $type,
+      'id' => $id,
+      //'data' => $data,
+      //'period' => 3600,
+      //'periodic' => TRUE,
+    );
+    job_scheduler()->remove($job);
+}
+/**
+* put your comment there...
+* 
+* @param mixed $step
+* @param mixed $options
+*/
+function cmlservice_set_cron_tasks($options = array()){
+  global $base_path;
+  $values = $options ? $options : $_SESSION['cmlservice_options'];    
+  $flags = isset($values['values_flags']) ? $values['values_flags'] : array();
+  
+  /**
+  * Управление флагами
+  */
+  $delete_all = (bool)$flags['delete_all'];
+  $update_all = (bool)$flags['update_all'];
+  $force_replace = (bool)$flags['force_replace'];
+  $product_enabled = (bool)$flags['product_enabled'];
+  $update_title = (bool)$flags['update_title'];
+  $update_description = (bool)$flags['update_description'];
+  $update_price = (bool)$flags['update_price'];
+  
+  if($delete_all)
+  if(!cmlservice_node_delete_all($flags)){
+    $step = 'step1'; // никогда не должен срабатывать
+  } 
+  
+  if($update_all || $update_title || $update_description)
+  if(cmlservice_products_create($values['system_path'], $flags)){
+    return TRUE; // никогда не должен срабатывать
+  }  
+  
+  if($update_all || $update_price)
+  if(cmlservice_offers_create($values['system_path'], $flags)){
+    return TRUE; // никогда не должен срабатывать
+  }
+  
+  // Удаление флаг файлов
+  cmlservice_schedule_set('cmlservice_import', 'cmlservice_import_finished', 1, array($values['system_path'], $flags));
+}
+/**
+* put your comment there...
+* 
+* @param mixed $type
+* @param mixed $callback
+*/
+function cmlservice_schedule_clear($type, $callback) {
+    job_scheduler()->removeAll($callback, $type);
+}
+/**
+* put your comment there...
+* 
+*/
+function cmlservice_get_flags(){
+  $system_path = variable_get('cml_data_path', drupal_get_path('module', 'cmlservice')); 
+  $_flags = file_scan_directory($system_path, '.*\.flg', array('.', '..', 'CVS'));
+  $flags = array();
+  foreach($_flags as $flag){
+    $flags[$flag->name] = $flag->name;
+  }
+  return $flags;
+}
+
+/**
+  node_types_rebuild();
+  if ($is_new && module_exists('imagefield')) {
+    uc_product_add_default_image_field('picture_field_name');
+  }
+  menu_rebuild();
+*/

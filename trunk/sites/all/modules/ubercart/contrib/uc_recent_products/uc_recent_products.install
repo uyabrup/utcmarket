@@ -1,0 +1,63 @@
+<?php
+// $Id$
+
+/**
+ * Install the recently viewed products module.
+ * @file
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function uc_recent_products_install() {
+  drupal_install_schema('uc_recent_products');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function uc_recent_products_uninstall() {
+  drupal_uninstall_schema('uc_recent_products');
+  variable_del('uc_recent_products_limit');
+  variable_del('uc_recent_products_expire');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function uc_recent_products_schema() {
+  $schema['uc_recent_products'] = array(
+    'fields' => array(
+      'rid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'sid' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => ''
+      ),
+      'visit_time' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+    ),
+    'indexes' => array(
+      'recent_products_sid' => array('sid'),
+    ),
+    'primary key' => array('rid')
+  );
+
+  return $schema;
+}
+

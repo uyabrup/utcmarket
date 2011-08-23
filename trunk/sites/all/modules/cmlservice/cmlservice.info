@@ -1,0 +1,13 @@
+﻿; $Id: cmlservice.info by mirocow
+name = CMLService
+description = CommerceML 2. Импорт/экспорт коммерческой информации (1С:ALL версии 8.x) Codede by mirocow
+;package = 
+core = "6.x"
+version = "6.x-2.08"
+
+dependencies[] = taxonomy
+dependencies[] = uc_product
+dependencies[] = uc_stock
+dependencies[] = imagecache
+dependencies[] = imagefield     
+;dependencies[] = job_scheduler 

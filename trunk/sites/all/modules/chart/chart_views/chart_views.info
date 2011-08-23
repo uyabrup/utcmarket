@@ -1,0 +1,13 @@
+name = Chart API Views Integration
+description = Provides a "Google Chart" Views style.
+package = Charting
+core = 6.x
+dependencies[] = chart
+dependencies[] = views
+dependencies[] = views_calc
+; Information added by drupal.org packaging script on 2010-07-11
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "chart"
+datestamp = "1278833672"
+

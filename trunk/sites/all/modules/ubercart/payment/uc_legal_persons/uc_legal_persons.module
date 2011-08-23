@@ -1,0 +1,184 @@
+<?php
+// $Id: uc_legal_persons.module,v 1.2 2011/02/12 10:40:19 podarok Exp $
+
+/**
+ * @file
+ * Defines a checkout pane that lets customers specify their VAT number
+ * This is required for stores that sell to professionals in the European Union
+ *
+ */
+
+ /**
+ * Field definitions for store settings form.
+ */
+ 
+function uc_legal_persons_field_info() {
+  return array(
+    'uc_uk_zkpo' => array(
+      'title' => t('ZKPO') ,
+      'description' => "" ,
+    ) ,
+    'uc_uk_rr' => array(
+      'title' => t('RR') ,
+      'description' => "" ,
+    ) ,
+    'uc_uk_mfo' => array(
+      'title' => t('MFO') ,
+      'description' => "" ,
+    ) ,
+    'uc_uk_sv_number' => array(
+      'title' => t('SV number') ,
+      'description' => "" ,
+    ) ,
+    'uc_uk_ipn' => array(
+      'title' => t('IPN') ,
+      'description' => "" ,
+    ) ,
+    'uc_uk_zkpo' => array(
+      'title' => t('ZKPO') ,
+      'description' => "" ,
+    ) ,
+  );
+}
+/*******************************************************************************
+ * Hook Functions
+ ******************************************************************************/
+/**
+ * Implementation of hook_menu().
+ */
+function uc_legal_persons_menu() {
+  global $user;
+  $items = array();
+  
+  $items['legal_person/%user/order/%uc_order/invoice'] = array(
+    'title' => 'View invoice' ,
+    'description' => 'View order invoice.' ,
+    'page callback' => 'uc_legal_persons_view' ,
+    'page arguments' => array(3) ,
+    'access callback' => 'uc_legal_persons_can_view_order' ,
+    'access arguments' => array(1, 3) ,
+    'type' => MENU_CALLBACK,
+  );
+  
+  return   $items;
+  
+}  
+ 
+/**
+ * Implementation of hook_theme_registry_alter(&$theme_registry).
+ */
+function uc_legal_persons_theme_registry_alter(&$theme_registry) {
+
+  if (!isset($theme_registry['uc_order']['theme paths'])) {
+    $theme_registry['uc_order']['theme paths']  =   array();
+  }  
+  $theme_registry['uc_order']['theme paths'][] = drupal_get_path('module' , 'uc_legal_persons') .'/templates';
+  
+}
+/**
+ * Implementation of hook_form_alter()
+ */
+function uc_legal_persons_form_alter(&$form, $form_state, $form_id) {
+  // Alter the global shop setting form to ask for the store VAT Number
+  if ($form_id == 'uc_store_store_settings_form') {
+    foreach (uc_legal_persons_field_info() as $field => $info) {
+     $form[$field] = array(
+      '#type' => 'textfield' ,
+      '#title' => $info['title'],
+      '#description' => $info['description'],
+      '#default_value' => variable_get($field, '') ,
+      '#size' => 32,
+      '#maxlength' => 64,
+      '#required' => FALSE,
+      '#weight' => 2,
+    );  
+    }
+  }
+}
+
+
+/**
+ * Implementation of hook_payment_method().
+ */
+function uc_legal_persons_payment_method() {
+  $methods[] = array(
+    'id' => 'legal_person' ,
+    'name' => t('UR. account for bank payment') ,
+    'title' => t('Legal persons (issue an invoice)') ,
+    'desc' => t('Issue an invoice for payment of legal entity.') ,
+    'callback' => 'uc_legal_persons_method_cod' ,
+    'weight' => -1,
+    'checkout' => FALSE,
+    'no_gateway' => TRUE,
+  );
+  return $methods;
+}
+
+
+/**
+ * Handle the Cash on Delivery payment method.
+ */
+function uc_legal_persons_method_cod($op, &$arg1) {
+
+ switch ($op) {
+  case 'cart-details':
+    return t("You can print invoice at the end of checkout.");
+  break;
+
+  case 'cart-review':  
+    $print_link  = l(t("Bill for legal person") , "legal_person/{$arg1->uid}/order/{$arg1->order_id}/invoice" , array('attributes' => array('target'=>'_blank')));
+    $review[] = array('title' => t('Print bill') , 'data' => $print_link);
+       return $review;
+    break;
+
+  case 'order-view':
+
+  case 'customer-view':
+      $output = t('Print');
+        return $output;
+   break;
+
+  case 'order-submit':
+    module_load_include('inc' , 'uc_order' , 'uc_order.admin');
+    $form_state = array();
+    $form_state['values']['order_id'] = $arg1->order_id;
+    $form_state['values']['email']    = $arg1->primary_email;
+    drupal_execute('uc_order_mail_invoice_form' , $form_state, $arg1);
+   break;
+  
+ }
+}
+
+
+/**
+ * Access callback for user/%user/orders*.
+ */
+function uc_legal_persons_can_view_order($order_user, $order = NULL) {
+  global $user;
+
+  $access = user_access('view all orders') || (user_access('view own orders') && $user->uid == $order_user->uid);
+
+  if (!is_null($order)) {
+    $access = $access && $order_user->uid == $order->uid;
+  }
+
+  return $access;
+}
+
+function uc_legal_persons_view($order) {
+    $output = theme('uc_order' , $order, 'print' , variable_get('uc_cust_order_invoice_template' , 'customer'));
+    $output .= '<div align="right" style="margin-top: 1em; margin-right: 1em;"><input type="button" value="'. t('Print invoice') .'" onclick="window.print();" /> '
+              .'<input type="button" value="'. t('Close window') .'" onclick="window.close();" /></div>';
+    print $output;
+    exit();
+}  
+
+function uc_legal_persons_preprocess_uc_order(&$variables) {
+
+ // Saving and getting invoice attributes
+ foreach (uc_legal_persons_field_info() as $field => $info) {
+  $variables[$field]    = variable_get($field, '');
+ }
+  $order = &$variables['order'];
+  $variables['template_files'][] = "uc_order-" . $order->payment_method;
+}

@@ -1,0 +1,16 @@
+; $Id: google_analytics_reports.info,v 1.2 2010/01/09 01:30:19 jkitching Exp $
+
+name = "Google Analytics Reports"
+package = Statistics
+description = "Provides interface to access Google Analytics API statistics."
+core = 6.x
+dependencies[] = google_analytics_api
+dependencies[] = chart
+dependencies[] = countries_api
+
+; Information added by drupal.org packaging script on 2010-07-11
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "google_analytics_api"
+datestamp = "1278834420"
+

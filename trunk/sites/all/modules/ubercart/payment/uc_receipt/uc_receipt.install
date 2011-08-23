@@ -1,0 +1,106 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Install hooks for uc_receipt.module
+ **/
+function uc_receipt_schema() {
+  $schema['uc_receipt_banks'] = array(
+    'description' => 'User bank information.',
+    'fields' => array(
+      'country_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "Primary key: The country's id.",
+      ),
+      'bank_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "The names shop banks",
+      ),
+      'bank_adress' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "The addresses shop banks",
+      ),
+      'bank_mfo' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "The MFO shop banks",
+      ),
+      'bank_ks_rs' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "The correspondent score banks",
+      ),
+      'userm_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "Name of the receiver",
+      ),
+      'userm_address' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "Address of the receiver",
+      ),
+      'userm_inn' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "INN of the receiver",
+      ),
+      'userm_rs' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "The settlement account of the receiver",
+      ),      
+      'currency' => array(
+        'type' => 'varchar',
+        'length' => 3,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "Currency receipt",
+      ),
+      'currency_ex' => array(
+        'type' => 'numeric',
+        'precision' => 10,
+        'scale' => 2,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => "Currency exchange rate",
+      ),    
+    ),
+    'indexes' => array(
+      'bank_mfo' => array('bank_mfo'),
+      'country_id' => array('country_id'),
+    ),
+    'primary key' => array('country_id', 'bank_mfo'),    
+  );
+  return $schema;
+}
+
+function uc_receipt_install() {
+  drupal_install_schema('uc_receipt');
+}
+
+function uc_receipt_uninstall() {
+  drupal_uninstall_schema('uc_receipt');
+}
+

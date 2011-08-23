@@ -1,0 +1,184 @@
+<?php
+
+// $Id$
+
+
+function ajax_search_perm() {
+  return array('ajax_search_settings');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function ajax_search_menu() {
+  $items = array();
+  $items['admin/settings/ajax_search'] = array(
+      'title' => t('AJAX search settings'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('ajax_search_settings'),
+      'access arguments' => array('ajax_search_settings')
+  );
+  $items['search/result'] = array(
+      'page callback' => 'ajax_search_result',
+      'type' => MENU_CALLBACK,
+      'access callback' => TRUE
+  );
+  $items['search/load'] = array(
+      'page callback' => 'ajax_search_load',
+      'type' => MENU_CALLBACK,
+      'access callback' => TRUE
+  );
+  return $items;
+}
+
+
+function ajax_search_result() {
+  if(arg(2)=='t') drupal_goto('taxonomy/term/'.arg(3));
+  if(arg(2)=='n') drupal_goto('node/'.arg(3));
+
+}
+
+/**
+ * Sending data to js
+ */
+function ajax_search_load() {
+  $out = '';
+  $str = $_POST['search'];
+  $to_js = array();
+  $result_on_page = variable_get('ajax_search_count', 20);
+
+  // Tags
+  if(variable_get('ajax_search_taxonomy_on', 1)){
+    $i = $vid = '0';
+    foreach (variable_get('ajax_search_taxonomy_cat', array()) as $key => $val) $vid .=','.$key;
+    $sql = db_query("SELECT * FROM {term_data} WHERE name like '%%%s%%' and vid in(%s) and tid in (SELECT tid FROM term_node) ORDER by name  LIMIT %d", $str, $vid, $result_on_page);
+    while ($data = db_fetch_object($sql)){
+      $to_js['taxonomy_title'][] = drupal_to_js($data->name);
+      $to_js['taxonomy_id'][] = drupal_to_js($data->tid);
+      $i++;
+    }
+    $to_js['taxonomy'][] = drupal_to_js(ajax_search_load_title('taxonomy',$i));
+  }
+
+  // Nodes
+  if(variable_get('ajax_search_node_on', 1)){
+    $type = '"0"';
+    $i = 0;
+    foreach (variable_get('ajax_search_node_type', array()) as $key => $val) if($val)$type .=',"'.$key.'"';
+
+    $sql = db_query("SELECT * FROM {node} WHERE title like '%%%s%%' and type in($type) and status=1 ORDER by title LIMIT %d", $str, $result_on_page);
+    while ($data = db_fetch_object($sql)){
+      $to_js['node_title'][] = drupal_to_js($data->title);
+      $to_js['node_id'][] = drupal_to_js($data->nid);
+      $i++;
+    }
+    $to_js['node'][] = drupal_to_js(ajax_search_load_title('node',$i));
+  }
+
+  $to_js_f = array();
+  foreach ($to_js as $key => $var) {
+    $to_js_f[] = '"'.$key.'": ['.implode(', ', $var).']';
+  }
+  $out = implode(', ', $to_js_f);
+  $out = '{'.$out.'}';
+
+  print $out;
+}
+
+function ajax_search_load_title($type,$i) {
+  $out = variable_get('ajax_search_'.$type.'_title', $type);
+  $out .= ' <i>('.$i.')</i>';
+  return $out;
+}
+
+// Initial installation
+
+function ajax_search_init() {
+  $path = drupal_get_path('module', 'ajax_search');
+  drupal_add_js($path.'/ajax_search.js');
+  drupal_add_css($path.'/ajax_search.css');
+
+  $form_patch = variable_get('ajax_search_patch', '#edit-search-theme-form-keys');
+  drupal_add_js(array(ajax_search_form=>$form_patch,ajax_search_patch=>url('').'search'), 'setting');
+}
+
+// Main settings
+
+function ajax_search_settings() {
+  $form = array();
+  $form['ajax_search_patch'] = array(
+    '#title' => t('Path'),
+    '#description' => t('Specify ID of field which you want enable ajax search for.For example:#edit-search-theme-form-keys. Use Firebug to find the ID.'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('ajax_search_patch', '#edit-search-theme-form-keys')
+  );
+  $form['ajax_search_count'] = array(
+    '#title' => t('Maximum number of results'),
+    '#type' => 'select',
+    '#options' => array(10=>10,15=>15,20=>20,25=>25,30=>30,40=>40,50=>50,75=>75,100=>100),
+    '#default_value' => variable_get('ajax_search_count', 20)
+  );
+
+
+    // Search tags
+
+    $form['taxonomy'] = array(
+    '#title' => t('Search tags'),
+    '#type' => 'fieldset'
+    );
+    $form['taxonomy']['ajax_search_taxonomy_on'] = array(
+    '#title' => t('Enable'),
+  	'#type' => 'checkbox',
+    '#default_value' => variable_get('ajax_search_taxonomy_on', 1)
+    );
+    $form['taxonomy']['ajax_search_taxonomy_title'] = array(
+    '#title' => t('Title'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('ajax_search_taxonomy_title', 'Теги')
+    );
+
+    $options = array();
+    $sql = db_query("SELECT * FROM {vocabulary} ORDER by name");
+    while ($data = db_fetch_object($sql)) $options[$data->vid] = $data->name;
+
+    $form['taxonomy']['ajax_search_taxonomy_cat'] = array(
+    '#title' => t('Restrict to only these vocabularies'),
+    '#type' => 'checkboxes',
+    '#options' => $options,
+    '#default_value' => variable_get('ajax_search_taxonomy_cat', array())
+    );
+
+     // Search nodes
+
+    $form['node'] = array(
+    '#title' => t('Search nodes (by titles)'),
+    '#type' => 'fieldset'
+    );
+    $form['node']['ajax_search_node_on'] = array(
+    '#title' => t('Enable'),
+  	'#type' => 'checkbox',
+    '#default_value' => variable_get('ajax_search_node_on', 1)
+    );
+    $form['node']['ajax_search_node_title'] = array(
+    '#title' => t('Title'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('ajax_search_node_title', 'Pages')
+    );
+
+    $options = array();
+    $sql = db_query("SELECT * FROM {node_type} ORDER by name");
+    while ($data = db_fetch_object($sql)) $options[$data->type] = $data->name;
+
+    $form['node']['ajax_search_node_type'] = array(
+    '#title' => t('Restrict nodes that have only these content types'),
+    '#type' => 'checkboxes',
+    '#options' => $options,
+    '#default_value' => variable_get('ajax_search_node_type', array())
+    );
+
+
+    $form = system_settings_form($form);
+    return $form;
+}
+
+

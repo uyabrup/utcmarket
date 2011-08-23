@@ -1,0 +1,453 @@
+<?php
+// $Id$
+function uc_receipt_order_pane() {
+  $panes[] = array(
+    'id' => 'packages',
+    'callback' => 'uc_receipt_order_pane_packages',
+    'title' => t('Print receipt'),
+    'weight' => 10,
+    'show' => array('view', 'customer'),
+  );
+
+  return $panes;
+}
+
+function uc_receipt_order_pane_packages($op, $arg1) {
+  switch ($op) {
+    case 'view':
+    case 'customer':
+      $output = js_print($arg1->order_id);
+      break;
+  }
+  return $output;
+}
+
+function uc_receipt_perm() {
+  return array('administer receipt configuration');
+}
+
+function uc_receipt_menu() {
+  global $user;
+  $items = array();
+  $items['cart/receipt/complete'] = array(
+    'page callback' => 'uc_receipt_complete',
+    'page arguments' => array(3),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/store/settings/payment/edit/banks'] = array(
+    'title' => 'Banks for receipt',
+    'page callback' => 'uc_receipt_total_page',
+    'access arguments' => array('administer receipt configuration'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/store/settings/payment/edit/banks/delete']=array(
+    'title' => 'Delete bank',
+    'page callback' => 'uc_receipt_delete',
+    'access arguments' => array('administer receipt configuration'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/store/settings/payment/edit/banks/edit']=array(
+    'title' => 'Edit bank',
+    'page callback' => 'uc_receipt_edit',
+    'access arguments' => array('administer receipt configuration'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['print/receipt'] = array(
+    'title' => 'Print receipt',
+    'page callback' => 'uc_receipt_template',
+    'page arguments' => array('print'),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function uc_receipt_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'uc_cart_checkout_review_form' && ($order_id = intval($_SESSION['cart_order'])) > 0) {
+    $order = uc_order_load($order_id);
+    $country_id = ($order->delivery_country) ? $order->delivery_country : $order->billing_country;
+    $country = db_result(db_query("SELECT country_id FROM {uc_receipt_banks} WHERE country_id = %d", $country_id));
+    if ($order->payment_method == 'receipt') {
+      unset($form['submit']);
+      if ($country) {
+        $form['#prefix'] = '<div class="js">'. js_print($order_id) .'</div><table style="display: inline; padding-top: 1em;"><tr><td>';
+        $form['#suffix'] = '</td><td>'. drupal_get_form('uc_receipt_form', $order) .'</td></tr></table>';
+      }
+      else {
+        $form['#prefix'] = '<table style="display: inline; padding-top: 1em;"><tr><td>';
+        $form['#suffix'] = '</td><td>'. t('No receipt for you country select other payment method.') .'</td></tr></table>';
+      }
+      
+    }
+  }
+}
+
+/**
+ * Implementation of hook_payment_method().
+ */
+function uc_receipt_payment_method() {
+  $methods[] = array(
+    'id' => 'receipt',
+    'name' => t('The receipt payment'),
+    'title' => t('The receipt payment'),
+    'desc' => t('Pay by receipt payment to our bank account.'),
+    'callback' => 'uc_receipt_method',
+    'weight' => 3,
+    'checkout' => TRUE,
+    'backend' => TRUE,
+  );
+  return $methods;
+}
+
+/**
+ * Handle the bank deposit payment method.
+ */
+function uc_receipt_method($op, &$arg1) {
+  switch ($op) {
+    case 'cart-details':
+    case 'customer-view':
+      $details = t('Depending on a choice of the country this or that sample of the filled receipt in which it will be necessary for you to put the signature will be offered you and to pay in the nearest branch of bank.');
+      return $details;
+    case 'cart-review': 
+      $review[] = array('title' => t('More info'), 'data' => t('You can print the receipt form having pressed the button the press in the bottom of the form. If for your country there is no form it is necessary for you to choose other method of payment from accessible on a site.'));
+      return $review;
+    case 'order-view':
+      return '';
+    case 'settings':
+      $country = uc_receipt_get_countries('banks');
+      foreach ($country as $key => $name) {
+        $form['uc_receipt_addressee_'. $key] = array(
+          '#type' => 'textfield',
+          '#title' => t('Enter the type of payment %name', array('%name' => $name)),
+          '#description' => t('Enter the type of payment, such as: "Payment for the goods in the online store"'),
+          '#default_value' => variable_get('uc_receipt_addressee_'. $key, ''),
+        );
+      }
+      return $form;
+  }
+}
+
+function uc_receipt_total_page() {
+  $output = uc_receipt_table($collapsed);
+  $output .= drupal_get_form('uc_receipt_add_bank_form');
+  return $output;
+}
+
+function uc_receipt_table() {
+  $header[] = t('Country');
+  $header[] = t('Bank name');
+  $header[] = t('Bank address');
+  $header[] = t('Bank id cod');
+  $header[] = t('Full name');
+  $header[] = t('Address');
+  $header[] = t('Currency');
+  $header[] = t('Exchange');
+  $header[] = t('Operation');
+  $result = db_query("SELECT * FROM {uc_receipt_banks} ORDER BY bank_name");
+  while ($data = db_fetch_object($result)) {
+    $row[] = array(
+      array(
+        'data' => $data->country_id),
+      array(
+        'data' => $data->bank_name),
+      array(
+        'data' => $data->bank_adress),
+      array(
+        'data' => $data->bank_mfo),
+      array(
+        'data' => $data->userm_name),
+      array(
+        'data' => $data->userm_address),
+      array(
+        'data' => $data->currency),
+      array(
+        'data' => $data->currency_ex),
+      array(
+        'data' => l(t('delete'), 'admin/store/settings/payment/edit/banks/delete/'. $data->country_id) .' | '. 
+        l(t('edit'), 'admin/store/settings/payment/edit/banks/edit/'. $data->country_id))
+    );
+  }
+  $output = theme('table', $header, $row);
+  return $output;
+}
+
+function uc_receipt_add_bank_form($form_state, $collapsed = TRUE, $bank = NULL) {
+  $countries = uc_receipt_get_countries();
+  if ($bank['country_id']) {
+    $title = t('Edit Bank');
+    $id = $bank['country_id'];
+    $submit_val = t('Edit Bank');}
+  else {
+    $title = t('Add Bank');
+    $submit_val = t('Add Bank');
+  }
+  $form['add_bank'] = array(
+    '#type' => 'fieldset',
+    '#title' => $title,
+    '#prefix' => '<div class="bank-form">',
+    '#suffix' => '</div>',
+    '#collapsible' => TRUE,
+    '#collapsed' => $collapsed,
+  );
+  $form['add_bank']['country'] = array(
+    '#title' => t('Country'),
+    '#description' => t('Select country'),
+    '#type' => 'select',
+    '#required' => TRUE,
+    '#options' => $countries,
+    '#default_value' => $bank['country_id'],   
+  );
+  $form['add_bank']['bank_name'] =array(
+    '#title' => t('Bank name'),
+    '#description' => t('Enter Bank name'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#default_value' => $bank['bank_name'],
+  );
+  $form['add_bank']['bank_adress'] =array(
+    '#title' => t('Bank address'),
+    '#description' => t('Enter Bank address'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#default_value' => $bank['bank_adress'],
+  );
+  $form['add_bank']['bank_mfo'] =array(
+    '#title' => t('Bank MFO / BIK'),
+    '#description' => t('Enter Bank code'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#default_value' => $bank['bank_mfo'],
+  );
+  $form['add_bank']['bank_ks_rs'] =array(
+    '#title' => t('Bank correspondets'),
+    '#description' => t('Enter Bank correspondets'),
+    '#type' => 'textfield',
+    '#required' => FALSE,
+    '#default_value' => $bank['bank_ks_rs'],
+  );
+  $form['add_bank']['userm_name'] =array(
+    '#title' => t('Fullname addressee of payment'),
+    '#description' => t('Enter Fullname addressee of payment'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#default_value' => $bank['userm_name'],
+  );
+  $form['add_bank']['userm_address'] =array(
+    '#title' => t('Addresse of payment'),
+    '#description' => t('Enter Addresse of payment'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#default_value' => $bank['userm_address'],
+  );
+  $form['add_bank']['userm_inn'] =array(
+    '#title' => t('INN'),
+    '#description' => t('Enter INN or Personal code'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#default_value' => $bank['userm_inn'],
+  );
+  $form['add_bank']['userm_rs'] =array(
+    '#title' => t('Users account number'),
+    '#description' => t('Enter bank account number'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#default_value' => $bank['userm_rs'],
+  );
+  $form['add_bank']['currency'] =array(
+    '#title' => t('Payment currency'),
+    '#description' => t('Enter bank currency'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#default_value' => $bank['currency'],
+  );
+  $form['add_bank']['currency_ex'] =array(
+    '#title' => t('Currency exchange'),
+    '#description' => t('Enter bank currency exchange'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#default_value' => $bank['currency_ex'],
+  );     
+  $form['add_bank']['bank_submit'] =array(
+    '#value' => $submit_val,
+    '#type' => 'submit'
+  );
+  $form['#validate'] = array(
+    'banks_validate' => array(),
+  );
+  return $form;
+}
+
+function uc_receipt_get_countries($banks = NULL) {
+  if ($banks) {
+    $select = db_query("SELECT c.country_id, c.country_name FROM {uc_countries} c RIGHT JOIN {uc_receipt_banks} r ON c.country_id = r.country_id");
+  }
+  else {
+    $select = db_query("SELECT country_id, country_name FROM {uc_countries}");
+  }
+  while ($count = db_fetch_array($select)) {
+    $countries[$count['country_id']] = $count['country_name'];
+  }
+  if (!$countries) {
+    $countries = array();
+  }
+  return $countries;
+}
+
+function banks_validate($form, &$form_state) {
+  //dpr($form_state); exit;
+}
+
+function uc_receipt_add_bank_form_submit($form, $form_state) {
+  $result = db_fetch_array(db_query("SELECT * FROM {uc_receipt_banks} WHERE country_id = %d", $form_state['values']['country']));
+  if ($result['country_id'] == $form_state['values']['country']) {
+    db_query("UPDATE {uc_receipt_banks} SET  bank_name = '%s', bank_adress = '%s', bank_mfo = '%s', bank_ks_rs = %d,
+      userm_name = '%s', userm_address = '%s', userm_inn = '%s', userm_rs = '%s', currency = '%s', currency_ex = %f
+      WHERE country_id = %d", $form_state['values']['bank_name'], $form_state['values']['bank_adress'], $form_state['values']['bank_mfo'], $form_state['values']['bank_ks_rs'],
+      $form_state['values']['userm_name'], $form_state['values']['userm_address'], $form_state['values']['userm_inn'], $form_state['values']['userm_rs'],
+      $form_state['values']['currency'], $form_state['values']['currency_ex'], $form_state['values']['country']);
+    drupal_set_message('Bank has been successfully updated.');
+    drupal_goto('admin/store/settings/payment/edit/banks');}
+  elseif ($result['country_id'] && $result['country_id'] != $form_state['values']['country']) {
+    drupal_set_message('System error!', 'error');
+  }
+  else {
+    db_query("INSERT INTO {uc_receipt_banks} (country_id, bank_name, bank_adress, bank_mfo, bank_ks_rs,
+      userm_name, userm_address, userm_inn, userm_rs, currency, currency_ex) VALUES (%d, '%s', '%s', %d, %d, '%s', '%s', '%s', %d, '%s', %f)
+      ", $form_state['values']['country'], $form_state['values']['bank_name'], $form_state['values']['bank_adress'], $form_state['values']['bank_mfo'], $form_state['values']['bank_ks_rs'],
+      $form_state['values']['userm_name'], $form_state['values']['userm_address'], $form_state['values']['userm_inn'], $form_state['values']['userm_rs'],
+      $form_state['values']['currency'], $form_state['values']['currency_ex']);
+    drupal_set_message('Bank has been successfully added.');
+  }
+}
+
+function uc_receipt_delete() {
+  $arg = arg(7);
+  db_query("DELETE FROM {uc_receipt_banks} WHERE country_id = %d", $arg);
+  drupal_set_message('Bank has been deleted.');
+  drupal_goto('admin/store/settings/payment/edit/banks');
+}
+
+function uc_receipt_edit() {
+  $arg = arg(7);
+  $bank_info = db_fetch_array(db_query("SELECT * FROM {uc_receipt_banks} WHERE country_id = %d", $arg));
+  $output .= drupal_get_form('uc_receipt_add_bank_form', FALSE, $bank_info);
+  return $output;
+}
+
+function uc_receipt_form($form_state, $order) {
+  $form['#action'] = '/cart/receipt/complete/'. $order->order_id; 
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Checkout'),
+  );
+  return $form;
+}
+
+function js_print($order_id = 0) {
+  uc_add_js("function open_receipt() { window.open('". base_path() ."print/receipt/". $order_id ."', '". t('Receipt') ."', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=1,width=700,height=760,left=50,top=50'); }", 'inline', 'header', FALSE, FALSE);
+    $contents = '<a href="#" onclick="open_receipt();">'. uc_store_get_icon('file:print') .' '. t('Click to open a window with a printable receipt.') .'</a>';
+    $output .= '<div class="order-pane">'. $contents .'</div>';
+  return $output;
+} 
+
+function uc_receipt_form_submit($form, $form_state) {
+  $form_state['redirect'] = array('cart/receipt/complete/'. $form_state['values']['order']);
+}
+
+function uc_receipt_complete() {
+  $order_id = arg(3);
+  drupal_set_title(t('Payment is finished'));
+  $output = '<div class="complete"><h3>'. t('Congratulations!') .'</h3></div>';
+  $order = uc_order_load($order_id);
+  if ($order === FALSE || uc_order_status_data($order->order_status, 'state') != 'in_checkout') {
+    return t('An error has occurred during payment.  Please contact us to ensure your order has submitted.');
+  }
+  $output .= uc_cart_complete_sale($order);
+  //Add a comment to let sales team know this came in through the site.
+  uc_order_comment_save($order->order_id, 0, t('Order not payed please pay by receipt.'), 'admin');
+  return $output;
+}
+
+function uc_receipt_token_values($type, $object = NULL) {
+  switch ($type) {
+    case 'receipt':
+      $order = $object;
+      if ($order->delivery_country) {
+        $variables = db_fetch_object(db_query("SELECT * FROM {uc_receipt_banks} WHERE country_id = %d", $order->delivery_country));
+        $values['bank-name'] = $variables->bank_name;
+        $values['bank-address'] = $variables->bank_adress;
+        $values['bank-mfo'] = $variables->bank_mfo;
+        if ($variables->bank_ks_rs) {
+          $values['bank-ks-rs'] = $variables->bank_ks_rs;
+        }
+        else {
+          $values['bank-ks-rs'] = '---';
+        }
+        $values['userm-name'] = $variables->userm_name;
+        $values['userm-address'] = $variables->userm_address;
+        $values['userm-inn'] = $variables->userm_inn;
+        $values['userm-rs'] = $variables->userm_rs;
+        $values['payment-pro'] = variable_get('uc_receipt_addressee_'. $order->delivery_country, '');
+        if (variable_get('uc_currency_code', 'USD') === $variables->currency) {
+          $values['receipt-total'] = $order->order_total;
+        }
+        else {
+          $values['receipt-total'] = round($order->order_total * $variables->currency_ex, 0);
+        }
+        $values['address'] = $order->delivery_city .' '. $order->delivery_street1 .' '.  $order->delivery_street2;
+      }
+      break;
+  }
+  return $values;
+}
+
+function uc_receipt_token_list($type = 'all') {
+  if ($type == 'order' || $type == 'ubercart' || $type == 'receipt' || $type = 'all') {
+    $tokens['receipt']['bank-name'] = t('Name bank for pay.');
+    $tokens['receipt']['bank-address'] = t('Address bank for pay.');
+    $tokens['receipt']['bank-mfo'] = t('Bank MFO.');
+    $tokens['receipt']['bank-ks-rs'] = t('Bank correspondent.');
+    $tokens['receipt']['userm-name'] = t('Name magazin boss');
+    $tokens['receipt']['userm-address'] = t('Address boss.');
+    $tokens['receipt']['userm-inn'] = t('INN.');
+    $tokens['receipt']['userm-rs'] = t('RS.');
+    $tokens['receipt']['receipt-total'] = t('Total summ.');
+    $tokens['receipt']['payment-pro'] = t('Payment type');
+    $tokens['receipt']['address'] = t('Address');
+  }
+  return $tokens;
+}
+
+function uc_receipt_template($op = 'print') {
+  if (is_numeric(arg(2))) $order_id = arg(2);
+  $country =db_result(db_query("SELECT delivery_country FROM {uc_orders} WHERE order_id = %d", $order_id));
+  $order = uc_order_load($order_id);
+  $output = uc_receipt_load_template($country, $order);
+
+  if ($op == 'print') {
+    $output .= '<div align="right" style="margin-top: 1em; margin-right: 1em;"><input type="button" value="'. t('Print receipt') .'" onclick="window.print();" /> '
+              .'<input type="button" value="'. t('Close window') .'" onclick="window.close();" /></div>';
+    print $output;
+    exit();
+  }
+
+  return $output;
+}
+
+function uc_receipt_load_template($cid, $order) {
+  $file = drupal_get_path('module', 'uc_receipt') .'/templates/'. $cid .'.itpl.php';
+  if (file_exists($file)) {
+    ob_start();
+      require($file);
+      $output = ob_get_contents();
+    ob_end_clean();
+  }
+  else {
+    $output = t('There no receipt template for you country!!! Please change alter payment method.');
+  }
+  $output = token_replace($output, 'global');
+  $output = token_replace($output, 'order', $order);
+  $output = token_replace($output, 'receipt', $order);
+  return $output; 
+}

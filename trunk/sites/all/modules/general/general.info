@@ -1,0 +1,6 @@
+; $Id$
+name = General
+description = Collections of different functions such form alterations etc.
+core = 6.x
+package = "OpenStore"
+version = "6.x-0.1-dev"

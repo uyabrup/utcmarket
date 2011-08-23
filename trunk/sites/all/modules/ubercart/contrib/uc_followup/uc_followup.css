@@ -1,0 +1,14 @@
+#ucf-tooltip{
+	position:absolute;
+	border:1px solid #333;
+	background:#f7f5d1;
+	padding:2px 5px;
+	color:#333;
+	display:none;
+  z-index:500;
+}
+
+#ucf-tooltip h4 {
+  margin: 0 0 5px 0;
+  font-size:1em;
+}

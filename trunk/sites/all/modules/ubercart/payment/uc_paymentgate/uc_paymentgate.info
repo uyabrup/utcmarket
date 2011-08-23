@@ -1,0 +1,12 @@
+; $Id: uc_paymentgate.info,v 1.1 2009/10/20 07:40:43 duke Exp $
+name = "RBS"
+description = "Process payments using 'Runet Business System' service."
+dependencies[] = uc_payment
+package = Ubercart - payment
+core = 6.x
+; Information added by drupal.org packaging script on 2009-10-20
+version = "6.x-1.0"
+core = "6.x"
+project = "uc_paymentgate"
+datestamp = "1256025055"
+

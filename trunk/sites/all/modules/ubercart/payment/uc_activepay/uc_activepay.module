@@ -1,0 +1,292 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Activepay payment gateway file.
+ *
+ * This module provides Activepay payment gateway through
+ * activepay.ru website, when using Drupal Ubercart.
+ * It was developed and tested for Ubercart 6.x-2.2.
+ */
+
+/********************************************************************
+ * ActivePay client module
+ ********************************************************************/
+class ActivePay {
+	var $method = "GET", $url_domain = "activepay.ru", $url_uri = "/merchant_pages/create/", $secret_key, $merchant_contract;
+
+	private function build_query_string($data) {
+		$query_string = "";
+		ksort($data);
+		foreach ($data as $item => $value)
+		{
+			if ($query_string != "")
+			{
+				$query_string .= "&";
+			}
+			$query_string .= rawurlencode($item)."=".rawurlencode($value);
+		}
+		return $query_string;
+	}
+	private function sign($data) {
+		$url = "http://$this->url_domain$this->url_uri";
+		$query_string = $this->build_query_string($data);
+		$string_to_sign = "$this->method\n$this->url_domain\n$this->url_uri\n$query_string";
+		$hmac_sha1_hash = hash_hmac("sha1", $string_to_sign, $this->secret_key, true);
+		return urlencode(base64_encode($hmac_sha1_hash));
+	}
+	public function build_merchant_pages_url($data) {
+		$data["merchant_contract"] = $this->merchant_contract;
+		$signature = $this->sign($data);
+		$query_string = $this->build_query_string($data);
+		return "http://$this->url_domain$this->url_uri?$query_string&signature=$signature";
+	}
+	public function check_signature($data) {
+                $signature = $data["signature"];
+                unset($data["signature"]);
+                $signature2 = $this->sign($data);
+                return urlencode($signature) == $signature2;
+        }
+
+	
+}
+/********************************************************************
+ * Drupal Hooks
+ ********************************************************************/
+
+/**
+ * Implementation of hook_menu()
+ */
+
+function uc_activepay_menu() {
+    $items['uc_activepay/result'] = array(
+      'title'    => 'Internal Data',
+      'page callback' => 'uc_activepay_result_payment',
+      'access arguments'   => array('access content'),
+      'type'     => MENU_CALLBACK
+    );
+    $items['uc_activepay/success'] = array(
+      'title'    => 'Activepay processing',
+      'page callback' => 'uc_activepay_payment_end',
+      'page arguments' => array('success'),
+      'access arguments'   => array('access content'),
+      'callback arguments' => array('success'),
+      'type'     => MENU_CALLBACK
+    );
+    $items['uc_activepay/fail'] = array(
+      'title'    => 'Activepay processing',
+      'page callback' => 'uc_activepay_payment_end',
+      'page arguments' => array('fail'),
+      'access arguments'   => array('access content'),
+      'callback arguments' => array('fail'),
+      'type'     => MENU_CALLBACK
+    );
+  return $items;
+}
+
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function uc_activepay_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'uc_cart_checkout_review_form' && ($order_id = intval($_SESSION['cart_order'])) > 0) {
+    $order = uc_order_load($order_id);
+
+    if ($order->payment_method == 'uc_activepay') {
+      unset($form['submit']);
+      $form['#prefix'] = '<table ><tr><td>';
+      $form['#suffix'] = '</td><td>'. drupal_get_form('uc_activepay_submit_form', $order) .'</td></tr></table>';
+    }
+  }
+}
+
+/********************************************************************
+ * Functions callback
+ ********************************************************************/
+/**
+ * Callback for Activepay payment method settings.
+ */
+
+
+function uc_activepay_result_payment() {
+  $ar_req = json_decode(file_get_contents('php://input'), true);
+  $order_id = $ar_req['merchant_data'];
+
+  $order = uc_order_load($order_id);
+  watchdog('activepay', var_export($ar_req, true));
+  $res="";
+  if ($ar_req['result'] != 'success' || (uc_order_status_data($order->order_status, 'state') != 'in_checkout' && uc_order_status_data($order->order_status, 'state') != 'payment_received') ) {
+    $res=t('An error has occurred during payment.  Please contact us to ensure your order has submitted.');
+    print $res;
+    uc_order_comment_save($order_id, 0, $res, 'admin');
+    uc_order_update_status($order_id, 'canceled');
+    exit();
+  }
+  $apay = new Activepay;
+  $apay->merchant_contract = variable_get('uc_activepay_mrh', '');
+  $apay->secret_key = variable_get('uc_activepay_scrt', '');
+  $apay->method = "POST";
+  $apay->url_domain = variable_get('uc_activepay_oursite', '');
+  $apay->url_uri = "/uc_activepay/result";
+
+  if (!$apay->check_signature($ar_req)) {
+      $res = t('Security check failed');
+  }
+
+  if ($res==="") {
+      $description = t('A payment was accepted.');
+      db_query("UPDATE {uc_actiepay_transaction} SET description = '%s' WHERE txnid = %d", $description, $order_id);
+      uc_payment_enter($order_id, 'activepay', $amount, $order->uid, NULL, $description);
+      uc_cart_complete_sale($order);
+      uc_order_comment_save($order_id, 0, t('A payment has been accepted.'), 'admin');
+      uc_order_update_status($order_id, 'payment_received');
+      return "OK". $order_id;
+  }
+  else {
+      uc_order_comment_save($order_id, 0, $res, 'admin');
+      uc_order_update_status($order_id, 'canceled');
+      return $res;
+  }
+}
+
+/********************************************************************
+ * other Functions
+ ********************************************************************/
+function uc_payment_method_activepay($op, &$arg1) {
+  switch ($op) {
+    case 'cart-details':
+      return $details;
+    case 'settings':
+  $form['uc_activepay_mrh'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Shop ID'),
+    '#default_value' => variable_get('uc_activepay_mrh', ''),
+    '#description'   => t("Please enter Shop ID."),
+  );
+  $form['uc_activepay_scrt'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Secret Key'),
+    '#default_value' => variable_get('uc_activepay_scrt', ''),
+    '#description'   => t("Please enter Secret Key."),
+  );
+  $form['uc_activepay_oursite'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Your site address'),
+    '#default_value' => variable_get('uc_activepay_oursite', ''),
+    '#description'   => t("Please enter your site address, same as 'Site Address' field on activepay.ru (without http:// or https://)."),
+  );
+
+
+  $form['url'] = array(
+    '#type' => 'fieldset',
+    '#collapsible' => TRUE,
+    '#title' => t('Urls (result, success, fail) for merchant interfase')
+  );
+
+  $form['url']['result'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Result url'),
+    '#value' => url('uc_activepay/result', array('absolute' => TRUE)),
+    '#description'   => t("Just for copy."),
+  );
+
+  $form['url']['success'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Success url'),
+    '#value' => url('uc_activepay/success', array('absolute' => TRUE)),
+    '#description'   => t("Just for copy."),
+  );
+  $form['url']['fail'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Fail url'),
+    '#value' => url('uc_activepay/fail', array('absolute' => TRUE)),
+    '#description'   => t("Just for copy."),
+  );
+
+      return $form;
+    case 'cart-process':
+      return;
+  }
+}
+
+function uc_activepay_submit_form(&$form_state, $order) {
+  $amount = $order->order_total;
+  $ser['amount']=$amount;
+  $description=serialize($ser);
+  if (db_result(db_query("SELECT COUNT(txnid) FROM {uc_activepay_transaction} WHERE txnid = '%s'", $order->order_id))) {
+    db_query("UPDATE {uc_activepay_transaction} SET description = '%s' WHERE txnid = %d", $description, $order->order_id);
+  }
+  else {
+    db_query("INSERT INTO {uc_activepay_transaction} (txnid, description) VALUES (%d, '%s')", $order->order_id, $description);
+  }
+  $mrh=variable_get('uc_activepay_mrh', '');
+  $succ_url=url('uc_activepay/success', array('absolute' => TRUE));
+  $fail_url=url('uc_activepay/fail', array('absolute' => TRUE));
+
+  $sitename=variable_get('site_name', 'Drupal');
+  $desc = t('Purchase from site !sitename. Transaction !ID.', array('!sitename' => $sitename, '!ID' => $order->order_id));
+
+  $apay = new Activepay;
+  $apay->merchant_contract = $mrh;
+  $apay->secret_key = variable_get('uc_activepay_scrt', '');
+
+  $sign_arr = array("merchant_contract" => $mrh,
+  					"merchant_data" => $order->order_id,
+					"amount" => $amount,
+					"currency" => "RUB",
+					"merchant_description" => $desc,
+					"redirect_url_failed"=> $fail_url,
+					"redirect_url_ok"=> $succ_url,);
+					
+  $mp_url = $apay->build_merchant_pages_url($sign_arr);
+
+  $form['#action'] = $mp_url;
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Place your order'),
+  );
+  return $form;
+}
+
+
+function uc_activepay_payment_end($type) {
+  if ($type=='success') {
+    if (isset($_SESSION['cart_order'])) {
+      $order_id=$_SESSION['cart_order'];
+      $_SESSION['do_complete'] = TRUE;
+      drupal_goto('cart/checkout/complete');
+    }
+  }
+  else {
+    unset($_SESSION['cart_order']);
+    drupal_set_message( t("Your payment has been declined."));
+    drupal_goto('cart');
+  }
+  return $output;
+}
+
+/********************************************************************
+ * Hook Functions (Ubercart)
+ ********************************************************************/
+
+/**
+ * Implementation of hook_payment_method().
+ */
+function uc_activepay_payment_method() {
+  $path = base_path() . drupal_get_path('module', 'uc_activepay');
+  $title =  t('Activepay');
+
+  $methods[] = array(
+    'id' => 'uc_activepay',
+    'name' => t('Activepay'),
+    'title' => $title,
+    'desc' => t('Redirect to Activepay.ru'),
+    'callback' => 'uc_payment_method_activepay',
+    'weight' => 3,
+    'checkout' => TRUE,
+    'no_gateway' => TRUE,
+  );
+
+  return $methods;
+}

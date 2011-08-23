@@ -1,0 +1,199 @@
+<?php
+// $Id: uc_followup.module,v 1.12 2010/02/28 10:16:52 neochief Exp $
+
+/**
+ * @file
+ * UC Follow-up allows to automatically send e-mails to customers on different stages of ordering.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function uc_followup_menu() {
+  $items['admin/store/follow-up'] = array(
+    'title' => 'Follow-ups',
+    'page callback' => 'uc_followup_list',
+    'access arguments' => array('administer order workflow'),
+    'file' => 'uc_followup.admin.inc',
+  );
+  $items['admin/store/follow-up/list'] = array(
+    'title' => 'Follow-ups',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -1,
+  );
+  $items['admin/store/follow-up/add'] = array(
+    'title' => 'Add follow-up',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uc_followup_form'),
+    'access arguments' => array('administer order workflow'),
+    'file' => 'uc_followup.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/store/follow-up/edit/%uc_followup'] = array(
+    'title' => 'Edit follow-up',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uc_followup_form', 4),
+    'access arguments' => array('administer order workflow'),
+    'file' => 'uc_followup.admin.inc',
+  );
+  $items['admin/store/follow-up/delete/%uc_followup'] = array(
+    'title' => 'Delete follow-up',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uc_followup_delete_confirm', 4),
+    'access arguments' => array('administer order workflow'),
+    'file' => 'uc_followup.admin.inc',
+  );
+  $items['admin/store/follow-up/settings'] = array(
+    'title' => 'Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uc_followup_settings'),
+    'access arguments' => array('administer order workflow'),
+    'file' => 'uc_followup.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/store/orders/%uc_order/follow-up'] = array(
+    'title' => 'Follow-up the customer',
+    'page callback' => 'uc_followup_customer',
+    'page arguments' => array(3),
+    'access arguments' => array('administer order workflow'),
+    'file' => 'uc_followup.admin.inc',
+  );
+  $items['admin/store/orders/%uc_order/follow-up/send/%uc_followup'] = array(
+    'title' => 'Preview & send',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uc_followup_send', 3, 6),
+    'access arguments' => array('administer order workflow'),
+    'file' => 'uc_followup.admin.inc',
+  );
+  $items['admin/store/orders/%uc_order/follow-up/details/%'] = array(
+    'title' => 'Sent follow-up details',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uc_followup_send', 3, '', 6),
+    'access arguments' => array('administer order workflow'),
+    'file' => 'uc_followup.admin.inc',
+  );
+  $items['admin/store/orders/%uc_order/follow-up/ahah_preview/%uc_followup'] = array(
+    'title' => 'Preview & send',
+    'page callback' => 'uc_followup_send_preview',
+    'page arguments' => array(3, 6),
+    'access arguments' => array('administer order workflow'),
+    'file' => 'uc_followup.admin.inc',
+  );
+  $items['admin/store/orders/%uc_order/follow-up/skip/%uc_followup'] = array(
+    'title' => 'Skip follow-up for this order?',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uc_followup_skip_confirm', 3, 6),
+    'access arguments' => array('administer order workflow'),
+    'file' => 'uc_followup.admin.inc',
+  );
+  return $items;
+}
+
+function uc_followup_load($followup_id) {
+  return db_fetch_array(db_query('SELECT * FROM {uc_followup} WHERE followup_id = %d', $followup_id));
+}
+
+function uc_followup_sent_details($follow_id) {
+  return db_fetch_array(db_query('SELECT * FROM {uc_followup_sent} WHERE follow_id = %d', $follow_id));
+}
+
+/**
+ * Implementation of hook_order_actions().
+ */
+function uc_followup_order_actions($order, $icon_html = FALSE) {
+  drupal_add_js(drupal_get_path('module', 'uc_followup') . '/uc_followup.js');
+  drupal_add_css(drupal_get_path('module', 'uc_followup') . '/uc_followup.css');
+  if (user_access('administer order workflow')) {
+    $result = db_query('SELECT fu.order_status, COUNT(fus.date) as "sent", COUNT(fu.followup_id) as "total", (COUNT(fu.followup_id) - COUNT(fus.date)) as "pending"  FROM {uc_followup} fu LEFT JOIN (SELECT * FROM {uc_followup_sent} WHERE order_id = %s GROUP BY followup_id ORDER BY date DESC) fus ON fu.followup_id = fus.followup_id WHERE fu.order_status = "%s" OR fus.date IS NOT NULL GROUP BY fu.order_status ORDER BY fu.status DESC', $order->order_id, $order->order_status);
+    $alt = array();
+    while ($data = db_fetch_array($result)) {
+      $folowups[$data['order_status']] = $data;
+      $state = uc_order_status_data($data['order_status'], 'title');
+      $alt[$data['order_status']] = t('%status: pending(@pending) | sent(@sent)', array('%status' => $state, '@pending' => $data['pending'], '@sent' => $data['sent']));
+    }
+    array_unshift($alt, '<b>'. $alt[$order->order_status] .'</b>');
+    unset($alt[$order->order_status]);
+    $alt = '<h4>'. t('Folow-up summary') .'</h4>'. implode('<br/>', $alt);
+
+    $actions[] = array(
+      'name' => t('Contact customer'),
+      'url' => 'admin/store/orders/'. $order->order_id .'/follow-up',
+      'icon' => '<img src="'. url(drupal_get_path('module', 'uc_followup') .'/images/email'. ($folowups[$order->order_status]['pending'] ? ($folowups[$order->order_status]['sent'] ? '-some' : '-active') : '') .'.png') .'" class="tooltip" alt="'. $alt .'" />',
+    );
+  }
+  return $actions;
+}
+
+/**
+ * Implementation of hook_mail().
+ */
+function uc_followup_mail($key, &$message, $params) {
+  $message['subject'] = $params['subject'];
+  $message['body'] = wordwrap($params['body']);
+  if (variable_get('uc_followup_bcc', '')) {
+    $message['headers']['Bcc'] = variable_get('uc_followup_bcc', '');
+  }
+}
+
+/**
+ * Implementation of hook_cron().
+ */
+function uc_followup_cron() {
+  if (variable_get('uc_followup_auto_send', TRUE)) {
+    $time = time();
+    // Select pending flow-ups.
+    $mega_query = '
+      SELECT o.order_id, fu.* , fus.date, fus.manual, fus.email
+      FROM {uc_followup} fu
+      LEFT JOIN {uc_orders} o ON fu.order_status = o.order_status
+      LEFT JOIN (
+        SELECT *, COUNT(order_id) as "sent_count"
+          FROM {uc_followup_sent}
+          GROUP BY followup_id, order_id
+          ORDER BY date DESC 
+        ) fus ON fu.followup_id = fus.followup_id AND fus.order_id = o.order_id
+      WHERE
+      ( 
+        (fus.date IS NULL AND (o.modified + fu.hours_past * 3600 BETWEEN %d - fu.hours_past * 3600 AND %d)) OR
+        (
+          (fu.repeat_after > 0 AND (fus.date + fu.repeat_after * 3600 BETWEEN %d - fu.hours_past * 3600 AND %d)) AND
+          (fu.repeat_max = 0 OR fu.repeat_max < fus.sent_count)
+        )
+      )
+      AND fu.status = 1
+    ';
+    $result = db_query($mega_query, $time, $time, $time, $time);
+    $i = 0;
+    while (($pending = db_fetch_array($result)) && ($i < variable_get('uc_followup_send_limit', 100))) {
+      $order = uc_order_load($pending['order_id']);
+      $replacements = uc_followup_get_token_replacements($order);
+
+      // Apply token replacements to from and recipient e-mail addressses.
+      $pending['sender'] = token_replace_multiple($pending['sender'], $replacements);
+      $pending['subject'] = token_replace_multiple($pending['subject'], $replacements);
+      $pending['body'] = token_replace_multiple($pending['body'], $replacements);
+      $pending['email'] = token_replace_multiple('[order-email]', $replacements);
+
+      // Send message
+      if (valid_email_address($pending['email'])) {
+        $sent = drupal_mail('uc_followup', '', $pending['email'], '', $pending, empty($pending['sender']) ? uc_store_email_from() : $pending['sender']);
+        if ($sent['result']) {
+          $pending['date'] = time();
+          $pending['manual'] = FALSE;
+          drupal_write_record('uc_followup_sent', $pending);
+          $i++;
+        }
+      }
+    }
+  }
+}
+
+function uc_followup_get_token_replacements($order) {
+  $account = user_load(array('uid' => $order->uid));
+  $replacements = array(
+    'global' => NULL,
+    'order' => $order,
+    'user' => $account,
+  );
+  return $replacements;
+}

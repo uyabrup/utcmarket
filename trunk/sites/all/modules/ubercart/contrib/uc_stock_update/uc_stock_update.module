@@ -1,0 +1,500 @@
+<?php
+// $Id: uc_stock_update.module 4751 2010-08-31 04:19:32Z david $
+/**
+ * uc_stock_update 6.x-2.0
+ * David Houlder http://davidhoulder.com
+ *
+ * Based on uc_stock_update 6.x-1.x:
+ *   Developed by INNODUS (jorditr@innodus.com) 
+ *   for www.freeskateshop.com - 06 july 2009
+ *   Based on Dennis Stevense's taxonomy_csv.module - Thanks! :-)
+*/
+
+define('uc_stock_update_COMMA', 0);
+define('uc_stock_update_SEMICOLON', 1);
+define('uc_stock_update_URL_ROOT', 'admin/store/update-stock-csv');
+
+function _uc_stock_update_formats() {
+  return array(
+      'products.csv' =>
+      array('_uc_stock_update_export_products', // export callback
+	    'product_prices',                   // submit button form element
+	    t('product prices'),	        // description
+	    '_uc_stock_update_import_products', // import callback
+	    array("PRODUCT_ID", "SKU", "name",  // CSV column headings
+		  "Cost", "List_price", "Sell_price"),
+	    array(0, 1),   // Which columns must be present in import
+	    array(3, 4, 5) // Which columns hold new values
+	    ),
+	       
+      'stock-level.csv' =>
+      array('_uc_stock_update_export_stock_level',
+	    'stock_levels',
+	    t('stock levels'),
+	    '_uc_stock_update_import_stock_level',
+	    array("PRODUCT_ID", "SKU", "name",
+		  "Active", "Stock_level", "Threshold"),
+	    array(0, 1),
+	    array(3, 4, 5)
+	    ),
+
+      'product-options.csv' =>
+      array('_uc_stock_update_export_product_options',
+	    'product_options',
+	    t('product option prices'),
+	    '_uc_stock_update_import_product_options',
+	    array("PRODUCT_ID",  "OPTION_ID",  "sku",
+		  "option_name", "Cost", "Price"),
+	    array(0, 1),
+	    array(4, 5)
+	    )
+      );
+}
+
+function _uc_stock_update_export_products($csv_filename, $headings) {
+  return _uc_stock_update_export(
+	     array('nid', 'model', 'title', 'cost', 'list_price','sell_price'),
+
+	     "SELECT {node}.nid, model, title, cost, list_price, sell_price ".
+	     "FROM {node} INNER JOIN {uc_products} ".
+	     "USING (vid) ".
+	     "ORDER BY model",
+	     
+	     $csv_filename, $headings);
+}
+
+function _uc_stock_update_export_stock_level($csv_filename, $headings) {
+  return _uc_stock_update_export(
+             array('nid', 'sku', 'title', 'active', 'stock', 'threshold'),
+
+	     "SELECT nid, sku, title, active, stock, threshold ".
+	     "FROM {uc_product_stock} INNER JOIN {node} ".
+	     "USING (nid) ".
+	     "ORDER BY sku",
+
+	     $csv_filename, $headings);
+}
+
+function _uc_stock_update_export_product_options($csv_filename, $headings) {
+  return _uc_stock_update_export(
+             array('nid',  'oid', 'model', 'name', 'cost', 'price'),
+
+	     "SELECT {node}.nid, oid, model, ".
+	     "{uc_attribute_options}.name, ".
+	     "{uc_product_options}.cost, {uc_product_options}.price ".
+	     "FROM {node} INNER JOIN {uc_product_options} USING (nid) ".
+	     "INNER JOIN {uc_products} USING (vid) ".
+	     "INNER JOIN {uc_attribute_options} USING (oid) ".
+	     "ORDER BY model",
+
+	     $csv_filename, $headings);
+}
+
+/**
+ * Implementation of hook_help().
+ */
+function uc_stock_update_help($path, $arg) {
+
+  switch ($path) {
+    case uc_stock_update_URL_ROOT:
+    case 'admin/help#uc_stock_update':
+      return t('<p>Use this form to transfer stock data and product prices between a Übercart online shop and <a href="http://en.wikipedia.org/wiki/Comma-separated_values" title="Wikipedia definition">CSV</a> files.</p><p><strong>Warning:</strong> Please make sure you have a backup before you proceed so you can roll back, if necessary.</p>');
+  }
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function uc_stock_update_perm() {
+  return array('import stock and price data');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function uc_stock_update_menu() {
+  $items = array();
+  
+  $items[uc_stock_update_URL_ROOT] = array(
+    'title' => 'Bulk update stock and price data',
+    'description' => 'Update stock and price data by uploading a CSV file',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uc_stock_update_import'),
+    'access arguments' => array('import stock and price data'),
+    'weight' => 12,
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  $items[uc_stock_update_URL_ROOT . '/getcsv/%'] = array(
+    'page callback' => '_uc_stock_update_get_csv',
+    'page arguments' => array(4), // Must index correct URL path component 
+    'access arguments' => array('import stock and price data'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Call export callback and send CSV data to browser.
+ */
+function _uc_stock_update_get_csv($csv_filename) {
+  $file_info=_uc_stock_update_formats();
+  $format=$file_info[$csv_filename];
+  if ($format === NULL)
+    return drupal_not_found();
+  list($func, $element, $label, $junk, $headings) = $format;
+
+  $csv_data=$func($csv_filename, $headings);
+
+  ob_end_clean();
+  $http_headers = array(
+			'Expires: 0',
+			'Cache-Control: must-revalidate',
+			'Content-Transfer-Encoding: binary',
+			'Content-Length:'. strlen($csv_data),
+			'Content-Disposition: attachment; filename="'.
+			$csv_filename .'"',
+			'Content-Type: text/csv'
+			);
+
+  /* Workaround for IE bug http://support.microsoft.com/kb/316431/ */
+
+  if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != '' && $_SERVER['HTTPS'] != 'off') {
+    $http_headers[] = 'Pragma: private';
+    $http_headers[] = 'Cache-Control: private';
+  } else {
+    $http_headers[] = 'Pragma: no-cache';
+    $http_headers[] = 'Cache-Control: no-cache';
+  }
+
+  foreach ($http_headers as $header) {
+    $header = preg_replace('/\r?\n(?!\t| )/', '', $header);
+    drupal_set_header($header);
+  }
+
+  print $csv_data;
+  exit();
+}
+
+/** 
+ * Used by export callbacks. Run SQL query and format results.
+ * See http://tools.ietf.org/html/rfc4180
+ */
+function _uc_stock_update_export($columns, $sql, $csv_name, $headings) {
+  $csv_output=implode(',', $headings) ."\r\n";
+
+  $result =  db_query($sql);
+  while ($o = db_fetch_array($result)) {
+    $row=array();
+    foreach ($columns as $index => $col_name) {
+      $row[$index] = '"'. str_replace('"', '""', $o[$col_name]) .'"';
+    }
+    $csv_output .= implode(',', $row) ."\r\n";
+  }
+  return $csv_output;
+}
+
+
+/**
+ * Generates the CSV export & import form.
+ */
+function uc_stock_update_import() {
+  $form = array('#attributes' => array('enctype' => 'multipart/form-data'));
+
+  $form['csv_export'] = array('#type' => 'fieldset',
+			      '#title' => t('Export data to CSV files'));
+  $form['csv_export']['#description'] = t('Use these links to download CSV files. After downloading, open the CSV files with a spreadsheet program. Alter the price and stock level column values as you see fit, then export or save as a CSV file. The saved file can then be imported below.');
+
+  $form['source'] = array('#type' => 'fieldset',
+			  '#title' => t('Import data from CSV files'));
+
+
+  $form['source']['#description'] = t('<strong>Data Structure:</strong> A CSV file used for import must have column names on its first line. This line must include a subset of the column names found in the corresponding export file. See below for details. You can add more columns or reorder them if you want. Note that you can only update existing items. Rows that do not match an existing product or option will be skipped on import. <ul><li>Upper case field names (e.g. <strong>PRODUCT_ID</strong>) are used to identify the item to update.</li><li>Lower case field names (e.g. <strong>name</strong>) are just for your information and are not used.</li><li>Capitalized field names (e.g. <strong>Sell_price</strong>) are used to supply updated values.</li></ul>');
+
+  if ($max_size = _uc_stock_update_parse_size(
+		     ini_get('upload_max_filesize'))) {
+    $form['source']['#description'] .= '<p>'.t('Due to server restrictions, the maximum upload file size is !size. Files that exceed this size will be disregarded without notice.', array('!size' => format_size($max_size))). '</p>';
+  }
+
+  $form['source']['delimiter'] = array(
+    '#type' => 'select',
+    '#title' => t('CSV file delimiter'),
+    '#options' => array(
+      uc_stock_update_COMMA => t('Comma – default'),
+      uc_stock_update_SEMICOLON => t('Semicolon'),
+    ),
+    '#description' => t('Choose the delimiter used in the CSV file you want to import.'),
+  );
+    
+  foreach (_uc_stock_update_formats() as $csv_name => $format) {
+    list($func, $element, $label, $icallback, $col_names,
+	 $req_columns, $data_columns) = $format;
+    $ta=array('@label'=>$label);
+
+    $form['csv_name_'.$element] =  array('#type' => 'value',
+					 '#value' => $csv_name);
+
+    $form['csv_export']['export_'.$element] = 
+      array('#value' => l(t('Export @label to CSV file.', $ta),
+			  uc_stock_update_URL_ROOT . '/getcsv/'. $csv_name) .
+	    '<br />');
+
+    $description=
+      t('The file must contain the columns').
+      ' <strong>'. implode('</strong>, <strong>',
+			   array_intersect_key($col_names,
+					       array_flip($req_columns))).
+      '</strong> '.
+      (count($data_columns) >1? t('and one or more of'): t('and')).
+      ' <strong>'. implode('</strong>, <strong>',
+			   array_intersect_key($col_names,
+					       array_flip($data_columns))).
+      '</strong>';
+    $form['source']['upload_'.$element] = array(
+			     '#type' => 'file',
+			     '#title' => t('Import @label CSV file', $ta),
+			     '#description' => $description);
+    $form['source'][$element] = array('#type' => 'submit',
+				      '#value' => t('Update @label', $ta));
+  }
+  return $form;
+}
+
+/**
+ * Parses PHP configuration size values into bytes.
+ *
+ * Edited from an example at http://php.net/manual/en/function.ini-get.php
+ */
+function _uc_stock_update_parse_size($value) {
+  $value = trim($value);
+  $number = (int)substr($value, 0, -1);
+
+  $suffix = strtoupper(substr($value, -1));
+  switch ($suffix) {
+    case 'G':
+      $number *= 1024;      
+    case 'M':
+      $number *= 1024;
+    case 'K':
+      $number *= 1024;
+  }
+  
+  return $number;
+}
+
+/**
+ * Handles CSV import form validation.
+ */
+function uc_stock_update_import_validate($form, &$form_state) {
+  $element=$form_state['clicked_button']['#parents'][0];
+  if ($element != "") {
+    $ok = $form_state['saved_file'] = file_save_upload('upload_'.$element);
+    if ($ok)
+      return;
+  }
+  form_set_error('upload_'.$element, t('Please specify a file.'));
+}
+
+/**
+ * Handles CSV import form submission.
+ * Reads the uploaded CSV file and schedules batch operations to
+ * update the database.
+ */
+function uc_stock_update_import_submit($form, &$form_state) {
+  require_once (dirname(__FILE__) . '/ReadCSV.inc');
+
+  $element=$form_state['clicked_button']['#parents'][0];
+  $values = $form_state['values'];
+
+  if ($values['delimiter'] == uc_stock_update_SEMICOLON) {
+    $delimiter = ';';
+  }
+  else {
+    $delimiter = ',';
+  }
+
+  $file_formats=_uc_stock_update_formats();
+  $format=$file_formats[$values['csv_name_'.$element]];
+  if (!$format) {
+    drupal_set_message('Bug - no format for '. $element, 'error');
+    return;
+  }
+  list($func, $e, $label, $import_func, $field_list,
+       $required_cols, $value_cols) = $format;
+  $file=$form_state['saved_file'];
+
+  $handle = fopen($file->filepath, 'r');
+  if (!$handle) {
+    drupal_set_message(t("Could not open uploaded file"), 'error');
+    return;
+  }
+
+  $batch = array(
+    'operations' => array(),
+    'finished' => 'uc_stock_update_import_finished',
+    'title' => t('Importing data from CSV file'),
+    'init_message' => t('Starting import...'),
+    'progress_message' => t('Imported @current out of @total lines.'),
+    'error_message' => t('An error occurred during the import.'),
+  );
+  $first = TRUE;
+  $field_reorder=array();
+  $csv_reader = new ReadCSV($handle,
+			    $delimiter,
+			    "\xEF\xBB\xBF"); // Skip any UTF-8 byte order mark.
+
+  while (($line = $csv_reader->get_row()) !== NULL) {
+    if (empty($line) || (count($line) == 1 && $line[0] == NULL)) continue;
+    if ($first) {
+      // First line has column labels. Generate the mapping from CSV
+      // column order to the column order we want.
+      foreach ($required_cols as $fi) {
+	$fn=$field_list[$fi];
+	$line_index=array_search($fn, $line);
+	if ($line_index === FALSE) {
+	  drupal_set_message(
+	     t('File does not contain required <strong>@name</strong> column heading',
+	       array('@name'=>$fn)),
+	     'error');
+	  return;
+	}
+	$field_reorder[$line_index]=$fi;
+      }
+
+      foreach ($value_cols as $fi) {
+	$fn=$field_list[$fi];
+	$line_index=array_search($fn, $line);
+	if ($line_index === FALSE)
+	  continue;
+	$field_reorder[$line_index]=$fi;
+      }
+
+      if (count($field_reorder) == count($required_cols)) {
+	drupal_set_message(
+           t('File does not contain any column headings for new data values'),
+	   'error');
+	return;
+      }
+
+      $first = FALSE;
+      continue;
+    }
+    $line_reordered=array();
+    foreach ($field_reorder as $from => $to)
+      $line_reordered[$to]=$line[$from];
+
+    // Note that $line_reordered may have gaps in its numeric indexes here
+    // That's OK - list() does the right thing:
+    //   list($a, $b, $c) = array(0=>'x', 2=>'y');
+    //   echo $a==='x', $b===NULL, $c==='y';
+
+    // Encode the line in base64 to prevent batch errors for weird encodings.
+    $batch['operations'][] = array('uc_stock_update_import_line',
+				   array(array_map('base64_encode',
+						   $line_reordered),
+					 $import_func));
+  }
+  fclose($handle);
+  
+  batch_set($batch);
+}
+
+/**
+ * Callback for finished batch import.
+ */
+function uc_stock_update_import_finished($success, $results, $operations) {
+  drupal_set_message(t('The CSV file has been imported.'));
+}
+
+function uc_stock_update_import_line($line, $callback) {
+  // Decode the line.
+  $line = array_map('base64_decode', $line);
+  
+  // Convert line to UTF-8.
+  $line = array_map('_uc_stock_update_import_line_to_utf8', $line);
+  
+  // Note that $callback is from initial form values, not
+  // browser-supplied data, so no risk of code injection here.
+  $callback($line);
+}
+
+/**
+ * Helper function to convert each line item to UTF-8.
+ */
+function _uc_stock_update_import_line_to_utf8($value) {
+  $enc = mb_detect_encoding($value, "UTF-8, ISO-8859-1, ISO-8859-15", TRUE);
+  if ($enc != "UTF-8") {
+    $value = drupal_convert_to_utf8($value, $enc);
+  }
+  return $value;
+}
+
+/**
+ * Import callbacks to update the datbase tables
+ */
+function _uc_stock_update_import_products($line) {
+  list($nid, $sku, $title, $cost, $list_price, $sell_price)=$line;
+
+  _uc_stock_update_update_table('uc_products',
+	      array("cost = %f" => $cost,
+		    "list_price = %f" => $list_price,
+		    "sell_price = %f" =>  $sell_price),
+	      "model = '%s' AND vid = (SELECT vid from {node} WHERE nid= %d)",
+	      array($sku, $nid));
+}
+
+function _uc_stock_update_import_stock_level($line) {
+  list($nid, $sku, $title, $active, $stock_level, $threshold)=$line;
+  _uc_stock_update_update_table('uc_product_stock',
+				array('active = %d' => $active,
+				      'stock = %d' => $stock_level,
+				      'threshold = %d' => $threshold),
+				"sku = '%s' AND nid = %d",
+				array($sku, $nid));
+}
+
+function _uc_stock_update_import_product_options($line) {
+  list($nid, $oid, $model,  $name, $cost, $price)=$line;
+  _uc_stock_update_update_table('uc_product_options',
+				array("cost = %f" => $cost,
+				      "price = %f" => $price),
+				"nid = %d AND oid = %d",
+				array($nid, $oid));
+}
+
+/**
+ * Used by import callbacks 
+ */
+function _uc_stock_update_update_table($table, $new_values,
+				       $where_clause, $where_args) {
+  $db_query_args=array();
+  $value_args=array();
+  $columns=array();
+  foreach ($new_values as $col_spec => $value) {
+    $value=trim($value);
+    if (is_numeric($value)) {
+      $columns[]= $col_spec;
+      $value_args[]=$value;
+    }
+  }
+
+  if ($columns) {
+    $db_query_args[]="UPDATE {".$table."} SET ".
+      implode(', ', $columns)  .
+      " WHERE ". $where_clause;
+    foreach ($value_args as $n)
+      $db_query_args[]=$n;  
+    foreach ($where_args as $a)
+      $db_query_args[]=$a;
+
+    call_user_func_array('db_query', $db_query_args);
+
+    if (db_affected_rows() < 1) {
+      drupal_set_message(t("Couldn't find an existing entry matching (@match). Skipping this row.",
+			   array('@match' => implode(', ', $where_args))));
+    }
+  } else {
+    drupal_set_message(t("Row does not have any new values. Skipping"));
+  }
+}

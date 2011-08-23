@@ -1,0 +1,11 @@
+; $Id: uc_stock_update.info 4754 2010-09-01 07:21:14Z david $
+
+name = Stock and Price Updater
+description = Allows you to update stock and price data from a CSV file.
+core = 6.x
+dependencies[] = uc_attribute
+dependencies[] = uc_stock
+version = 6.x-2.0.1
+package = Ubercart - extra
+project = uc_stock_update
+
