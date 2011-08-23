@@ -1,0 +1,178 @@
+# $Id$
+#
+# Russian translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  uc_legal_persons.module,v 1.2 2011/02/12 10:40:19 podarok
+#  uc_legal_persons.info,v 1.3 2011/02/12 10:21:31 podarok
+#  uc_order-legal_person.tpl.php,v 1.1 2011/02/09 16:09:35 podarok
+#  uc_order-legal_persons.tpl.php,v 1.1 2011/02/12 10:55:26 podarok
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2011-02-13 13:38+0300\n"
+"PO-Revision-Date: 2011-02-13 13:53+0300\n"
+"Last-Translator: OpenStore <openstore.org.ua@gmail.com>\n"
+"Language-Team: Russian <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((((n%10)==1)&&((n%100)!=11))?(0):(((((n%10)>=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
+
+#: uc_legal_persons.module:18;38
+msgid "ZKPO"
+msgstr "ЗКПО"
+
+#: uc_legal_persons.module:22
+msgid "RR"
+msgstr "Р/р"
+
+#: uc_legal_persons.module:26
+msgid "MFO"
+msgstr "МФО"
+
+#: uc_legal_persons.module:30
+msgid "SV number"
+msgstr "Номер свідоцтва"
+
+#: uc_legal_persons.module:34
+msgid "IPN"
+msgstr "IPN"
+
+#: uc_legal_persons.module:106
+msgid "UR. account for bank payment"
+msgstr "Расчётный счёт для юрлица"
+
+#: uc_legal_persons.module:107
+msgid "Legal persons (issue an invoice)"
+msgstr "Юрлица (выписать счет-фактуру)"
+
+#: uc_legal_persons.module:108
+msgid "Issue an invoice for payment of legal entity."
+msgstr "Выписать счет на оплату для юридических лиц."
+
+#: uc_legal_persons.module:125
+msgid "You can print invoice at the end of checkout."
+msgstr "Вы можете распечатать инвойс в конце оформления заказа."
+
+#: uc_legal_persons.module:129
+msgid "Bill for legal person"
+msgstr "Счёт для юрлица"
+
+#: uc_legal_persons.module:130
+msgid "Print bill"
+msgstr "Распечатать"
+
+#: uc_legal_persons.module:137
+msgid "Print"
+msgstr "Распечатать"
+
+#: uc_legal_persons.module:170
+msgid "Print invoice"
+msgstr "Печать"
+
+#: uc_legal_persons.module:171
+msgid "Close window"
+msgstr "Закрыть"
+
+#: uc_legal_persons.module:54
+msgid "View invoice"
+msgstr "Смотреть инвойсы"
+
+#: uc_legal_persons.module:55
+msgid "View order invoice."
+msgstr "Просмотр инвойса заказа."
+
+#: uc_legal_persons.info:0
+msgid "UC for legal person"
+msgstr "Счёт для юридического лица"
+
+#: uc_legal_persons.info:0
+msgid "UC order for legal person. Ukrainian Invoices."
+msgstr "Счёт для юридического лица Украины"
+
+#: uc_legal_persons.info:0
+msgid "Ubercart - extra"
+msgstr "Магазин - дополнительно"
+
+#: templates/uc_order-legal_person.tpl.php:11
+#: templates/uc_order-legal_persons.tpl.php:11
+msgid "Supplier"
+msgstr "Постачальник"
+
+#: templates/uc_order-legal_person.tpl.php:21
+#: templates/uc_order-legal_persons.tpl.php:21
+msgid "Customer:"
+msgstr "Клиент:"
+
+#: templates/uc_order-legal_person.tpl.php:21
+#: templates/uc_order-legal_persons.tpl.php:21
+msgid "Customer"
+msgstr "Клиент"
+
+#: templates/uc_order-legal_person.tpl.php:21
+#: templates/uc_order-legal_persons.tpl.php:21
+msgid "the same"
+msgstr "той же"
+
+#: templates/uc_order-legal_person.tpl.php:22
+#: templates/uc_order-legal_persons.tpl.php:22
+msgid "Products on order:"
+msgstr "Ваши покупки:"
+
+#: templates/uc_order-legal_person.tpl.php:23
+#: templates/uc_order-legal_persons.tpl.php:23
+msgid "Order #:"
+msgstr "Заказ #:"
+
+#: templates/uc_order-legal_person.tpl.php:24
+#: templates/uc_order-legal_persons.tpl.php:24
+msgid "№"
+msgstr "№"
+
+#: templates/uc_order-legal_person.tpl.php:24
+#: templates/uc_order-legal_persons.tpl.php:24
+msgid "SKU: "
+msgstr "SKU: "
+
+#: templates/uc_order-legal_person.tpl.php:24
+#: templates/uc_order-legal_persons.tpl.php:24
+msgid "Product"
+msgstr "Товар"
+
+#: templates/uc_order-legal_person.tpl.php:24
+#: templates/uc_order-legal_persons.tpl.php:24
+msgid "Measuring"
+msgstr "Одиниця виміру"
+
+#: templates/uc_order-legal_person.tpl.php:24
+#: templates/uc_order-legal_persons.tpl.php:24
+msgid "Quantity"
+msgstr "Количество"
+
+#: templates/uc_order-legal_person.tpl.php:24
+#: templates/uc_order-legal_persons.tpl.php:24
+msgid "Amount"
+msgstr "Сумма"
+
+#: templates/uc_order-legal_person.tpl.php:24
+#: templates/uc_order-legal_persons.tpl.php:24
+msgid "UA PDV"
+msgstr "ПДВ"
+
+#: templates/uc_order-legal_person.tpl.php:24
+#: templates/uc_order-legal_persons.tpl.php:24
+msgid "Total"
+msgstr "Сумма"
+
+#: templates/uc_order-legal_person.tpl.php:46
+#: templates/uc_order-legal_persons.tpl.php:46
+msgid "items"
+msgstr "товари"
+
+#: templates/uc_order-legal_person.tpl.php:55
+#: templates/uc_order-legal_persons.tpl.php:55
+msgid "Invoice total:"
+msgstr "Сумма всего:"
+

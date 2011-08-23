@@ -1,0 +1,527 @@
+<?php
+// $Id$
+
+/* @file
+ * Provides the Western Union payment method.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function uc_western_union_menu() {
+  $items['admin/store/orders/%uc_order/receive_western_union'] = array(
+    'title' => t('Receive Western Union Transfer'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uc_western_union_receive_western_union_form', 3),
+    'access arguments' => array('view all orders'),
+    'type' => MENU_CALLBACK,
+    'file' => 'uc_western_union.admin.inc',
+  );
+  return $items;
+}
+
+function uc_western_union_theme() {
+  return array(
+    'uc_western_union_receive_western_union_form' => array(
+      'arguments' => array('form' => NULL),
+      'file' => 'uc_western_union.admin.inc',
+    ),
+    'uc_western_union_admv_form' => array(
+      'arguments' => array('form' => NULL),
+      //'file' => 'uc_western_union.admin.inc',
+    ),
+    'uc_western_union_enterpayment_form' => array(
+      'arguments' => array('form' => NULL),
+      //'file' => 'uc_western_union.admin.inc',
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function uc_western_union_init() {
+  global $conf;
+  $conf['i18n_variables'][] = 'uc_western_union_policy';
+  $conf['i18n_variables'][] = 'uc_western_union_instructions';
+}
+
+function theme_uc_western_union_enterpayment_form($form) {
+   $output = drupal_render($form);
+   return $output;
+}
+
+function uc_western_union_enterpayment_form($form_state, $order) {
+  $form['uc_western_union_order_id'] = array(
+    '#type' => 'value',
+    '#value' => $order->order_id,
+  );
+
+  $result = db_query("SELECT transfer_sum FROM {uc_western_union} WHERE order_id = %d AND data_state != %d", $order->order_id, 1);
+  $declared_total = 0;
+  while ($row = db_fetch_object($result)) {
+    $declared_total += $row->transfer_sum;
+  }
+  $balance_current = ($order->order_total - $declared_total);
+  $balance_current = number_format($balance_current, 2, '.', '');
+  $form['uc_western_union_enter_sum'] = array(
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#title' => t('The sum of this transfer'),
+    '#description' => t('Enter the transfered amount of money. You can split your order payment into several transfers.'),
+    '#default_value' => ($balance_current > 0) ? $balance_current : '',
+  );
+  $form['uc_western_union_enter_code'] = array(
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#title' => t('Western Union Money Transfer Control Number'),
+    '#description' => t('Provide the Money Transfer Control Number (MTCN) of the transfer.'),
+  );
+
+  $name = $order->delivery_first_name . ' ' . $order->delivery_last_name;
+  $form['uc_western_union_sender'] = array(
+    '#title' => t('Transfer sender name'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#default_value' => !empty($name) ? $name : '',
+    '#description' => t('Full name of the person who have made this transfer.'),
+   );
+
+  $city = $order->delivery_city;
+  $form['city_of_transfer'] = array(
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#title' => t('City of transfer origin'),
+    '#description' => t('Provide the city name where the transfer was made.'),
+    '#default_value' => !empty($city) ? $city : '',
+  );
+
+  $form['country_of_transfer'] = uc_country_select(t('Country of transfer origin'), $order->delivery_country, t('Select the country where the transfer was made.', NULL, TRUE));
+
+  $form['uc_western_union_transfer_comment'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Comments (optional)'),
+    '#description' => t('You can provide here any comments regarding the transfer.'),
+    '#rows' => 3,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Send information')
+  );
+
+  return $form;
+}
+
+/**
+  * Validate the form.
+  */
+function uc_western_union_enterpayment_form_validate($form, &$form_state) {
+   if (!is_numeric($form_state['values']['uc_western_union_enter_sum'])) {
+      // We notify the form API that this field has failed validation.
+      form_set_error('uc_western_union_enter_sum',
+        t('The sum of transfer must be a number.'));
+   }
+
+}
+/**
+  * Handle post-validation form submission.
+  */
+function uc_western_union_enterpayment_form_submit($form, &$form_state) {
+  $order_id = $form_state['values']['uc_western_union_order_id'];
+  $sum = $form_state['values']['uc_western_union_enter_sum'];
+  $transfer_id = $form_state['values']['uc_western_union_enter_code'];
+  $name = $form_state['values']['uc_western_union_sender'];
+  $city = $form_state['values']['city_of_transfer'];
+  $country = $form_state['values']['country_of_transfer'];
+  $user_comment = $form_state['values']['uc_western_union_transfer_comment'];
+  if (!isset($user_comment)){
+    $user_comment = '---';
+  }
+
+  db_query("INSERT INTO {uc_western_union} (order_id, transfer_sum, transfer_control_id, sender_name, city, country_id, user_comment, created) VALUES (%d, %f, '%s', '%s', '%s', %d, '%s', %d)",
+  $order_id, $sum, $transfer_id, $name, $city, $country, $user_comment, time());
+
+  drupal_set_message(t('Your transfer information has been sent.'));
+}
+
+/**
+  * Admin form - really should be in uc_western_union.admin.inc but putting it there throws php warning :(
+  */
+function uc_western_union_admv_form($form_state, $order) {
+  $user_input_id = array();
+  $result = db_query("SELECT * FROM {uc_western_union} WHERE order_id = %d ORDER BY user_input_id ASC", $order->order_id);
+  while ($transfer_data = db_fetch_object($result)) {
+    $user_input_id[] = $transfer_data->user_input_id;
+
+    $input_date = date('D d\/m\/Y H:i:s', $transfer_data->created);
+    $form['uc_western_created' . $transfer_data->user_input_id] = array(
+      '#prefix' => '<tr><td class="uc_western_union_summary"><div>',
+      '#value' => t('<strong>Date: </strong>') . $input_date,
+      '#suffix' => '</div>',
+    );
+
+    $form['uc_western_union_id' . $transfer_data->user_input_id] = array(
+      '#prefix' => '<div>',
+      '#value' => t('<strong>MTCN: </strong>') . check_plain($transfer_data->transfer_control_id),
+      '#suffix' => '</div>',
+    );
+
+    $form['uc_western_union_sender_name' . $transfer_data->user_input_id] = array(
+      '#prefix' => '<div>',
+      '#value' => t('<strong>Sender: </strong>') . check_plain($transfer_data->sender_name),
+      '#suffix' => '</div>',
+    );
+
+    $form['uc_western_union_city' . $transfer_data->user_input_id] = array(
+      '#prefix' => '<div>',
+      '#value' => t('<strong>City: </strong>') . check_plain($transfer_data->city),
+      '#suffix' => '</div>',
+    );
+
+    $country = db_fetch_object(db_query("SELECT country_name FROM {uc_countries} WHERE country_id = %d", $transfer_data->country_id));
+    $form['uc_western_union_country' . $transfer_data->user_input_id] = array(
+      '#prefix' => '<div>',
+      '#value' => t('<strong>Country: </strong>') . $country->country_name,
+      '#suffix' => '</div>',
+    );
+
+    $context = array(
+      'revision' => 'formatted-original',
+      'type' => 'amount',
+    );
+    $options = array(
+      'sign' => FALSE,
+      'thou' => FALSE,
+      'dec' => '.',
+    );
+    $sum = check_plain($transfer_data->transfer_sum);
+    $form['uc_western_union_sum' . $transfer_data->user_input_id] = array(
+      '#prefix' => '<div>',
+      '#value' => t('<strong>Amount: </strong>') . uc_price($sum, $context),
+      '#suffix' => '</div></td>',
+    );
+
+    $form['uc_western_union_user_comment' . $transfer_data->user_input_id] = array(
+      '#prefix' => '<td class="uc_western_union_comment"><div>',
+      '#value' => check_plain($transfer_data->user_comment),
+      '#suffix' => '</div></td>',
+    );
+
+    $form['uc_western_union_admin_comment' . $transfer_data->user_input_id] = array(
+      '#prefix' => '<td class="uc_western_union_adm_comment"><div>',
+      '#type' => 'textarea',
+      '#rows' => 4,
+      '#default_value' => isset($transfer_data->admin_comment) ? check_plain($transfer_data->admin_comment) : '',
+      '#cols' => 20,
+      '#suffix' => '</div></td>',
+      '#resizable' => FALSE,
+    );
+
+    $balance = uc_payment_balance($order);
+    if ($balance > 0) {
+      $form['uc_western_union_data_state' . $transfer_data->user_input_id] = array(
+        '#prefix' => '<td class="uc_western_union_checkbox"><div>',
+        '#type' => 'checkbox',
+        '#default_value' => isset($transfer_data->data_state) ? $transfer_data->data_state : 0,
+        '#suffix' => '</div></td></tr>',
+      );
+    }
+    if ($balance <= 0) {
+      $form['uc_western_union_data_state' . $transfer_data->user_input_id] = array(
+        '#prefix' => '<td class="uc_western_union_checkbox"><div>',
+        '#type' => 'checkbox',
+        '#disabled' => TRUE,
+        '#default_value' => isset($transfer_data->data_state) ? $transfer_data->data_state : 0,
+        '#suffix' => '</div></td></tr>',
+      );
+    }
+  }
+
+  $form['user_input_ids'] = array(
+    '#type' => 'value',
+    '#value' => $user_input_id,
+  );
+  $form['submit'] = array(
+    '#prefix' => '</table><div class="uc_western_union_submit_wrapper">',
+    '#type' => 'submit',
+    '#value' => t('Update'),
+    '#suffix' => '</div>'
+  );
+
+  return $form;
+}
+
+/**
+  * Handle post-validation form submission this must be uc_western_union.admin.inc with the form itself.
+  */
+function uc_western_union_admv_form_submit($form, &$form_state) {
+  $user_input_ids = $form_state['values']['user_input_ids'];
+  foreach ($user_input_ids as $input_id) {
+    db_query("UPDATE {uc_western_union} SET data_state = %d, admin_comment = '%s' WHERE user_input_id = %d", $form_state['values']['uc_western_union_data_state' . $input_id], $form_state['values']['uc_western_union_admin_comment' . $input_id], $input_id);
+  }
+  drupal_set_message(t('Western union transfers information has been updated.'));
+}
+
+/**
+  * Theme admin form - really should be in uc_western_union.admin.inc with the form itself
+  */
+function theme_uc_western_union_admv_form($form) {
+
+  $output = drupal_render($form['order_id']);
+  $output .= '<table class="uc_western_union">';
+  $output .= '<thead>';
+  $output .= '<th class="uc_western_union_tr_details">' . t('Transfer details') . '</th>';
+  $output .= '<th class="uc_western_union_u_comment">' . t('User comment') . '</th>';
+  $output .= '<th class="uc_western_union_a_comment">' . t('Admin comment') . '</th>';
+  $output .= '<th class="uc_western_union_failure">' . t('Receive failure') . '</th>';
+  $output .= '</thead>';
+  $output .= '<tbody>';
+
+  $output .= drupal_render($form);
+
+  return $output;
+}
+
+/**
+  * Implementation of hook_payment_method().
+  */
+function uc_western_union_payment_method() {
+  $methods[] = array(
+    'id' => 'western_union',
+    'name' => t('Western Union'),
+    'title' => variable_get('uc_western_union_method_title', 'Western Union'),
+    'desc' => t('Pay via Western Union.'),
+    'callback' => 'uc_payment_method_western_union',
+    'weight' => 1,
+    'checkout' => TRUE,
+    'no_gateway' => TRUE,
+  );
+  return $methods;
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function uc_western_union_token_values($type, $object = NULL) {
+  switch ($type) {
+    case 'order':
+      $order = $object;
+      $values['order-western-union-transfer-details'] = uc_western_union_transfer_details($order->order_id);
+      break;
+  }
+
+  return $values;
+}
+
+/**
+ * Implementation of hook_token_list(). (token.module)
+ */
+function uc_western_union_token_list($type = 'all') {
+  if ($type == 'order' || $type == 'ubercart' || $type == 'all') {
+    $tokens['order']['order-western-union-transfer-details'] = t('The details of the Western Union payment for the order.');
+  }
+
+  return $tokens;
+}
+
+/**
+ * Handle the Western Union payment method.
+ */
+function uc_payment_method_western_union($op, &$arg1) {
+  switch ($op) {
+    case 'cart-details':
+      $details = t('Western Union transfer should be made out to: ') . '<br />' . uc_western_union_transfer_details($arg1->order_id);
+      return $details;
+
+    case 'cart-review':
+      $review[] = array('title' => t('Western Union transfer should be made out to'), 'data' => uc_western_union_transfer_details($arg1->order_id));
+      return $review;
+
+    case 'order-view':
+      if (!variable_get('uc_payment_tracking', TRUE)) {
+        return '';
+      }
+
+      $balance = uc_payment_balance($arg1);
+      $context = array(
+        'revision' => 'formatted-original',
+        'type' => 'amount',
+      );
+      $options = array(
+        'sign' => FALSE,
+        'thou' => FALSE,
+        'dec' => '.',
+      );
+      $result = db_query("SELECT transfer_sum FROM {uc_western_union} WHERE order_id = %d AND data_state != %d", $arg1->order_id, 1);
+      $declared_total = 0;
+      while ($row = db_fetch_object($result)) {
+        $declared_total += $row->transfer_sum;
+      }
+      $declared = uc_price($declared_total, $context);
+      $declared_unformed = uc_price($declared_total, $context, $options);
+      $total = uc_price($arg1->order_total, $context, $options);
+      $total_formatted = uc_price($arg1->order_total, $context);
+      $remain = uc_price(($total - $declared_unformed), $context);
+
+      if ((variable_get('uc_payment_tracking', TRUE)) && (uc_price($balance, $context, $options) <= 0)) {
+        $output = t('Western Union payment Received');
+        $output .= drupal_get_form('uc_western_union_admv_form', $arg1);
+        return $output;
+      }
+
+      else {
+        $output = t('Order total: @total', array('@total' => $total_formatted));
+        $output .= '<br />';
+        $output .= t('Declared total: @declared', array('@declared' => $declared));
+        $output .= '<br />';
+        $output .= t('Remain to declare: @remain', array('@remain' => $remain));
+        $output .= '<br />';
+        $output .= l(t('Receive Western Union transfer'), 'admin/store/orders/'. $arg1->order_id .'/receive_western_union');
+        $output .= '<br />';
+        $output .= drupal_get_form('uc_western_union_admv_form', $arg1);
+        return $output;
+      }
+
+    case 'customer-view':
+
+      if (!variable_get('uc_payment_tracking', TRUE)) {
+        return '';
+      }
+
+      $balance = uc_payment_balance($arg1);
+      $context = array(
+        'revision' => 'formatted-original',
+        'type' => 'amount',
+      );
+      $options = array(
+        'sign' => FALSE,
+        'thou' => FALSE,
+        'dec' => '.',
+      );
+      if ((variable_get('uc_payment_tracking', TRUE)) && (uc_price($balance, $context, $options) <= 0)) {
+        $output = t('Your Western Union payment Received');
+        return $output;
+      }
+
+      if ((variable_get('uc_payment_tracking', TRUE)) && (uc_price($balance, $context, $options) > 0)) {
+
+         $result = db_query("SELECT transfer_sum FROM {uc_western_union} WHERE order_id = %d AND data_state != %d", $arg1->order_id, 1);
+         $declared_total = 0;
+         while ($row = db_fetch_object($result)) {
+           $declared_total += $row->transfer_sum;
+         }
+
+        if ((uc_price($declared_total, $context, $options)) <= 0) {
+          $output = t('<strong>Status:</strong><br />');
+          $output .= t('Waiting for Western Union transfer.<br /> To initiate processing of your order please enter the transfer details in the form below and press &quot;Send information&quot; button.');
+          $output .= drupal_get_form('uc_western_union_enterpayment_form', $arg1);
+          return $output;
+          }
+
+        if (((uc_price($declared_total, $context, $options)) > 0) && ((uc_price($declared_total, $context, $options)) < $arg1->order_total)) {
+          $declared = uc_price($declared_total, $context);
+          $o_total = uc_price($arg1->order_total, $context);
+          $output = t('<strong>Status:</strong><br />');
+          $output .= t('Order total: @total<br />', array('@total' => $o_total));
+          $output .= t('Declared total: @declared<br />', array('@declared' => $declared));
+          $output .= t('Waiting for the remaining Western Union transfer(s).<br />Please enter transfer details for the next Western Union transfer.');
+          $output .= drupal_get_form('uc_western_union_enterpayment_form', $arg1);
+          return $output;
+        }
+
+        if ((uc_price($declared_total, $context, $options)) >= $arg1->order_total) {
+          $output = t('Processing your Western Union payment.');
+          return $output;
+        }
+      }
+
+      else {
+        return '';
+      }
+
+    case 'order-delete':
+      db_query("DELETE FROM {uc_western_union} WHERE order_id = %d", $arg1->order_id);
+    break;
+
+    case 'settings':
+      // help text
+      $form['uc_western_union_help_text'] = array(
+        '#type' => 'item',
+        '#prefix' => '<div class="help">',
+        '#value' => t('<h4><strong>Installation instructions</strong></h4><p>For better customer experience please use the token [order-western-union-transfer-details] in your invoice template to display the payment details on the invoice.</p>'),
+        '#suffix' => '</div>',
+      );
+
+      $form['uc_western_union_method_title'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Payment method title'),
+        '#description' => t('Provide specific description for the payment method on the order checkout page.'),
+        '#default_value' => variable_get('uc_western_union_method_title', t('Western Union transfer')),
+      );
+
+      $form['western_union_info'] = array(
+        '#value' => '<div>'. t('Set the payment details to display to customers who choose this payment method during checkout.') .'</div>',
+      );
+      $form['uc_western_union_mailing_name'] = uc_textfield(t('Payment recipient name'), variable_get('uc_western_union_mailing_name', ''), FALSE, t('The name of a person who will receive Western Union payment'), 128);
+      $form['uc_western_union_mailing_city'] = uc_textfield(uc_get_field_name('city'), variable_get('uc_western_union_mailing_city', ''), FALSE);
+      $form['uc_western_union_mailing_country'] = uc_country_select(uc_get_field_name('country'), variable_get('uc_western_union_mailing_country', uc_store_default_country()));
+      if (isset($_POST['uc_western_union_mailing_country'])) {
+        $country_id = intval($_POST['uc_western_union_mailing_country']);
+      }
+      else {
+        $country_id = variable_get('uc_western_union_mailing_country', uc_store_default_country());
+      }
+      $form['uc_western_union_mailing_zone'] = uc_zone_select(uc_get_field_name('zone'), variable_get('uc_western_union_mailing_zone', ''), FALSE, $country_id);
+      $form['uc_western_union_instructions'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Instructions for customers'),
+        '#description' => t('Instructions for customers on the checkout page.'),
+        '#default_value' => variable_get('uc_western_union_instructions', t('After sending the transfers, please go to "My account" >> "Orders" section, select the order and enter transfers details.')),
+        '#rows' => 3,
+      );
+      $form['uc_western_union_policy'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Western Union payment policy'),
+        '#description' => t('Inform customers about the policy of this payment method.'),
+        '#default_value' => variable_get('uc_western_union_policy', t('Western Union transfers need up to 3 business days for processing from the date when the transfer details were received before an order will get status "Payment received".')),
+        '#rows' => 3,
+      );
+      return $form;
+  }
+}
+
+/**
+ * Implementation of uc_western_union_transfer_details($oid).
+ *
+ * $oid = order ID
+ */
+function uc_western_union_transfer_details($oid) {
+  if (variable_get('uc_western_union_mailing_name', '') <> '') {
+    $transfer_info[] = t('<strong>Recipient name: </strong>') . variable_get('uc_western_union_mailing_name', '');
+  }
+  if (variable_get('uc_western_union_mailing_city', '') <> '') {
+    $transfer_info[] = t('<strong>City: </strong>') . variable_get('uc_western_union_mailing_city', '');
+  }
+  if (($zone_id = variable_get('uc_western_union_mailing_zone', '')) != '') {
+    $result = db_query("SELECT * FROM {uc_zones} WHERE zone_id = %d", $zone_id);
+    $zone_data = db_fetch_object($result);
+    $transfer_info[] = t('<strong>State/Province: </strong>') . $zone_data->zone_name;
+  }
+  if (($country_id = variable_get('uc_western_union_mailing_country', '')) != '') {
+    $result = db_query("SELECT * FROM {uc_countries} WHERE country_id = %d", $country_id);
+    $country_data = db_fetch_object($result);
+    $transfer_info[] = t('<strong>Country: </strong>') . $country_data->country_name;
+  }
+  if (variable_get('uc_western_union_instructions', '') != '') {
+    $transfer_info[] = '<div class="instructions">'. variable_get('uc_western_union_instructions', '') .'</div>';
+  }
+  if (variable_get('uc_western_union_policy', '') != '') {
+    $transfer_info[] = '<div class="policy">'. variable_get('uc_western_union_policy', '') .'</div>';
+  }
+
+  isset($transfer_info) ? ($transfer_details = implode('<br />', $transfer_info)) : ($transfer_details = '');
+
+  return $transfer_details;
+}
+

@@ -1,0 +1,38 @@
+name = Frontend
+description = Front end theme
+screenshot = images/screenshot.gif
+core = "6.x"
+project = "Frontend"
+engine = phptemplate
+
+regions[content_top] = Content top
+regions[header_1] = Header 1
+regions[header_2] = Header 2
+regions[top_bar] = Top bar
+regions[left] = First sidebar
+regions[right] = Second sidebar
+regions[footer_block] = Footer
+regions[content_bottom] = Content bottom
+regions[primary_menu] = Primary menu
+regions[product_collapsible] = Product collapsible fields
+regions[product_left_region] = Product left region
+regions[product_right_region] = Product right region
+regions[profile_blocks] = Profile blocks
+regions[wide_blocks] = Wide blocks
+
+features[] = logo
+features[] = name
+features[] = slogan
+features[] = mission
+features[] = favicon
+features[] = primary_links
+features[] = secondary_links
+
+stylesheets[all][] = css/default.css
+stylesheets[all][] = css/layout.css
+stylesheets[all][] = css/style.css
+stylesheets[all][] = css/profile.css                                                                            
+stylesheets[all][] = css/page.css
+stylesheets[all][] = css/views.css
+
+settings[basic_block_editing]   = 1

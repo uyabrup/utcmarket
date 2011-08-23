@@ -1,0 +1,147 @@
+# $Id$
+#
+# Russian translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  cmlservice.admin.inc: n/a
+#  cmlservice.module: n/a
+#  cmlservice.info: n/a
+#  cmlservice.install: n/a
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2011-02-11 19:47+0300\n"
+"PO-Revision-Date: 2011-02-11 20:08+0300\n"
+"Last-Translator: OpenStore <openstore.org.ua@gmail.com>\n"
+"Language-Team: Russian <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((((n%10)==1)&&((n%100)!=11))?(0):(((((n%10)>=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
+
+#: cmlservice.admin.inc:25
+msgid "Delete all."
+msgstr "Удалить всё"
+
+#: cmlservice.admin.inc:26
+msgid "Updated all."
+msgstr "Обновлено всё."
+
+#: cmlservice.admin.inc:27
+msgid "Updated price."
+msgstr "Обновлена цена."
+
+#: cmlservice.admin.inc:29
+msgid "Product force replace."
+msgstr "Принудительная замена товара."
+
+#: cmlservice.admin.inc:30
+msgid "Product enabled."
+msgstr "Товар включён."
+
+#: cmlservice.admin.inc:56
+msgid "Updated title."
+msgstr "Обновлён заголовок."
+
+#: cmlservice.admin.inc:60
+msgid "Updated description."
+msgstr "Обновлено описание."
+
+#: cmlservice.admin.inc:64
+msgid "Updated pictures."
+msgstr "Обновлены изображения."
+
+#: cmlservice.admin.inc:79
+msgid "Processing..."
+msgstr "Обработка..."
+
+#: cmlservice.admin.inc:106
+msgid "Path to folder"
+msgstr "Путь"
+
+#: cmlservice.admin.inc:107
+msgid "Path must be without /import_files"
+msgstr "Путь должен быть без /import_files"
+
+#: cmlservice.admin.inc:112
+msgid "Altered price on/off"
+msgstr "Уточнение цены"
+
+#: cmlservice.module:43
+msgid "CML settings"
+msgstr "CMLService"
+
+#: cmlservice.module:44
+msgid "1c CML settings"
+msgstr "Настройки интеграции 1С"
+
+#: cmlservice.module:384
+msgid "Try create imagefield picture @pic"
+msgstr "Попробовать создать поле изображения @pic"
+
+#: cmlservice.module:387
+msgid "Can`t create imagefield from source path @pic"
+msgstr "Невозможно создать поле изображения из адреса @pic"
+
+#: cmlservice.module:414
+msgid "Insert product %node% from XML."
+msgstr "Вставить товар %node% из XML."
+
+#: cmlservice.module:416
+msgid "Update product %node% from XML."
+msgstr "Обновить товар %node% из XML."
+
+#: cmlservice.module:466
+msgid "Try copy from @from to @pic"
+msgstr "Попробовать скопировать @from в @pic"
+
+#: cmlservice.module:487
+msgid "Find picture @pic"
+msgstr "Найти изображение @pic"
+
+#: cmlservice.module:527;663;837
+msgid "An error occurred while processing %error_operation with arguments: @arguments"
+msgstr "Произошла ошибка при обработке %error_operation с аргументом: @arguments"
+
+#: cmlservice.module:639
+msgid "The price of %product has updated"
+msgstr "Цена %product была обновлена"
+
+#: cmlservice.module:816
+msgid "The product of nid %nid has delete"
+msgstr "Товар с ID %nid удалён."
+
+#: cmlservice.module:945
+msgid "Order"
+msgstr "Заказ"
+
+#: cmlservice.module:17
+msgid "administer cmlservice"
+msgstr "Администрировать"
+
+#: cmlservice.module:17
+msgid "cml import add"
+msgstr "Добавлять импорт"
+
+#: cmlservice.module:26
+#: cmlservice.info:0
+msgid "CMLService"
+msgstr "CMLService"
+
+#: cmlservice.module:35
+msgid "CML batch support"
+msgstr "Поддержка пакетной обработки"
+
+#: cmlservice.install:24
+msgid "Product id."
+msgstr "ID товара"
+
+#: cmlservice.install:31
+msgid "A multi-site unique identifier for a product."
+msgstr "Уникальный идентификатор товара"
+
+#: cmlservice.info:0
+msgid "CommerceML 2. Импорт/экспорт коммерческой информации (1С:ALL версии 8.x) Codede by mirocow"
+msgstr "CommerceML 2. Импорт/экспорт коммерческой информации (1С:ALL версии 8.x) Автор mirocow"
+

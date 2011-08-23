@@ -1,0 +1,662 @@
+<?php
+// $Id: general.module
+
+/**
+* @file
+* Custom functions for this site.
+*/
+
+module_load_include('inc', 'general', 'preprocess/preprocess_common');
+module_load_include('inc', 'general', 'preprocess/preprocess_views');
+module_load_include('inc', 'general', 'preprocess/preprocess_node_form');
+module_load_include('inc', 'general', 'form_alter');
+module_load_include('inc', 'general', 'blocks');
+if (module_exists('chart')) {
+module_load_include('inc', 'general', 'system_charts');
+}
+
+
+
+function general_admin() {
+  $form = array();
+  	 $form['openstore']['misc'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('Miscellaneous settings'),
+     '#weight' => -8,
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+     );
+	 
+	 $form['openstore']['misc']['openstore_grid'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Display a grid overlay'),
+    '#default_value' => variable_get('openstore_grid', NULL),
+    '#description'   => t('During theme development, it can be useful to display a grid system for reference.'),
+  );
+  
+  // Charts
+  
+  if (module_exists('chart')) {
+  
+     // Выбор стиля отображения
+ 
+    $options = array (    
+      CHART_TYPE_LINE => t('Curve line with points'),
+      CHART_TYPE_LINE_XY => t('Curve line with coordinates'),
+      CHART_TYPE_BAR_H => t('Horizontal bar'),
+      CHART_TYPE_BAR_V => t('Vertical bar'),
+      CHART_TYPE_PIE => t('Two dimensional pie'),
+      CHART_TYPE_PIE_3D => t('Three-dimensional pie'), 
+    );  
+  
+    $form['openstore']['sys_charts'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('System charts'),
+     '#weight' => -7,
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+     );
+     
+    $form['openstore']['sys_charts']['enabled'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('Enabled charts'),
+     '#weight' => -10,
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+     );
+     
+    $form['openstore']['sys_charts']['styles'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('Chart styles'),
+     '#weight' => -9,
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+     );    
+     
+    $form['openstore']['sys_charts']['enabled']['users'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('User charts block'),
+     '#weight' => -10,
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+     );
+     
+    $form['openstore']['sys_charts']['enabled']['nodes'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('Nodes charts block'),
+     '#weight' => -9,
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+     );   
+	 
+
+     
+    // Филдсеты по стилям
+
+	 $form['openstore']['sys_charts']['styles']['user_role'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('Users Per Role'),
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+     );	
+	 
+	 $form['openstore']['sys_charts']['styles']['user_status'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('User Status'),
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+     );		 
+	 
+	 $form['openstore']['sys_charts']['styles']['nodes_all'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('Nodes'),
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+     );	 
+	 
+	 $form['openstore']['sys_charts']['styles']['node_activity'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('Node Activity'),
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+     );		 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 // Выбор размеров графиков
+	 
+
+     
+    $form['openstore']['sys_charts']['styles']['user_role']['openstore_charts_user_role_height'] = array(
+     '#type' => 'textfield',
+     '#title' => t('Users Per Role height'),
+     '#default_value' => variable_get('openstore_charts_user_role_height', FALSE),
+     '#size' => 20,
+     );
+     
+    $form['openstore']['sys_charts']['styles']['user_role']['openstore_charts_user_role_width'] = array(
+     '#type' => 'textfield',
+     '#title' => t('Users Per Role width'),
+     '#default_value' => variable_get('openstore_charts_user_role_width', FALSE),
+     '#size' => 20,
+     );
+     
+    $form['openstore']['sys_charts']['styles']['user_status']['openstore_charts_user_status_height'] = array(
+     '#type' => 'textfield',
+     '#title' => t('User Status height'),
+     '#default_value' => variable_get('openstore_charts_user_status_height', FALSE),
+     '#size' => 20,
+     );
+     
+    $form['openstore']['sys_charts']['styles']['user_status']['openstore_charts_user_status_width'] = array(
+     '#type' => 'textfield',
+     '#title' => t('User Status width'),
+     '#default_value' => variable_get('openstore_charts_user_status_width', FALSE),
+     '#size' => 20,
+     );             
+     
+    $form['openstore']['sys_charts']['styles']['nodes_all']['openstore_charts_nodes_height'] = array(
+     '#type' => 'textfield',
+     '#title' => t('Nodes height'),
+     '#default_value' => variable_get('openstore_charts_nodes_height', FALSE),
+     '#size' => 20,
+     );
+     
+    $form['openstore']['sys_charts']['styles']['nodes_all']['openstore_charts_nodes_width'] = array(
+     '#type' => 'textfield',
+     '#title' => t('Nodes width'),
+     '#default_value' => variable_get('openstore_charts_nodes_width', FALSE),
+     '#size' => 20,
+     );
+     
+    $form['openstore']['sys_charts']['styles']['node_activity']['openstore_charts_node_activity_height'] = array(
+     '#type' => 'textfield',
+     '#title' => t('Node Activity height'),
+     '#default_value' => variable_get('openstore_charts_node_activity_height', FALSE),
+     '#size' => 20,
+     );
+     
+    $form['openstore']['sys_charts']['styles']['node_activity']['openstore_charts_node_activity_width'] = array(
+     '#type' => 'textfield',
+     '#title' => t('Node Activity width'),
+     '#default_value' => variable_get('openstore_charts_node_activity_width', FALSE),
+     '#size' => 20,
+     );     
+     
+
+	 
+
+     // Watchdog
+
+  if (module_exists('dblog')) {	 
+	 
+    $form['openstore']['sys_charts']['enabled']['watchdog'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('Watchdog charts block'),
+     '#weight' => -8,
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+     );	
+
+	 $form['openstore']['sys_charts']['styles']['watchdog_counts'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('Watchdog Messages'),
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+     );	
+
+	 $form['openstore']['sys_charts']['styles']['watchdog_severity'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('Message Severity'),
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+     );		 
+	 
+	 $form['openstore']['sys_charts']['styles']['watchdog_severity']['openstore_charts_watchdog_severity_style'] = array(
+     '#type' => 'select',
+     '#title' => t('Message Severity style'),
+     '#options' => $options,
+     '#default_value' => variable_get('openstore_charts_watchdog_severity_style', CHART_TYPE_PIE),     
+     );
+     
+    $form['openstore']['sys_charts']['styles']['watchdog_counts']['openstore_charts_watchdog_counts_style'] = array(
+     '#type' => 'select',
+     '#title' => t('Watchdog Messages style'),
+     '#options' => $options,
+     '#default_value' => variable_get('openstore_charts_watchdog_counts_style', CHART_TYPE_PIE),     
+     );
+	 
+	$form['openstore']['sys_charts']['styles']['watchdog_counts']['openstore_charts_watchdog_counts_height'] = array(
+     '#type' => 'textfield',
+     '#title' => t('Watchdog Messages height'),
+     '#default_value' => variable_get('openstore_charts_watchdog_counts_height', FALSE),
+     '#size' => 20,
+     ); 	 	 
+     
+    $form['openstore']['sys_charts']['styles']['watchdog_counts']['openstore_charts_watchdog_counts_width'] = array(
+     '#type' => 'textfield',
+     '#title' => t('Watchdog Messages width'),
+     '#default_value' => variable_get('openstore_charts_watchdog_counts_width', FALSE),
+     '#size' => 20,
+     );
+     
+    $form['openstore']['sys_charts']['styles']['watchdog_severity']['openstore_charts_watchdog_severity_height'] = array(
+     '#type' => 'textfield',
+     '#title' => t('Message Severity height'),
+     '#default_value' => variable_get('openstore_charts_watchdog_severity_height', FALSE),
+     '#size' => 20,
+     );
+     
+    $form['openstore']['sys_charts']['styles']['watchdog_severity']['openstore_charts_watchdog_severity_width'] = array(
+     '#type' => 'textfield',
+     '#title' => t('Message Severity width'),
+     '#default_value' => variable_get('openstore_charts_watchdog_severity_width', FALSE),
+     '#size' => 20,
+     );
+	 
+    $form['openstore']['sys_charts']['enabled']['watchdog']['openstore_charts_watchdog_messages'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Watchdog messages'),
+    '#default_value' => variable_get('openstore_charts_watchdog_messages', TRUE),
+    '#description'   => t('Display Watchdog Messages chart'),
+  );
+
+  $form['openstore']['sys_charts']['enabled']['watchdog']['openstore_charts_watchdog_severity'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Watchdog severity'),
+    '#default_value' => variable_get('openstore_charts_watchdog_severity', TRUE),
+    '#description'   => t('Display Watchdog Severity chart'),
+  );
+
+    }	
+	 
+	 // / Watchdog
+     
+
+  
+    $form['openstore']['sys_charts']['styles']['user_status']['openstore_charts_user_status_style'] = array(
+     '#type' => 'select',
+     '#title' => t('User Status style'),
+     '#options' => $options,
+     '#default_value' => variable_get('openstore_charts_user_status_style', CHART_TYPE_PIE),
+     );
+     
+    $form['openstore']['sys_charts']['styles']['user_role']['openstore_charts_user_role_style'] = array(
+     '#type' => 'select',
+     '#title' => t('Users Per Role style'),
+     '#options' => $options,
+     '#default_value' => variable_get('openstore_charts_user_role_style', CHART_TYPE_PIE),
+     );         
+    
+    $form['openstore']['sys_charts']['styles']['nodes_all']['openstore_charts_nodes_style'] = array(
+     '#type' => 'select',
+     '#title' => t('Nodes style'),
+     '#options' => $options,
+     '#default_value' => variable_get('openstore_charts_nodes_style', CHART_TYPE_PIE),
+     );	 
+      
+     
+     // Выбор элементов блоков
+     
+  $form['openstore']['sys_charts']['enabled']['users']['openstore_charts_users_role'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Users per role'),
+    '#default_value' => variable_get('openstore_charts_users_role', TRUE),
+    '#description'   => t('Display Users per role chart'),
+  );
+  
+  $form['openstore']['sys_charts']['enabled']['users']['openstore_charts_users_status'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('User status'),
+    '#default_value' => variable_get('openstore_charts_users_status', TRUE),
+    '#description'   => t('Display Users Status chart'),
+  );
+  
+  $form['openstore']['sys_charts']['enabled']['nodes']['openstore_charts_nodes_total'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Nodes total'),
+    '#default_value' => variable_get('openstore_charts_nodes_total', TRUE),
+    '#description'   => t('Display Nodes Total chart'),
+  );
+  
+  $form['openstore']['sys_charts']['enabled']['nodes']['openstore_charts_nodes_published'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Nodes published'),
+    '#default_value' => variable_get('openstore_charts_nodes_published', TRUE),
+    '#description'   => t('Display Nodes Published chart'),
+  );
+  
+  $form['openstore']['sys_charts']['enabled']['nodes']['openstore_charts_nodes_activity'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Nodes activity'),
+    '#default_value' => variable_get('openstore_charts_nodes_activity', TRUE),
+    '#description'   => t('Display Nodes Activity chart'),
+  );
+  
+  } // End module_exists('chart')   
+
+  return system_settings_form($form);
+}
+
+function general_menu() { // Задаём ссылку в меню и страницу настроек модуля
+  $items = array();
+  $items['admin/settings/openstore'] = array(
+    'title' => 'Openstore module settings',
+    'description' => 'Openstore module settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('general_admin'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+   );
+  return $items;
+}
+
+
+function general_theme() { // Функция темизации
+  $items = array();
+  
+  $items['product_node_form'] = array( // Регистрируем отдельный шаблон для формы добавления товара  с типом документа "product"
+    'arguments' => array('form' => array()),
+    'path' => drupal_get_path('theme', variable_get('admin_theme', NULL)) . '/templates', // Путь к теме администратора
+    'template' => 'node-product-form',
+    'preprocess functions' => array(
+    'general_preprocess_product_form' // Определяем функцию препроцесса
+    )
+  );
+
+    $items['page_node_form'] = array( // Регистрируем отдельный шаблон для формы добавления товара  с типом документа "page"
+    'arguments' => array('form' => array()),
+    'path' => drupal_get_path('theme', variable_get('admin_theme', NULL)) . '/templates', // Путь к теме администратора
+    'template' => 'node-page-form',
+    'preprocess functions' => array(
+    'general_preprocess_page_form' // Определяем функцию препроцесса
+    )
+  );
+ 
+    $items['banner_node_form'] = array( // Регистрируем отдельный шаблон для формы добавления товара  с типом документа "banner"
+    'arguments' => array('form' => array()),
+    'path' => drupal_get_path('theme', variable_get('admin_theme', NULL)) . '/templates', // Путь к теме администратора
+    'template' => 'node-banner-form',
+    'preprocess functions' => array(
+    'general_preprocess_banner_form' // Определяем функцию препроцесса
+    )
+  );
+  
+    $items['simplenews_node_form'] = array( // Регистрируем отдельный шаблон для формы добавления товара  с типом документа "simplenews"
+    'arguments' => array('form' => array()),
+    'path' => drupal_get_path('theme', variable_get('admin_theme', NULL)) . '/templates', // Путь к теме администратора
+    'template' => 'node-simplenews-form',
+    'preprocess functions' => array(
+    'general_preprocess_simplenews_form' // Определяем функцию препроцесса
+    )
+  );
+  
+    $items['poll_node_form'] = array( // Регистрируем отдельный шаблон для формы добавления товара  с типом документа "poll"
+    'arguments' => array('form' => array()),
+    'path' => drupal_get_path('theme', variable_get('admin_theme', NULL)) . '/templates', // Путь к теме администратора
+    'template' => 'node-poll-form',
+    'preprocess functions' => array(
+    'general_preprocess_poll_form' // Определяем функцию препроцесса
+    )
+  );
+
+    $items['product_kit_node_form'] = array( // Регистрируем отдельный шаблон для формы добавления товара  с типом документа "product-kit"
+    'arguments' => array('form' => array()),
+    'path' => drupal_get_path('theme', variable_get('admin_theme', NULL)) . '/templates', // Путь к теме администратора
+    'template' => 'node-product-kit-form',
+    'preprocess functions' => array(
+    'general_preprocess_product_kit_form' // Определяем функцию препроцесса
+    )
+  );
+  return $items;
+}
+
+function general_link_alter(&$links, $node, $comment = NULL) { // Обработка ссылок в теле документа
+
+     if (arg(0) == 'node' && is_numeric(arg(1))) {    
+     if (user_access('manipulate queues')) {  // Мы хотим показывать/прятать ссылки добавления в некоторые очереди при наличии/отсутствия загруженного изображения (поле field_banner)  
+     $node = node_load(arg(1));    
+     $banner = $node->field_banner[0];  
+     foreach ($links as $key=>$value) { 
+	 
+     $link_item = explode(' ', $key);
+	 
+     if ($link_item[1] == 'nodequeue-toggle-q-1' && empty($banner)) { // Показываем/прячем ссылки по наличию баннера для очереди №1
+     unset($links[$key]);
+     } 
+     
+     if ($link_item[1] == 'nodequeue-toggle-q-6' && empty($banner)) { // Показываем/прячем ссылки по наличию баннера для очереди №6
+     unset($links[$key]);
+     } 	 
+    }
+   }
+  } 
+   
+ }
+ 
+
+function general_catalog_browse($tid = 0) {
+
+  $output = '';
+  $catalog = uc_catalog_get_page((int)$tid);
+  drupal_set_title(check_plain($catalog->name));
+  drupal_set_breadcrumb(uc_catalog_set_breadcrumb($catalog->tid));
+  $types = uc_product_types();
+  $links = array();
+  $child_list = array();
+  $preset = imagecache_preset(variable_get('uc_cat_auto_pic_preset', 10));
+  foreach ($catalog->children as $child) {
+    if (!empty($child->nodes)) {
+      $links[] = array('title' => $child->name . (variable_get('uc_catalog_breadcrumb_nodecount', FALSE) ? ' ('. $child->nodes .')' : ''), 'href' => uc_catalog_path($child),
+        'attributes' => array('rel' => 'tag'),
+      );
+    }
+	
+	  //$edit_link = l(theme('imagecache', $preset['presetname'], $filepath), uc_catalog_path($child), array('html' => TRUE));
+	  if (user_access('administer taxonomy')) {
+	  $edit_cat_pic = 'admin/content/taxonomy/edit/term/'.$child->tid;
+	  $edit_link = '<div class="cat-pic-edit">' . l(t('Edit picture'), $edit_cat_pic, array('html' => true, 'query' => drupal_get_destination())) . '</div>';	  
+	  }
+	
+    if (!empty($child->image)) {
+      $image = '<div class="cat-pic-wrapper">';
+      $image .= l(theme('imagecache', $preset['presetname'], $child->image['filepath']), uc_catalog_path($child), array('html' => TRUE));
+      $image .= $edit_link;
+      $image .= '</div>';
+    } else {
+      
+	  $image_field = variable_get('uc_image_product', FALSE);
+	  $image_table = 'content_' . $image_field;
+	  $childterm = $child->tid;
+	  
+	  
+	  
+	  $tree = taxonomy_get_tree(variable_get('uc_catalog_vid', FALSE), $childterm, -1, NULL);
+	  
+	  if (!empty($tree)) {	  
+	  $tdi_items = array();
+	  foreach ($tree as $treename) {	  
+      $tdi_items[] = $treename->tid;	  
+	  } 
+	  $tdi_items = implode(",", $tdi_items); 
+	  } else {
+	  $tdi_items = $childterm;
+	  }	  
+      $sql = "SELECT f.filepath FROM {node} n 
+              INNER JOIN {term_node} tn ON tn.vid = n.vid  
+              INNER JOIN {$image_table} cf ON cf.vid = n.vid 
+              INNER JOIN {files} f ON f.fid = cf.field_image_cache_fid 
+              WHERE n.type = 'product' AND tn.tid = '%s'";			  
+	 
+	  $result = db_fetch_array(db_query($sql,$tdi_items));		  
+      $filepath = $result['filepath'];
+	  $image = '<div class="cat-pic-wrapper">';
+	  $image .= l(theme('imagecache', $preset['presetname'], $filepath), uc_catalog_path($child), array('html' => TRUE));
+      $image .= $edit_link;
+      $image .= '</div>';	  
+    }
+	
+    $grandchildren = array();
+    $j = 0;
+    $max_gc_display = 3;
+    foreach ($child->children as $i => $grandchild) {
+      if ($j > $max_gc_display) {
+        break;
+      }
+      $g_child_nodes = 0;
+      foreach ($types as $type) {
+        $g_child_nodes += taxonomy_term_count_nodes($grandchild->tid, $type);
+      }
+      if ($g_child_nodes) {
+        $grandchildren[$i] = l($grandchild->name, uc_catalog_path($grandchild), array('class' => 'subcategory'));
+        $j++;
+     }
+    }
+    //$grandchildren = array_slice($grandchildren, 0, intval(count($grandchildren) / 2) + 1, TRUE);
+    if ($j > $max_gc_display) {
+      array_push($grandchildren, l(t('More...'), uc_catalog_path($child), array('class' => 'subcategory')));
+    }
+    if ($child->nodes) {
+	
+	
+      $cell_link = '<div class="cat-pic-wrapper">' . $image . $edit_link . '<strong>'. l($child->name, uc_catalog_path($child)) .'</strong></div>';
+      if (variable_get('uc_catalog_show_subcategories', TRUE)) {
+        $cell_link .= "<span>". implode(', ', $grandchildren) ."</span>\n";
+      }
+      $child_list[] = $cell_link;
+    }
+  }
+  if (!empty($catalog->image) && variable_get('uc_category_image', TRUE)) {
+      $preset = imagecache_preset(variable_get('uc_category_image_preset', 10));
+      $output .= theme('imagecache', $preset['presetname'], $catalog->image['filepath'], $catalog->name, $catalog->name, array('class' => 'category'));
+    } else {
+      $output .= '';
+  }
+
+  // Build an ORDER BY clause for the SELECT query based on table sort info.
+  if (empty($_REQUEST['order'])) {
+    $order = 'ORDER BY p.ordering, n.title, n.nid';
+  }
+  else {
+    $order = tapirsort_sql(uc_product_table_header());
+  }
+
+  $sql = "SELECT DISTINCT(n.nid), n.sticky, n.title, n.created, p.model, p.sell_price, p.ordering
+    FROM {node} n
+      INNER JOIN {term_node} tn ON n.vid = tn.vid
+      INNER JOIN {uc_products} AS p ON n.vid = p.vid
+    WHERE tn.tid = %d AND n.status = 1
+      AND n.type IN (". db_placeholders($types, 'varchar') .") ". $order;
+
+  $sql_count = "SELECT COUNT(DISTINCT(n.nid))
+    FROM {node} n
+      INNER JOIN {term_node} tn ON n.vid = tn.vid
+      INNER JOIN {uc_products} AS p ON n.vid = p.vid
+    WHERE tn.tid = %d
+      AND n.status = 1
+      AND n.type IN (". db_placeholders($types, 'varchar') .")";
+
+  $sql = db_rewrite_sql($sql);
+  $sql_count = db_rewrite_sql($sql_count);
+  $sql_args = array($catalog->tid);
+  foreach ($types as $type) {
+    $sql_args[] = $type;
+  }
+  $catalog->products = array();
+  $result = pager_query($sql, variable_get('uc_product_nodes_per_page', 12), 0, $sql_count, $sql_args);
+  while ($node = db_fetch_object($result)) {
+    $catalog->products[] = $node->nid;
+  }
+  if (count($catalog->products)) {
+    if (count($links)) {
+      $output .= theme('links', $links, array('class' => 'links inline uc-categories')) ."<br />\n";
+    }
+    $output .= $catalog->description;
+    $output .= theme('uc_catalog_products', $catalog->products);
+    $output .= theme('pager');
+  }
+  else {
+    // Display table of child categories similar to an osCommerce site's front page.
+    $columns = variable_get('uc_catalog_category_columns', 3);
+    $cat_rows = array();
+    $row = array();
+    $i = 1;
+    foreach ($child_list as $cell) {
+      $row[] = array('data' => $cell, 'class' => 'category');
+      if ($i % $columns == 0) {
+        $cat_rows[] = $row;
+        $row = array();
+      }
+      $i++;
+    }
+    if (count($row) > 0 && count($row) < $columns) {
+      if (count($cat_rows) >= 1) {
+        $row = array_merge($row, array_fill(count($row), $columns - count($row), array('data' => '&nbsp;', 'class' => 'category')));
+      }
+      $cat_rows[] = $row;
+    }
+    $output .= $catalog->description;
+    $output .= theme('table', array(), $cat_rows, array('class' => 'category'));
+  }
+
+  return $output;
+
+}
+
+if (variable_get('openstore_welcome_message', FALSE)) {
+$path_to_lib = drupal_get_path('module', 'general') . '/lib';
+$path_to_jqm_css = drupal_get_path('profile', 'openstore') . '/style';
+drupal_add_js('$(document).ready(function() {
+                            $(\'div.welcome-message\').removeClass(\'messages\');                           							
+							$(\'div.welcome-message\').jqm({overlay: 90}).jqmShow();
+							});', 'inline');							
+drupal_add_js($path_to_lib . '/jqmodal/jqModal.js', 'theme', 'header', FALSE, TRUE, FALSE);
+drupal_add_css($path_to_jqm_css . '/welcome.css');
+}
+
+if (arg(1) && variable_get('openstore_welcome_message', FALSE)) {
+drupal_flush_all_caches();
+variable_del('openstore_welcome_message');
+}
+
+
+function general_views_default_views_alter(&$views) {
+
+	 if (isset($views['admin_users'])) {include_once 'views/admin_users.inc';}
+	 if (isset($views['advanced_catalog'])) {include_once 'views/advanced_catalog.inc';}
+	 if (isset($views['comments_recent'])) {include_once 'views/comments_recent.inc';}
+	 if (isset($views['flag_bookmarks'])) {include_once 'views/flag_bookmarks.inc';}
+	 if (isset($views['flag_bookmarks_tab'])) {include_once 'views/flag_bookmarks_tab.inc';}
+	 if (isset($views['new_products'])) {include_once 'views/new_products.inc';}
+	 if (isset($views['orders'])) {include_once 'views/orders.inc';}
+	 if (isset($views['popular_products'])) {include_once 'views/popular_products.inc';}
+	 if (isset($views['product_pairs_block'])) {include_once 'views/product_pairs_block.inc';}
+	 if (isset($views['taxonomy_term'])) {include_once 'views/taxonomy_term.inc';}
+	 if (isset($views['top_content'])) {include_once 'views/top_content.inc';}
+	 if (isset($views['uc_products'])) {include_once 'views/uc_products.inc';}	 
+	 variable_set('openstore_views_owerrided', TRUE);
+
+}
+
+if (variable_get('openstore_views_owerrided', FALSE) && arg(0) == 'admin' && arg(2) == 'views' && !arg(3)) {
+drupal_flush_all_caches();
+variable_del('openstore_views_owerrided');
+}
+
+/*
+function general_l10n_servers() {
+$server = array('openstore.org.ua' => array(
+              'name' => 'openstore.org.ua',
+              'server_url' => 'http://openstore.org.ua/sites/default/files/translations/l10n_server.xml',
+              'update_url' => 'http://openstore.org.ua/sites/default/files/translations/%core/%project/%project-%release.%language.po',
+     ),
+  );
+
+return $server;
+
+}
+*/

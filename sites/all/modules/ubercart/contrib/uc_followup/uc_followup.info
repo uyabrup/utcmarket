@@ -1,0 +1,14 @@
+; $Id: uc_followup.info,v 1.2 2009/05/06 00:44:45 neochief Exp $
+name = UC Followup
+description = Automatically follow-up customers by e-mail on different stages of ordering.
+dependencies[] = uc_cart
+dependencies[] = uc_order
+dependencies[] = uc_store
+package = Ubercart - extra
+core = 6.x
+; Information added by drupal.org packaging script on 2010-02-28
+version = "6.x-1.1"
+core = "6.x"
+project = "uc_followup"
+datestamp = "1267352409"
+

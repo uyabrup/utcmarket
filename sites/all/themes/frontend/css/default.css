@@ -1,0 +1,194 @@
+
+* {
+  margin: 0;
+  padding: 0; }
+
+.clearfix {
+  display: inline-block; }
+  .clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden; }
+
+* html .clearfix {
+  height: 1%; }
+
+.clearfix {
+  display: block; }
+
+.clearleft, .clearl, .cleft {
+  clear: left; }
+
+.clearright, .clearr, .cright {
+  clear: right; }
+
+.clear, .clearboth, .clearall {
+  clear: both; }
+
+.floatleft, .fleft, .floatl {
+  float: left;
+  margin: 0 10px 5px 0; }
+
+.floatright, .fright, .floatr {
+  float: right;
+  margin: 0 0 5px 10px; }
+
+div.view div.views-admin-links {
+  width: auto; }
+
+div.block,
+div.cat-pic-wrapper,
+div.views-row,
+div.nude-block {
+  position: relative; }
+  
+  div.block .edit,
+  div.nude-block .edit,
+  div.cat-pic-wrapper .cat-pic-edit {
+  display: none;
+    position: absolute;
+    right:0;
+    top: 0;
+    z-index: 40;
+    padding: 3px 8px 0;
+    font-size: 10px;
+    line-height: 16px;
+    background-color: white;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-box-shadow: 0 1px 3px #888888;
+    -webkit-box-shadow: -1px 1px 2px #666666; 
+	}
+	
+		
+	div.carousel-admin .banner-edit {
+	display: none;
+
+
+position:absolute;
+top:0;
+z-index:100;
+
+    padding: 3px 8px 0;
+    font-size: 10px;
+    line-height: 16px;
+    background-color: white;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-box-shadow: 0 1px 3px #888888;
+    -webkit-box-shadow: -1px 1px 2px #666666; 
+}
+	
+
+	
+	div.view-content .views-field-edit-node {
+	display: none; 
+    position: absolute;
+    left:0;
+    bottom: 0;
+    z-index: 40;
+    padding: 3px 8px 0;
+    font-size: 10px;
+    line-height: 16px;
+    background-color: white;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-box-shadow: 0 1px 3px #888888;
+    -webkit-box-shadow: -1px 1px 2px #666666; 
+	}
+	
+	ul.edit {
+	background:none;
+	list-style:none;
+	margin:0;
+	padding:0;
+	}
+	
+	ul.edit li {
+	list-style-type:none;
+	padding:0;
+	margin:0;
+	}
+	
+	ul.edit li:hover,
+	ul.edit li a:hover {
+	background:none;
+	color:#000 !important;
+	}
+	
+	.views-field-edit-node ul.links li {
+	float:left;
+	margin-right:.5em;
+	}
+	
+	.views-field-edit-node li.nodequeue-ajax-toggle a.toggle-remove {
+	color:#FF0000;
+	}
+	
+	.views-field-edit-node li.nodequeue-ajax-toggle a.toggle-add {
+	color: #339900;
+	}
+	
+	.views-field-edit-node li.nodequeue-ajax-toggle a.nodequeue-ajax-toggle {
+	background:none;
+	}	
+	
+    div.block .edit a,
+	div.nude-block .edit a,
+	div.cat-pic-wrapper .cat-pic-edit a,
+	div.view-content .views-field-edit-node a,
+	div.carousel-admin .banner-edit a {
+      display: block;
+      border: 0;
+      padding: 0;
+      margin: 0; 
+	  }
+	  
+	  
+  div.block:hover .edit,
+  div.nude-block:hover .edit,
+  div.cat-pic-wrapper:hover .cat-pic-edit,
+  div.view-content:hover .views-field-edit-node,
+  div.views-showcase-subitem:hover .banner-edit {
+    display: block; }
+
+.with-wireframes #header,
+.with-wireframes #content-top,
+.with-wireframes #content-top>*,
+.with-wireframes #content-header,
+.with-wireframes #content-header>*,
+.with-wireframes #content-area,
+.with-wireframes #content-area>*,
+.with-wireframes #content-bottom,
+.with-wireframes #content-bottom>*,
+.with-wireframes #primary,
+.with-wireframes #secondary,
+.with-wireframes #sidebar-left-inner,
+.with-wireframes #sidebar-right-inner,
+.with-wireframes .block {
+  padding: 2px;
+  border: 1px solid #bbbbbb; }
+.with-wireframes .node {
+  border-bottom: 1px solid #bbbbbb;
+  margin-bottom: 10px; }
+.with-wireframes .block {
+  margin-bottom: 3px; }
+.with-wireframes #content-top,
+.with-wireframes #content-header,
+.with-wireframes #content-area,
+.with-wireframes #content-bottom {
+  margin: 0 3px 3px; }
+.with-wireframes #footer {
+  margin-top: 3px;
+  padding: 2px;
+  border: 1px solid #cccccc; }
+.with-wireframes.with-navigation #content,
+.with-wireframes.with-navigation .sidebar {
+  margin-top: 50px; }
+.with-wireframes #navigation {
+  height: 50px; }

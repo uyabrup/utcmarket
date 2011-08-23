@@ -1,0 +1,116 @@
+# $Id$
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenStore 1\n"
+"POT-Creation-Date: 2010-12-19 16:12+0000\n"
+"PO-Revision-Date: 2010-12-26 21:21+0300\n"
+"Last-Translator: OpenStore <openstore.org.ua@gmail.com>\n"
+"Language-Team: OpenStore <openstore.org.ua@gmail.com>\n"
+"X-Poedit-Language: Russian\n"
+"X-Poedit-Country: UKRAINE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((((n%10)==1)&&((n%100)!=11))?(0):(((((n%10)>=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
+
+#: template.php:57
+msgid "Comments"
+msgstr "Комментарии"
+
+#: template.php:75;86
+msgid "!datetime — !username"
+msgstr "!datetime — !username"
+
+#: garland.info:0
+msgid "Garland"
+msgstr "Garland"
+
+#: garland.info:0
+msgid "Tableless, recolorable, multi-column, fluid width theme (default)."
+msgstr "Тема по умолчанию, предоставленная ядром Drupal"
+
+#: color/color.inc:8
+#: minnelli/color/color.inc:8
+msgid "Blue Lagoon (Default)"
+msgstr "Blue Lagoon (по умолчанию)"
+
+#: color/color.inc:9
+#: minnelli/color/color.inc:9
+msgid "Ash"
+msgstr "Ash"
+
+#: color/color.inc:10
+#: minnelli/color/color.inc:10
+msgid "Aquamarine"
+msgstr "Aquamarine"
+
+#: color/color.inc:11
+#: minnelli/color/color.inc:11
+msgid "Belgian Chocolate"
+msgstr "Belgian Chocolate"
+
+#: color/color.inc:12
+#: minnelli/color/color.inc:12
+msgid "Bluemarine"
+msgstr "Bluemarine"
+
+#: color/color.inc:13
+#: minnelli/color/color.inc:13
+msgid "Citrus Blast"
+msgstr "Citrus Blast"
+
+#: color/color.inc:14
+#: minnelli/color/color.inc:14
+msgid "Cold Day"
+msgstr "Cold Day"
+
+#: color/color.inc:15
+#: minnelli/color/color.inc:15
+msgid "Greenbeam"
+msgstr "Greenbeam"
+
+#: color/color.inc:16
+#: minnelli/color/color.inc:16
+msgid "Mediterrano"
+msgstr "Mediterrano"
+
+#: color/color.inc:17
+#: minnelli/color/color.inc:17
+msgid "Mercury"
+msgstr "Mercury"
+
+#: color/color.inc:18
+#: minnelli/color/color.inc:18
+msgid "Nocturnal"
+msgstr "Nocturnal"
+
+#: color/color.inc:19
+#: minnelli/color/color.inc:19
+msgid "Olivia"
+msgstr "Olivia"
+
+#: color/color.inc:20
+#: minnelli/color/color.inc:20
+msgid "Pink Plastic"
+msgstr "Pink Plastic"
+
+#: color/color.inc:21
+#: minnelli/color/color.inc:21
+msgid "Shiny Tomato"
+msgstr "Shiny Tomato"
+
+#: color/color.inc:22
+#: minnelli/color/color.inc:22
+msgid "Teal Top"
+msgstr "Teal Top"
+
+#: minnelli/minnelli.info:0
+msgid "Minnelli"
+msgstr "Minnelli"
+
+#: minnelli/minnelli.info:0
+msgid "Tableless, recolorable, multi-column, fixed width theme."
+msgstr "Многоколоночная тема с фиксированной шириной."
+

@@ -1,0 +1,220 @@
+<?php
+// $Id: uc_paymentgate.module,v 1.1 2009/10/20 07:40:43 duke Exp $
+/**
+ * @file
+ * Process payments using RBS service. */
+function uc_paymentgate_menu() {
+  $items['cart/paymentgate/complete'] = array(
+    'title' => 'Congratulations',
+    'page callback' => 'uc_paymentgate_complete',
+    'access callback' => 'user_access',
+    'type' => MENU_CALLBACK,
+    );
+  return $items;
+}
+function uc_paymentgate_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'uc_cart_checkout_review_form' && ($order_id = intval($_SESSION['cart_order'])) > 0) {
+    $order = uc_order_load($order_id);
+    if ($order->payment_method == 'paymentgate') {
+      unset($form['submit']);
+      $form['#prefix'] = '<table style="display: inline; padding-top: 1em;"><tr><td>';
+      $form['#suffix'] = '</td><td>'. str_replace('accept-charset="UTF-8"', 'accept-charset="cp1251"', drupal_get_form('uc_paymentgate_form', $order)) .'</td></tr></table>';
+    }
+  }
+}
+function uc_paymentgate_payment_method() {
+  $path = base_path() . drupal_get_path('module', 'uc_paymentgate');
+  $methods[] = array(
+      'id' => 'paymentgate',
+      'name' => t('Runet Business System'),
+      'title' => t('Runet Business System Payment') .'<br /><img src="'. $path .'/paymentgate.png" style="position: relative; left: 2.5em;">',
+      'desc' => t('Pay by Credit Card through Runet Business System Secure Server.'),
+      'callback' => 'uc_paymentgate_method_card',
+      'weight' => 5,
+      'checkout' => TRUE,
+      'backend' => TRUE,
+      );
+  return $methods;
+}
+
+function uc_paymentgate_method_card($op, &$arg1) {
+  $lang = array('RU' => t('Russian'), 'EN' => t('English'));
+  switch ($op) {
+    /*case 'cart-details':
+      return $details;
+    case 'cart-process':
+      return;*/
+    case 'settings':
+      //SHOPNAME
+      $form['shopname'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Shop name'),
+        '#default_value' => variable_get('shopname', ''),
+        '#description' => t('The shop name on RBS service.')
+      );
+      //MERCHANTNUMBER
+      $form['paymentgate_id'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Merchant ID'),
+        '#default_value' => variable_get('paymentgate_id', ''),
+        '#description' => t('The shop id on RBS service.')
+      );
+      //MERCHANTPASSWD
+      $form['paymentgate_pass'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Merchant password'),
+        '#default_value' => variable_get('paymentgate_pass', ''),
+        '#description' => t('The shop password on RBS service.')
+      );      
+      //$ORDERDESCRIPTION
+      $form['paymentgate_desc'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Text description'),
+        '#default_value' => variable_get('paymentgate_desc', ''),
+        '#description' => t('The comments for order.')
+      );
+      //LANGUAGE
+      $form['paymentgate_lang'] = array(
+        '#type' => 'select',
+        '#title' => t('Language'),
+        '#default_value' => variable_get('paymentgate_lang', 'RU'),
+        '#options' => $lang,
+        '#description' => t('Select language for RBS system'),
+      );
+      $form['paymentgate_mode'] = array(
+        '#type' => 'select',
+        '#title' => t('Transaction mode'),
+        '#description' => t('Transaction mode used for processing orders.'),
+        '#options' => array(
+            'production' => t('Live'),
+            'test' => t('Test'),
+        ),
+        '#default_value' => variable_get('paymentgate_mode', 'test')
+      );
+      $form['paymentgate_checkout_button'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Order review submit button text'),
+        '#description' => t('Provide RBS specific text for the submit button on the order review page.'),
+        '#default_value' => variable_get('paymentgate_checkout_button', t('Submit Order')),
+      );
+  }
+  return $form;
+}
+
+function uc_paymentgate_form($form_state, $order = NULL) {
+  $paymentgate_mode = variable_get('paymentgate_mode', 'test');
+  if ($paymentgate_mode == 'test') {
+    $data = uc_paymentgate_get_data($order->order_id, 1, 'test');
+    $form = array(
+      '#id' => 'checkout',
+      '#name' => 'checkout',
+      '#method' => 'post',
+      '#action' => 'https://playground.paymentgate.ru/bpcservlet/BPC/AcceptPayment.jsp?MDORDER='. $data['MDORDER'],
+    );
+  }
+  else {
+    $data = uc_paymentgate_get_data($order->order_id, $order->order_total);
+    $form = array(
+      '#id' => 'checkout',
+      '#name' => 'checkout',
+      '#method' => 'post',
+      '#action' => 'https://engine.paymentgate.ru/bpcservlet/BPC/AcceptPayment.'. variable_get('shopname', '') .'.jsp?MDORDER='. $data['MDORDER'],
+    );
+  }
+  if (!empty($data['MDORDER'])) {
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => variable_get('paymentgate_checkout_button', t('Submit Order')),
+    );
+  }
+  else {
+    drupal_set_message(t('Technical problem on this service please change other payment method or pay later'), 'error');
+  }
+  return $form;
+}
+
+function uc_paymentgate_get_data($order_id, $amount, $mode = NULL) {
+  global $base_url;
+  $data = array();
+  $datas = array(
+    'MERCHANTNUMBER' => variable_get('paymentgate_id', ''),
+    'ORDERNUMBER' => $order_id,
+    'AMOUNT' => $amount * 100,
+    'BACKURL' => $base_url .'/cart/paymentgate/complete/'. $order_id,
+    '$ORDERDESCRIPTION' => variable_get('paymentgate_desc', ''),
+    'LANGUAGE' => variable_get('paymentgate_lang', 'RU'),
+    'DEPOSITFLAG' => 1,
+    'MERCHANTPASSWD' => variable_get('paymentgate_pass', ''),
+    'MODE' => 1,
+  );
+  foreach ($datas as $name => $value) {
+    $param[] = $name .'='. $value;  
+  }
+  $str = implode('&', $param);
+  if ($mode) {
+    $url = 'https://playground.paymentgate.ru/bpcservlet/Merchant2Rbs?'. $str;  
+  }
+  else {
+    $url = 'https://engine.paymentgate.ru/bpcservlet/Merchant2Rbs?'. $str;
+  }
+  $request = drupal_http_request($url);
+  if ($request->data) {
+    $data['MDORDER'] = $request->data;
+  }
+  else {
+    drupal_set_message(t('Operation error, not connect to service'), 'error');
+  }
+  return $data;
+}
+
+function uc_paymentgate_complete() {
+  $args = explode('/', $_REQUEST['q']);
+  $order_id = $args[count($args)-1];
+  $answer = $_REQUEST['ANSWER'];
+  $pars = xml_parser_create();
+  xml_parse_into_struct($pars, $answer, $vals, $index);
+  xml_parser_free($pars);  
+  $code = uc_paymentgate_operation_code($vals[0]['attributes']['PRIMARYRC'], $vals[0]['attributes']['SECONDARYRC']);
+  if ($code['result'] == 'complete') {
+    drupal_set_title(t('Payment is finished'));
+    $output = '<div class="complete"><h3>'. t('Congratulations!') .'</h3>';
+    $output .= '<p>'. $code['message'] .'</p></div>';
+    $order = uc_order_load($order_id);
+    if ($order === FALSE || uc_order_status_data($order->order_status, 'state') != 'in_checkout') {
+      return t('An error has occurred during payment.  Please contact us to ensure your order has submitted.');
+    }
+    $output .= uc_cart_complete_sale($order);
+    // Add a comment to let sales team know this came in through the site.
+    uc_order_comment_save($order->order_id, 0, t('Order was payed through RBS Site'), 'admin');}
+  else {
+    drupal_set_title(t('Payment failed'));
+    $output = '<div class="no-complete"><h3>'. $code['message'] .'</h3>';
+    $output .= '<p>'. t('You can either try to pay later or use another payment method available on the site.') .'</p>';
+    $output .= '<p>'. t('!click to get back to checkout page.', array('!click' => l(t('Click here'), 'cart/checkout'))) .'</p></div>';
+  }
+  return $output;
+}
+
+function uc_paymentgate_operation_code($primary = '', $secondary = '') {
+  if ($primary === '0' && $secondary === '0') {
+    $data['result'] = 'complete';
+  }
+  $reason = array(
+    '0-0'  => 'Your payment is successful!',
+    '34-1014' => 'Payment failed for financial reasons',
+    '7-1015' => 'error-1',
+    '8-204' => 'error-2',
+    '15-1018' => 'error-3',
+    '15-1019' => 'error-4',
+    '-2-0' => 'error-5',
+    '-2-1' => 'error-6',
+    '-2-2' => 'error-7',
+  );
+  if (isset($reason[$primary .'-'. $secondary])) {
+    $data['message'] = t($reason[$primary .'-'. $secondary]);
+  }
+  else {
+    $data['message'] = t('An unknown error occured. Error code !code.', array('!code' => $primary .'-'. $secondary));
+  }
+  return $data;
+}

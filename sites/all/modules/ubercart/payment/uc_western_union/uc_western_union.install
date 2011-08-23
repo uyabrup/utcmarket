@@ -1,0 +1,83 @@
+<?php
+// $Id$
+
+function uc_western_union_schema() {
+  $schema = array();
+
+  $schema['uc_western_union'] = array(
+    'fields' => array(
+      'user_input_id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'order_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'data_state' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'transfer_sum' => array(
+        'type' => 'varchar',
+        'length' => '64',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'transfer_control_id' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'default' => '',
+      ),
+      'sender_name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'default' => '',
+      ),
+      'city' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'default' => '',
+      ),
+      'country_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'user_comment' => array(
+        'type' => 'text',
+        'size' => 'normal',
+      ),
+      'admin_comment' => array(
+        'type' => 'text',
+        'size' => 'normal',
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0
+      ),
+    ),
+    'indexes' => array(
+      'order_id' => array('order_id'),
+    ),
+    'primary key' => array('user_input_id'),
+  );
+
+  return $schema;
+}
+
+function uc_western_union_install() {
+  drupal_install_schema('uc_western_union');
+}
+
+function uc_western_union_uninstall() {
+  drupal_uninstall_schema('uc_western_union');
+  db_query("DELETE FROM {variable} WHERE name LIKE 'uc_western_union_%%'");
+}

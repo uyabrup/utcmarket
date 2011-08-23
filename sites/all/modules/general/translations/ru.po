@@ -1,0 +1,1794 @@
+# $Id$
+#
+# Russian translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  blocks.inc: n/a
+#  preprocess/preprocess_common.inc: n/a
+#  system_charts.inc: n/a
+#  general.module: n/a
+#  form_alter.inc: n/a
+#  general.info: n/a
+#  preprocess/preprocess_node_form.inc: n/a
+#  preprocess/preprocess_views.inc: n/a
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2011-01-22 16:43+0300\n"
+"PO-Revision-Date: 2011-02-03 19:33+0300\n"
+"Last-Translator: OpenStore <openstore.org.ua@gmail.com>\n"
+"Language-Team: Russian <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((((n%10)==1)&&((n%100)!=11))?(0):(((((n%10)>=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
+
+#: blocks.inc:10
+#: preprocess/preprocess_common.inc:178
+msgid "Store name:"
+msgstr "Название:"
+
+#: blocks.inc:14
+#: preprocess/preprocess_common.inc:181
+msgid "Store owner:"
+msgstr "Владелец:"
+
+#: blocks.inc:18
+#: preprocess/preprocess_common.inc:184
+msgid "Store e-mail:"
+msgstr "E-mail:"
+
+#: blocks.inc:22
+#: preprocess/preprocess_common.inc:187
+msgid "Store phone:"
+msgstr "Тел.:"
+
+#: blocks.inc:26
+#: preprocess/preprocess_common.inc:190
+msgid "Store fax:"
+msgstr "Факс:"
+
+#: blocks.inc:30
+#: preprocess/preprocess_common.inc:193
+msgid "Store city:"
+msgstr "Город:"
+
+#: blocks.inc:34
+#: preprocess/preprocess_common.inc:196
+msgid "Store street 1:"
+msgstr "Улица:"
+
+#: blocks.inc:38
+#: preprocess/preprocess_common.inc:199
+msgid "Store postal code:"
+msgstr "Почтовый код:"
+
+#: blocks.inc:42
+msgid "See us on Yandex Map"
+msgstr "Мы на ЯндексКартах"
+
+#: blocks.inc:51
+msgid "See us on Google Map"
+msgstr "Мы на GoogleMaps "
+
+#: blocks.inc:62
+msgid "Download .XLS price"
+msgstr "Скачать прайс"
+
+#: blocks.inc:62
+msgid "Download .XLS price for all products"
+msgstr "Скачать весь прайс магазина в Exel"
+
+#: blocks.inc:63
+msgid "Download .DOC price"
+msgstr "Скачать прайс"
+
+#: blocks.inc:63
+msgid "Download .DOC price for all products"
+msgstr "Скачать весь прайс магазина в формате .doc"
+
+#: blocks.inc:87;100
+msgid "Store contacts"
+msgstr "Контакты"
+
+#: blocks.inc:88;107
+msgid "Download price"
+msgstr "Скачать прайс"
+
+#: blocks.inc:89;114
+#: system_charts.inc:321
+msgid "Users"
+msgstr "Пользователи"
+
+#: blocks.inc:90;119
+#: system_charts.inc:316
+#: general.module:112
+msgid "Nodes"
+msgstr "Документы"
+
+#: blocks.inc:91;124
+#: system_charts.inc:326
+msgid "Watchdog"
+msgstr "Журнал системных событий"
+
+#: blocks.inc:92;129
+msgid "Systems charts"
+msgstr "Диаграммы состояния системы"
+
+#: blocks.inc:93;152
+msgid "Add content"
+msgstr "Добавить содержимое"
+
+#: blocks.inc:145
+msgid "No connection to internet. Charts are not available."
+msgstr "Нет связи с google.com, поэтому невозможно сгенерировать диаграммы. Проверьте соединение с internet"
+
+#: form_alter.inc:22
+msgid "Show products"
+msgstr "Показать товары"
+
+#: form_alter.inc:23;31
+msgid "All categories"
+msgstr "Все категории"
+
+#: form_alter.inc:24;32
+msgid "All manufacturers"
+msgstr "Все производители"
+
+#: form_alter.inc:25;33
+msgid "Price from"
+msgstr "От"
+
+#: form_alter.inc:26;34
+msgid "Price to"
+msgstr "до"
+
+#: form_alter.inc:30
+msgid "Show discounts"
+msgstr "Показать скидки"
+
+#: form_alter.inc:42
+msgid "Add contact information"
+msgstr "добавить контактную информацию"
+
+#: form_alter.inc:44
+msgid "Show contact information on maintain page in additional to text set below. The info will be taken from <em>admin/store/settings/store/edit</em>."
+msgstr "Показывать контактную информацию в дополнении к сообщении о профилактических работах на сайте. Эта информация будет взята отсюда <em>admin/store/settings/store/edit</em>."
+
+#: form_alter.inc:77
+msgid "Product image display settings"
+msgstr "Изображения товара"
+
+#: form_alter.inc:86
+msgid "Empty image placeholder"
+msgstr "Заменитель изображения"
+
+#: form_alter.inc:94
+msgid "Placeholder text"
+msgstr "Текст заменителя"
+
+#: form_alter.inc:96
+msgid "Enter a text that will be show if product images are not provided."
+msgstr "Укажите текст, который будет показан на странице товара, если изображение для неё не установлено."
+
+#: form_alter.inc:101
+msgid "Fancybox"
+msgstr "Fancybox"
+
+#: form_alter.inc:101
+msgid "Slimbox"
+msgstr "Slimbox"
+
+#: form_alter.inc:102
+msgid "Choose JavaScript plugin"
+msgstr "JavaScript плагин "
+
+#: form_alter.inc:105
+msgid "Choose which JavaScript plugin will used for displaying big product images on a product page. Plugins stored in libraries directory"
+msgstr "Выберите, какой JQUERY плагин будет использован для отображения большого изображения товара. Сами плагины храняться в директории /lib модуля general"
+
+#: form_alter.inc:112;490
+msgid "Do not adjust image size"
+msgstr "Не уточнять размер изображения товара"
+
+#: form_alter.inc:116;117;118;119;333;334;494;495
+msgid "Display via imagecache preset !preset"
+msgstr "Отображать через алгоритм !preset"
+
+#: form_alter.inc:125
+msgid "Small image"
+msgstr "Маленькое изображение"
+
+#: form_alter.inc:129
+msgid "Choose a preset name to use as small additional product images."
+msgstr "Выберитеназвание алгоритма, который будет использован для дополнительных изображений товара."
+
+#: form_alter.inc:134
+msgid "Adjusted image preset"
+msgstr "Корректировка"
+
+#: form_alter.inc:138
+msgid "Choose a preset name to use depending on left/right sidebar position."
+msgstr "Выберите другой размер главного изображения товара, который будет показан при отсутствии одного или всех боковых сайдбаров с блоками."
+
+#: form_alter.inc:143
+msgid "Product image"
+msgstr "Изображение товара"
+
+#: form_alter.inc:147
+msgid "Choose a preset name to use as main product image."
+msgstr "Выберите алгоритм изображения, применяемого для основного изображения товара."
+
+#: form_alter.inc:152
+msgid "Big image"
+msgstr "Большое изображение"
+
+#: form_alter.inc:156
+msgid "Choose a preset name to use as original product images (popup)."
+msgstr "Выберите алгоритм изображения, который будет использован для показа оригинального размера товара (попап)."
+
+#: form_alter.inc:161
+msgid "Zoom settings"
+msgstr "Увеличительное стекло"
+
+#: form_alter.inc:170
+msgid "Zoom height"
+msgstr "Высота зума"
+
+#: form_alter.inc:174
+msgid "Enter the image height value (in px). Images with greater height will be displayed via zoom."
+msgstr "Укажите высоту оригинального изображения (в пикселях), которое будет служить пороговым значением, при котором включается зум."
+
+#: form_alter.inc:179
+msgid "Zoom width"
+msgstr "Ширина зума"
+
+#: form_alter.inc:183
+msgid "Enter the image width value (in px). Images with greater width will be displayed via zoom."
+msgstr "Укажите ширину оригинального изображения (в пикселях), которое будет служить пороговым значением, при котором включается зум."
+
+#: form_alter.inc:188
+msgid "Jqzoom"
+msgstr "Jqzoom"
+
+#: form_alter.inc:188
+msgid "Cloud Zoom"
+msgstr "Cloud Zoom"
+
+#: form_alter.inc:189
+msgid "Choose zoom plugin"
+msgstr "Зум-плагин"
+
+#: form_alter.inc:192
+msgid "Choose which JavaScript plugin will used for zoom effect."
+msgstr "Выберите, какой использовать плугин для эффекта \"увеличительное стекло\"."
+
+#: form_alter.inc:197;207
+msgid "Tab style"
+msgstr "Стиль табов"
+
+#: form_alter.inc:206
+msgid "Accordion"
+msgstr "Аккордион"
+
+#: form_alter.inc:206
+msgid "Collapsed with cookie"
+msgstr "Свёрнутые блоки с эффектом запоминания положения"
+
+#: form_alter.inc:210
+msgid "Choose how to display main tabs on product page."
+msgstr "Выберите, как отображать блок с главными закладками на странице товара. "
+
+#: form_alter.inc:215
+msgid "Scroll threshold"
+msgstr "Порог прокрутки"
+
+#: form_alter.inc:220
+msgid "If a product has more additional images then set here, these images will have scrolling effect."
+msgstr "Если товар имеет дополнительных изображений больше указанного здесь количества, для их показа будет применён эффект прокрутки мышкой."
+
+#: form_alter.inc:267
+msgid "Start copyright date"
+msgstr "Начальная дата"
+
+#: form_alter.inc:271
+msgid "The date, when your business was started. Used for copyright"
+msgstr "Дата, когда был запущен ваш бизнес."
+
+#: form_alter.inc:276
+msgid "Location on Yandex Map"
+msgstr "Мы на ЯндексКартах"
+
+#: form_alter.inc:279
+msgid "Office/store location shown on <a href=\"http://maps.yandex.ru\">Yandex Maps</a>"
+msgstr "Расположение офиса или магазина на карте сервиса <a href=\"http://maps.yandex.ru\">ЯндексКарты</a>. Отметьте своё местоположение, получите ссылку на эту карту и вставьте сюда. Ссылка должна быть прямая, то есть начинаться с http:// "
+
+#: form_alter.inc:284
+msgid "Location on Google Map"
+msgstr "Расположение на GoogleMaps "
+
+#: form_alter.inc:287
+msgid "Office/store location shown on <a href=\"http://maps.google.com\">Google Maps</a>"
+msgstr "Расположение офиса или магазина на карте сервиса <a href=\"http://maps.google.com\">GoogleMaps</a>. Отметьте своё местоположение, получите ссылку на эту карту и вставьте сюда. Ссылка должна быть прямая, то есть начинаться с http://    "
+
+#: form_alter.inc:317
+msgid "Catalog auto pictures"
+msgstr "Автоматические изображения"
+
+#: form_alter.inc:319
+msgid "If selected, category pictures will be filled automatically from associated nodes imagefields"
+msgstr "Если выбрано, изображения категорий будут заполнены автоматически из связанных документов"
+
+#: form_alter.inc:324
+msgid "Enable category image"
+msgstr "Включить изображение категорий"
+
+#: form_alter.inc:326
+msgid "If selected, parent category picture will be shown on nested pages"
+msgstr "Если выбрано, изображения родительский категорий будут показаны на вложенных страницах"
+
+#: form_alter.inc:339
+msgid "Catalog picture preset"
+msgstr "Алгоритм для изображений каталога"
+
+#: form_alter.inc:342
+msgid "Choose the preset name used for catalog image output"
+msgstr "Выберите алгоритм, который будет использоваться для изображений категорий"
+
+#: form_alter.inc:347
+msgid "Category picture preset"
+msgstr "Изображения категорий"
+
+#: form_alter.inc:350
+msgid "Choose a preset name used for category image output"
+msgstr "Выберите алгоритм, который будет использоваться для создания изображений категорий"
+
+#: form_alter.inc:362
+msgid "Cart message"
+msgstr "Сообщение в корзине"
+
+#: form_alter.inc:367
+msgid "Message"
+msgstr "Сообщение"
+
+#: form_alter.inc:370
+msgid "Enter a help message that will shown on cart page."
+msgstr "Укажите справочный текст, который будет показан на странице просмотра корзины."
+
+#: form_alter.inc:383
+msgid "Request new password"
+msgstr "Напомнить пароль"
+
+#: form_alter.inc:402;402
+msgid "OpenID"
+msgstr "OpenID"
+
+#: form_alter.inc:402
+msgid "Click to login via OpenID"
+msgstr "Войти через OpenID"
+
+#: form_alter.inc:416
+msgid "Twitter"
+msgstr "Twitter"
+
+#: form_alter.inc:416
+msgid "Sign in with Twitter"
+msgstr "Войти через Twitter"
+
+#: form_alter.inc:427
+msgid "Subscribe to store newsletters"
+msgstr "Хотите быть в курсе новых поступлений в магазин, скидок и акций? Выберите категорию рассылок ниже"
+
+#: form_alter.inc:433
+msgid "NOTE: we DO NOT spam!"
+msgstr "Рассылки носят ненавязчивый характер, вы можете отписаться в любой момент в пару кликов. Мы не передаём ваш E-mail третьей стороне и не занимаемся спамом!"
+
+#: form_alter.inc:450
+msgid "Please provide your address information below. It will used for delivery and payment address"
+msgstr "Пожалуйста, укажите свой адрес. Эта информация будет использована при оформлении заказа. Вы сможете потом отредактировать эти данные или указать дополнительный адрес. Эти данные НЕ будут показаны публично."
+
+#: form_alter.inc:459
+msgid "Return to login/register"
+msgstr "Вернуться к входу/регистрации"
+
+#: form_alter.inc:471
+msgid "Return to previous page"
+msgstr "К предыдущей странице"
+
+#: form_alter.inc:499
+msgid "Product kit preset"
+msgstr "Размер изображения для набора товаров"
+
+#: form_alter.inc:502
+msgid "Choose a preset name to use as product kit items image."
+msgstr "Выберите название алгоритма обработки изображений, которые будут использоваться для показа отдельных товаров в наборе товаров."
+
+#: form_alter.inc:507
+msgid "Product kit main image preset"
+msgstr "Размер главных изображений товаров в наборе"
+
+#: form_alter.inc:510
+msgid "Choose a preset name to use as product kit main image."
+msgstr "Выберите название алгоритма обработки изображений, которые будут использоваться в качестве главных изображений отдельных товаров в наборе товаров."
+
+#: form_alter.inc:515
+msgid "Column count"
+msgstr "Число колонок"
+
+#: form_alter.inc:518
+msgid "Choose how many columns will have the table which presents product kit items"
+msgstr "Выберите, на сколько колонок будет поделена таблица с товарами, входящими в набор при показе на странице."
+
+#: system_charts.inc:127
+msgid "Total pages"
+msgstr "Всего страниц"
+
+#: system_charts.inc:131
+msgid "Published pages"
+msgstr "Опубликованные страницы"
+
+#: system_charts.inc:136
+msgid "Unpublished pages"
+msgstr "Неопубликованные страницы"
+
+#: system_charts.inc:208
+msgid "Node Activity for !date"
+msgstr "Активность за !date"
+
+#: system_charts.inc:232
+#: general.module:207
+msgid "Watchdog Messages"
+msgstr "Сообщения системного журнала"
+
+#: system_charts.inc:253
+#: general.module:214
+msgid "Message Severity"
+msgstr "Важность сообщений"
+
+#: system_charts.inc:276
+#: general.module:98
+msgid "Users Per Role"
+msgstr "Пользователи по ролям"
+
+#: system_charts.inc:299
+#: general.module:105
+msgid "User Status"
+msgstr "Состояние пользователей"
+
+#: system_charts.inc:318
+msgid "Various node data reports."
+msgstr "Различные отчёты по документам."
+
+#: system_charts.inc:323
+msgid "User access and information reporting."
+msgstr "Отчёты по доступу пользователей и прочей информации."
+
+#: system_charts.inc:328
+msgid "Log charts."
+msgstr "Диаграммы лога."
+
+#: system_charts.inc:343
+msgid "Notice"
+msgstr "Замечание"
+
+#: system_charts.inc:347
+msgid "Warning"
+msgstr "Предупреждение"
+
+#: system_charts.inc:351
+msgid "Error"
+msgstr "Ошибка"
+
+#: system_charts.inc:360
+msgid "Active"
+msgstr "Активно"
+
+#: system_charts.inc:360
+msgid "Blocked"
+msgstr "Заблокировано"
+
+#: general.module:24
+msgid "Miscellaneous settings"
+msgstr "Разное"
+
+#: general.module:32
+msgid "Display a grid overlay"
+msgstr "Отображать сетку для оценки вёрстки"
+
+#: general.module:34
+msgid "During theme development, it can be useful to display a grid system for reference."
+msgstr "Во время разработки бывает полезно отображать визуальную сетку поверх страницы для оценки корректности вёрстки."
+
+#: general.module:44
+msgid "Curve line with points"
+msgstr "Кривая с пунктами"
+
+#: general.module:45
+msgid "Curve line with coordinates"
+msgstr "Кривая с координатами"
+
+#: general.module:46
+msgid "Horizontal bar"
+msgstr "Горизонтальные столбики"
+
+#: general.module:47
+msgid "Vertical bar"
+msgstr "Вертикальные столбики"
+
+#: general.module:48
+msgid "Two dimensional pie"
+msgstr "Простой пирог"
+
+#: general.module:49
+msgid "Three-dimensional pie"
+msgstr "Объёмный пирог"
+
+#: general.module:54
+msgid "System charts"
+msgstr "Системные диаграммы"
+
+#: general.module:62
+msgid "Enabled charts"
+msgstr "Видимость диаграмм"
+
+#: general.module:70
+msgid "Chart styles"
+msgstr "Стили диаграмм"
+
+#: general.module:78
+msgid "User charts block"
+msgstr "Диаграммы пользователей"
+
+#: general.module:86
+msgid "Nodes charts block"
+msgstr "Диаграммы документов"
+
+#: general.module:119
+msgid "Node Activity"
+msgstr "Диаграммы активности"
+
+#: general.module:136
+msgid "Users Per Role height"
+msgstr "Высота диаграммы"
+
+#: general.module:143
+msgid "Users Per Role width"
+msgstr "Ширина диаграммы"
+
+#: general.module:150
+msgid "User Status height"
+msgstr "Высота диаграммы"
+
+#: general.module:157
+msgid "User Status width"
+msgstr "Ширина диаграммы"
+
+#: general.module:164
+msgid "Nodes height"
+msgstr "Высота диаграммы"
+
+#: general.module:171
+msgid "Nodes width"
+msgstr "Ширина диаграммы"
+
+#: general.module:178
+msgid "Node Activity height"
+msgstr "Высота диаграммы"
+
+#: general.module:185
+msgid "Node Activity width"
+msgstr "Ширина диаграммы"
+
+#: general.module:199
+msgid "Watchdog charts block"
+msgstr "Диаграммы системного журнала"
+
+#: general.module:221
+msgid "Message Severity style"
+msgstr "Стиль диаграммы"
+
+#: general.module:228
+msgid "Watchdog Messages style"
+msgstr "Стиль диаграммы"
+
+#: general.module:235
+msgid "Watchdog Messages height"
+msgstr "Высота диаграммы"
+
+#: general.module:242
+msgid "Watchdog Messages width"
+msgstr "Ширина диаграммы"
+
+#: general.module:249
+msgid "Message Severity height"
+msgstr "Высота диаграммы"
+
+#: general.module:256
+msgid "Message Severity width"
+msgstr "Ширина диаграммы"
+
+#: general.module:263
+msgid "Watchdog messages"
+msgstr "Журнал сообщений"
+
+#: general.module:265
+msgid "Display Watchdog Messages chart"
+msgstr "Отображать диаграмму журнала сообщений"
+
+#: general.module:270
+msgid "Watchdog severity"
+msgstr "Важность сообщений"
+
+#: general.module:272
+msgid "Display Watchdog Severity chart"
+msgstr "Отображать диаграмму важности системных сообщений"
+
+#: general.module:283
+msgid "User Status style"
+msgstr "Стиль диаграммы"
+
+#: general.module:290
+msgid "Users Per Role style"
+msgstr "Стиль диаграммы"
+
+#: general.module:297
+msgid "Nodes style"
+msgstr "Стиль диаграммы"
+
+#: general.module:307
+msgid "Users per role"
+msgstr "Пользователи по ролям"
+
+#: general.module:309
+msgid "Display Users per role chart"
+msgstr "Отображать диаграмму ролей пользователей"
+
+#: general.module:314
+msgid "User status"
+msgstr "Состояние пользователей"
+
+#: general.module:316
+msgid "Display Users Status chart"
+msgstr "Отображать диаграмму состояния пользователей"
+
+#: general.module:321
+msgid "Nodes total"
+msgstr "Общая диаграмма"
+
+#: general.module:323
+msgid "Display Nodes Total chart"
+msgstr "Отображать общую диаграмму документов"
+
+#: general.module:328
+msgid "Nodes published"
+msgstr "Опубликованные документы"
+
+#: general.module:330
+msgid "Display Nodes Published chart"
+msgstr "Отображать диаграмму опубликованных документов"
+
+#: general.module:335
+msgid "Nodes activity"
+msgstr "Активность публикации документов"
+
+#: general.module:337
+msgid "Display Nodes Activity chart"
+msgstr "Отображать диаграмму активности публикаций"
+
+#: general.module:462
+msgid "Edit picture"
+msgstr "Редактировать изображение"
+
+#: general.module:521
+msgid "More..."
+msgstr "Больше..."
+
+#: general.module:348;349
+msgid "Openstore module settings"
+msgstr "Openstore"
+
+#: general.info:0
+msgid "General"
+msgstr "Общие"
+
+#: general.info:0
+msgid "Collections of different functions such form alterations etc."
+msgstr "Коллекция различных функций темизации и др."
+
+#: general.info:0
+msgid "OpenStore"
+msgstr "OpenStore"
+
+#: preprocess/preprocess_common.inc:52
+msgid "Your basket is empty"
+msgstr "Ваша корзина пуста"
+
+#: preprocess/preprocess_common.inc:55
+msgid "In your"
+msgstr "В вашей"
+
+#: preprocess/preprocess_common.inc:55
+msgid "Go to cart"
+msgstr "Добавить в корзину"
+
+#: preprocess/preprocess_common.inc:55
+msgid "basket"
+msgstr "корзине"
+
+#: preprocess/preprocess_common.inc:55
+msgid "totaling"
+msgstr "на сумму"
+
+#: preprocess/preprocess_common.inc:108
+msgid "Enter search key"
+msgstr "Ключевое слово поиска"
+
+#: preprocess/preprocess_common.inc:118
+msgid "How would you rate this product?"
+msgstr "Как бы вы оценили этот товар?"
+
+#: preprocess/preprocess_common.inc:121
+msgid "To contact site administration please use"
+msgstr "Для связи с администрацией по любым вопросам используйте"
+
+#: preprocess/preprocess_common.inc:121
+msgid "this contact form"
+msgstr "эту контактную форму"
+
+#: preprocess/preprocess_common.inc:123
+msgid "Your review about"
+msgstr "Ваш отзыв об "
+
+#: preprocess/preprocess_common.inc:124
+msgid "Please, DO NOT use the form to ask about this product! The form is intended to share your opinion about this product."
+msgstr "Пожалуйста, НЕ используйте эту форму, чтобы задать вопрос об этом товаре! Здесь вы можете поделиться своей объективной точкой зрения об этом товаре."
+
+#: preprocess/preprocess_common.inc:132
+msgid "Welcome back,"
+msgstr "Добро пожаловать,"
+
+#: preprocess/preprocess_common.inc:136;1686
+msgid "Log out"
+msgstr "Выход"
+
+#: preprocess/preprocess_common.inc:141
+msgid "Log in/Register"
+msgstr "Вход/Регистрация"
+
+#: preprocess/preprocess_common.inc:151
+msgid "Cart"
+msgstr "Корзина"
+
+#: preprocess/preprocess_common.inc:152
+msgid "Order info entry"
+msgstr "Ввод данных заказа"
+
+#: preprocess/preprocess_common.inc:153
+msgid "Review"
+msgstr "Просмотр"
+
+#: preprocess/preprocess_common.inc:154
+msgid "Payment or submit order"
+msgstr "Оплата или отправка заказа"
+
+#: preprocess/preprocess_common.inc:173
+msgid "Contact us"
+msgstr "Контакты"
+
+#: preprocess/preprocess_common.inc:229
+msgid "All rights reserved"
+msgstr "Все права защищены. Копировать и любой контент сайта, его дизайн или элементы дизайна без разрешения запрещено."
+
+#: preprocess/preprocess_common.inc:233
+msgid "OpenStore - The OpenSource e-commerce solution"
+msgstr "OpenStore - открытый скрипт интернет-магазина"
+
+#: preprocess/preprocess_common.inc:236
+msgid "The Administrator theme developed specially for OpenStore e-commerce software by Iurii Makukh. If you have some questions or suggestions, please visit the <a href=\"http://openstore.org.ua\">official site</a>"
+msgstr "Тема оформления \"Администратор\" создана специально для применения в составе сборки скрипта интернет-магазина OpenStore©. Если у вас есть вопросы и предложения относительно этой темы или сборки в целом, зайдите на <a href=\"http://openstore.org.ua\">сайт поддержки</a> OpenStore©."
+
+#: preprocess/preprocess_common.inc:271
+msgid "New user? Create an account here"
+msgstr "Новый пользователь? Пожалуйста, зарегистрируйтесь"
+
+#: preprocess/preprocess_common.inc:274
+msgid "Have you already registered an account? Log in here"
+msgstr "Уже регистрировались? Войдите здесь"
+
+#: preprocess/preprocess_common.inc:295
+msgid "Profile of "
+msgstr "Профиль пользователя"
+
+#: preprocess/preprocess_common.inc:307
+msgid "Edit profile"
+msgstr "Редактирование профиля"
+
+#: preprocess/preprocess_common.inc:311
+msgid "My address book"
+msgstr "Мои адреса"
+
+#: preprocess/preprocess_common.inc:315
+msgid "My OpenId accounts"
+msgstr "Мои OpenId аккаунты"
+
+#: preprocess/preprocess_common.inc:319
+msgid "Edit newsletters"
+msgstr "Редактирование рассылок"
+
+#: preprocess/preprocess_common.inc:323
+msgid "My purchased files"
+msgstr "Мои файлы"
+
+#: preprocess/preprocess_common.inc:327
+msgid "My contact form"
+msgstr "Моя контактная форма"
+
+#: preprocess/preprocess_common.inc:336
+msgid "Profile addresses help text"
+msgstr ""
+"<p>На этой странице показаны все адреса, которые установлены вами ранее.</p>\r\n"
+"\r\n"
+"<p>Вы можете указывать нужный адрес при расчёте для адреса доставки и, если включено, платёжного адреса.</p> \r\n"
+"\r\n"
+"<p>Вы можете добавлять новые, редактировать или удалять существующие адреса.</p>\r\n"
+"\r\n"
+"\r\n"
+"<p>Помните: вы  не можете удалять адрес по умолчанию.</p>"
+
+#: preprocess/preprocess_common.inc:344
+msgid "Open toolbar to edit"
+msgstr "Открыть настройки"
+
+#: preprocess/preprocess_common.inc:345
+msgid "Close settings toolbar"
+msgstr "Закрыть настройки"
+
+#: preprocess/preprocess_common.inc:453
+msgid "The site works better if <a href=\"http://google.com/support/websearch/bin/answer.py?hl=ru&amp;answer=23852\" target=\"_blank\" rel=\"nofollow\">JavaScript enabled</a>"
+msgstr "Похоже у вас в браузере отключена поддержка JavaScript. Для нормальной работы этого сайта необходимо <a href=\"http://google.com/support/websearch/bin/answer.py?hl=ru&amp;answer=23852\" target=\"_blank\" rel=\"nofollow\">включить JavaScript</a>"
+
+#: preprocess/preprocess_common.inc:477
+msgid "Add to your bookmarks"
+msgstr "В социальные закладки"
+
+#: preprocess/preprocess_common.inc:482
+msgid "Submitted by "
+msgstr "Отправлено "
+
+#: preprocess/preprocess_common.inc:483
+msgid "Created on "
+msgstr "Создано "
+
+#: preprocess/preprocess_common.inc:490
+msgid "This document is published"
+msgstr "Опубликовано"
+
+#: preprocess/preprocess_common.inc:490
+msgid "Unpublish document"
+msgstr "Снять с публикации"
+
+#: preprocess/preprocess_common.inc:493
+msgid "This document is unpublished"
+msgstr "Не опубликовано"
+
+#: preprocess/preprocess_common.inc:493
+msgid "Publish document"
+msgstr "Опубликовать"
+
+#: preprocess/preprocess_common.inc:506
+msgid "Catalog category:"
+msgstr "Категория каталога:"
+
+#: preprocess/preprocess_common.inc:516;741
+msgid "Manufacturer:"
+msgstr "Торговая марка:"
+
+#: preprocess/preprocess_common.inc:526
+msgid "Categories:"
+msgstr "Категории:"
+
+#: preprocess/preprocess_common.inc:536;771
+msgid "Tags:"
+msgstr "Теги:"
+
+#: preprocess/preprocess_common.inc:546
+msgid "Promo:"
+msgstr "Акции:"
+
+#: preprocess/preprocess_common.inc:551;554;1159;1262
+msgid "Add comment"
+msgstr "Добавить комментарий"
+
+#: preprocess/preprocess_common.inc:590;881
+msgid "Product SKU:"
+msgstr "Артикул:"
+
+#: preprocess/preprocess_common.inc:591
+msgid "Usual price:"
+msgstr "Обычная цена: "
+
+#: preprocess/preprocess_common.inc:592
+msgid "Product kit discount:"
+msgstr "Скидка при покупке в наборе:"
+
+#: preprocess/preprocess_common.inc:604
+msgid "Product regular amount:"
+msgstr "Обычная цена товара:"
+
+#: preprocess/preprocess_common.inc:605
+msgid "Kit discount amount:"
+msgstr "Скидка при покупке в наборе:"
+
+#: preprocess/preprocess_common.inc:608
+msgid "Buying these products separately you would pay"
+msgstr "Покупая товары в этом наборе отдельно, вы бы заплатили в сумме"
+
+#: preprocess/preprocess_common.inc:608
+msgid "You will save"
+msgstr "Вы сэкономите"
+
+#: preprocess/preprocess_common.inc:608
+msgid "by buying these"
+msgstr "при покупке этих"
+
+#: preprocess/preprocess_common.inc:608
+msgid "_together"
+msgstr "вместе"
+
+#: preprocess/preprocess_common.inc:664
+msgid "The product can be delivered via"
+msgstr "Способы доставки"
+
+#: preprocess/preprocess_common.inc:665
+msgid "More about shipping"
+msgstr "Подробнее о доставке"
+
+#: preprocess/preprocess_common.inc:671
+msgid "This product is not shippable!"
+msgstr "Этот товар не доставляется!"
+
+#: preprocess/preprocess_common.inc:692
+msgid "We accept the following payment methods:"
+msgstr "Способы оплаты"
+
+#: preprocess/preprocess_common.inc:693
+msgid "More about payment"
+msgstr "Подробнее об оплате"
+
+#: preprocess/preprocess_common.inc:711
+msgid "Category:"
+msgstr "Категория:"
+
+#: preprocess/preprocess_common.inc:725;755;785
+msgid "Download .XLS price for"
+msgstr "Скачать прайс в Exel для"
+
+#: preprocess/preprocess_common.inc:725;755;785
+msgid "Download .XLS price for all similar products"
+msgstr "Скачать прайс в формате Exel для всех товаров в той же категории, что и этот товар  "
+
+#: preprocess/preprocess_common.inc:726;756;786
+msgid "Download .DOC price for"
+msgstr "Скачать прайс в формате .doc для"
+
+#: preprocess/preprocess_common.inc:726;756;786
+msgid "Download .DOC price for all similar products"
+msgstr "Скачать прайс в формате .doc для всех товаров в той же категории, что и этот товар  "
+
+#: preprocess/preprocess_common.inc:836
+msgid " official manufacturers warranty"
+msgstr " официальной гарантии производителя"
+
+#: preprocess/preprocess_common.inc:841
+msgid "Our warranty:"
+msgstr "Наша гарантия:"
+
+#: preprocess/preprocess_common.inc:842
+msgid "More about warranty"
+msgstr "Подробнее об гарантии"
+
+#: preprocess/preprocess_common.inc:847
+msgid "Rate this product"
+msgstr "Оцените товар"
+
+#: preprocess/preprocess_common.inc:869
+msgid "*Specifications and packaging of the product can be changed without notice"
+msgstr "*Описание и комплектность товара может быть изменено производителем без предварительного уведомления"
+
+#: preprocess/preprocess_common.inc:884
+msgid "Your current points:"
+msgstr "Ваши текущие баллы:"
+
+#: preprocess/preprocess_common.inc:891
+msgid "This product is sold under the order. It means that we check availability of the product after you place an order for this product. We can not guarantee 100% availability of the product"
+msgstr "Этот товар продаётся под заказ. Это означает, что мы проверяем его наличие после того, как вы разместите свой заказ. Мы не можем гарантировать 100% наличие этого товара."
+
+#: preprocess/preprocess_common.inc:894
+msgid "This product in stock"
+msgstr "Товар в наличии"
+
+#: preprocess/preprocess_common.inc:898
+msgid "Contact category - bargain"
+msgstr "Цена товара у конкурентов"
+
+#: preprocess/preprocess_common.inc:898
+msgid "Contact message - bargain"
+msgstr "Я видел этот товар дешевле здесь"
+
+#: preprocess/preprocess_common.inc:898
+msgid "I know where is cheaper!"
+msgstr "Я знаю, где дешевле!"
+
+#: preprocess/preprocess_common.inc:900
+msgid "Contact category - error"
+msgstr "Неточность в описании"
+
+#: preprocess/preprocess_common.inc:900
+msgid "Wrong description"
+msgstr "Ошибки в описании товара"
+
+#: preprocess/preprocess_common.inc:900
+msgid "Contact message - error"
+msgstr "На странице "
+
+#: preprocess/preprocess_common.inc:900
+msgid "Contact message - error2"
+msgstr " обнаружены следующие ошибки в описании "
+
+#: preprocess/preprocess_common.inc:900
+msgid "The description contains errors!"
+msgstr "Сообщить об ошибках в описании"
+
+#: preprocess/preprocess_common.inc:903
+msgid "Contact category - common"
+msgstr "Общие вопросы"
+
+#: preprocess/preprocess_common.inc:903
+msgid "Contact message - common"
+msgstr "Ваш вопрос, предложение, замечание:"
+
+#: preprocess/preprocess_common.inc:903
+msgid "Contact general questions"
+msgstr "Обшие вопросы"
+
+#: preprocess/preprocess_common.inc:904
+msgid "Contact category - partnership"
+msgstr "Сотрудничество"
+
+#: preprocess/preprocess_common.inc:904
+msgid "Contact message - partnership"
+msgstr "Предложение или вопрос касательно сотрудничества:"
+
+#: preprocess/preprocess_common.inc:904
+msgid "Contact partnership questions"
+msgstr "Вопросы по сотрудничеству"
+
+#: preprocess/preprocess_common.inc:905
+msgid "Contact category - product"
+msgstr "Вопрос по товару"
+
+#: preprocess/preprocess_common.inc:905
+msgid "Contact message - product"
+msgstr "Вопрос по товару"
+
+#: preprocess/preprocess_common.inc:905
+msgid "Contact product questions"
+msgstr "Есть вопросы по товару?"
+
+#: preprocess/preprocess_common.inc:916;930
+msgid "Our price"
+msgstr "Наша цена"
+
+#: preprocess/preprocess_common.inc:917;925
+msgid "You save"
+msgstr "Вы экономите"
+
+#: preprocess/preprocess_common.inc:923
+msgid "Old price was"
+msgstr "Старая цена"
+
+#: preprocess/preprocess_common.inc:1124
+msgid "Product Tab 1"
+msgstr "Описание"
+
+#: preprocess/preprocess_common.inc:1127
+msgid "Product Tab 2"
+msgstr "Характеристики"
+
+#: preprocess/preprocess_common.inc:1130
+msgid "Product Tab 3"
+msgstr "Медиа"
+
+#: preprocess/preprocess_common.inc:1133
+msgid "Product Tab 4"
+msgstr "Отзывы"
+
+#: preprocess/preprocess_common.inc:1204
+msgid "You can use your points"
+msgstr "Вы можете использовать свои баллы"
+
+#: preprocess/preprocess_common.inc:1204
+msgid "currently you have"
+msgstr "сейчас у вас"
+
+#: preprocess/preprocess_common.inc:1204
+msgid "to get discount for this product."
+msgstr "чтобы получить скидку на этот товар."
+
+#: preprocess/preprocess_common.inc:1207
+msgid "You can use points to get a discount for this product, but you do not have them."
+msgstr "Вы можете использовать свои баллы, чтобы получить скидку на этот товар, но у вас пока нет баллов."
+
+#: preprocess/preprocess_common.inc:1210;1582
+msgid "The maximum discount you can get using your points -"
+msgstr "Максимальная скидка, которую вы можете получить за ваши баллы за один заказ - "
+
+#: preprocess/preprocess_common.inc:1213;1579
+msgid "Rating exchange for your existing points -"
+msgstr "Курс обмена ваших баллов -"
+
+#: preprocess/preprocess_common.inc:1213;1579
+msgid "point(s) ="
+msgstr "балл(ов) ="
+
+#: preprocess/preprocess_common.inc:1213;1579
+msgid ", that means discount value"
+msgstr ", что соответствует суммарной скидке"
+
+#: preprocess/preprocess_common.inc:1215
+msgid "To see price for you, please continue checkout"
+msgstr ". Итоговая цена для вас будет показана на странице расчёта при оформлении заказа."
+
+#: preprocess/preprocess_common.inc:1227
+msgid "Every time you buy a product (using your points as discount or not), you get some points to your account calculated as"
+msgstr "При покупке вы получаете некоторые баллы, которые рассчитываются по формуле"
+
+#: preprocess/preprocess_common.inc:1227
+msgid "point(s)"
+msgstr "балл(ов)"
+
+#: preprocess/preprocess_common.inc:1232
+msgid "NOTE: the minimum amount to get userpoints - "
+msgstr "ВНИМАНИЕ: минимальная сумма для получения баллов - "
+
+#: preprocess/preprocess_common.inc:1233
+msgid "You should increase your order amount to get points"
+msgstr "Если вы купите только этот товар, сумма будет недостаточна для получения баллов за эту покупку"
+
+#: preprocess/preprocess_common.inc:1240
+msgid "If you buy this product, you will get"
+msgstr "Если вы купите этот товар, вы получите"
+
+#: preprocess/preprocess_common.inc:1240
+msgid "discount on next order, more amount - bigger discount."
+msgstr "скидку на следующий заказ. Больше сумму - больше скидка."
+
+#: preprocess/preprocess_common.inc:1251
+msgid "Total amount range"
+msgstr "Сумма"
+
+#: preprocess/preprocess_common.inc:1251
+msgid "Your discount"
+msgstr "Ваша скидка"
+
+#: preprocess/preprocess_common.inc:1255
+msgid "Currently we have the following discount rates enabled"
+msgstr "Система скидок"
+
+#: preprocess/preprocess_common.inc:1265
+msgid "Be first to review this product!"
+msgstr "Напишите отзыв первым!"
+
+#: preprocess/preprocess_common.inc:1312;1312
+msgid "Subscribe to news RSS feed"
+msgstr "Новости магазина"
+
+#: preprocess/preprocess_common.inc:1313;1313
+msgid "Subscribe to common RSS feed"
+msgstr "Общая лента"
+
+#: preprocess/preprocess_common.inc:1314;1314
+msgid "Subscribe to top rated RSS feed"
+msgstr "Лидеры рейтинга"
+
+#: preprocess/preprocess_common.inc:1315;1315
+msgid "Subscribe to new products RSS feed"
+msgstr "Последние поступления"
+
+#: preprocess/preprocess_common.inc:1316;1316
+msgid "Subscribe to last reviews RSS feed"
+msgstr "Последние отзывы"
+
+#: preprocess/preprocess_common.inc:1317;1317
+msgid "Subscribe to discounts RSS feed"
+msgstr "Скидки"
+
+#: preprocess/preprocess_common.inc:1319;1319
+msgid "Subscribe to promo RSS feed"
+msgstr "Акции магазина"
+
+#: preprocess/preprocess_common.inc:1324
+msgid "Subscribe to product comments RSS feed"
+msgstr "Подписаться на отзывы"
+
+#: preprocess/preprocess_common.inc:1324
+msgid "Subscribe to this product comments RSS feed"
+msgstr "Получайте автоматически отзывы на этот товар по каналу RSS"
+
+#: preprocess/preprocess_common.inc:1333
+msgid "Related articles"
+msgstr "Связанные статьи"
+
+#: preprocess/preprocess_common.inc:1371;1384
+msgid "edit block"
+msgstr "Настройки блока"
+
+#: preprocess/preprocess_common.inc:1374
+msgid "edit the content of this block"
+msgstr "Редактировать содержимое этого блока"
+
+#: preprocess/preprocess_common.inc:1387
+msgid "configure this block"
+msgstr "Настроить блок"
+
+#: preprocess/preprocess_common.inc:1399;1413;1467
+msgid "edit menu"
+msgstr "Редактировать меню"
+
+#: preprocess/preprocess_common.inc:1402;1416;1470
+msgid "edit the menu that defines this block"
+msgstr "Редактировать меню, которое определяет этот блок"
+
+#: preprocess/preprocess_common.inc:1434
+msgid "settings for this view"
+msgstr "Настройки отображения вида для этого блока"
+
+#: preprocess/preprocess_common.inc:1434
+msgid "view settings"
+msgstr "Настройки вида"
+
+#: preprocess/preprocess_common.inc:1450
+msgid "edit queue"
+msgstr "Настройка очереди"
+
+#: preprocess/preprocess_common.inc:1453
+msgid "edit a nodequeue which built the block"
+msgstr "Редактировать очередь, которая создала этот блок"
+
+#: preprocess/preprocess_common.inc:1530
+msgid "Add comment/Edit vote"
+msgstr "Добавить комментарий/Редактировать голос"
+
+#: preprocess/preprocess_common.inc:1539
+msgid "You have been with us for"
+msgstr "Вы с нами уже"
+
+#: preprocess/preprocess_common.inc:1554
+msgid "Your role(s)"
+msgstr "Ваши роли"
+
+#: preprocess/preprocess_common.inc:1561
+msgid "My userpoints"
+msgstr "Мои баллы"
+
+#: preprocess/preprocess_common.inc:1576
+msgid "You can use your points to get discount for ordered products."
+msgstr "Вы можете использовать ваши баллы для получения скидки во время заказа."
+
+#: preprocess/preprocess_common.inc:1600
+msgid "You subscriber on:"
+msgstr "Вы подписаны на:"
+
+#: preprocess/preprocess_common.inc:1603
+msgid "You are not subscribed to any our newsletters."
+msgstr "Вы не подписаны ни к одной нашей рассылке. Подписка на рассылку позволяет вам быть в курсе свежих поступлений, акций и скидок. Вы можете в любой момент легко отписаться от получение рассылок."
+
+#: preprocess/preprocess_common.inc:1604
+msgid "Subscribe now!"
+msgstr "Подписаться на рассылку!"
+
+#: preprocess/preprocess_common.inc:1608
+msgid "Manage your address book"
+msgstr "Редактирование адресной книги"
+
+#: preprocess/preprocess_common.inc:1612;1674
+msgid "Add address"
+msgstr "Добавить адрес"
+
+#: preprocess/preprocess_common.inc:1616
+msgid "Edit your profile"
+msgstr "Редактирование профиля"
+
+#: preprocess/preprocess_common.inc:1619
+msgid "Manage facebook account"
+msgstr "Привязка к аккаунту Facebook"
+
+#: preprocess/preprocess_common.inc:1623
+msgid "Manage twitter account"
+msgstr "Привязка к аккаунту Twitter"
+
+#: preprocess/preprocess_common.inc:1627
+msgid "Manage openid account"
+msgstr "Привязка к OpenId"
+
+#: preprocess/preprocess_common.inc:1630
+msgid "Profile username"
+msgstr "Логин профиля:"
+
+#: preprocess/preprocess_common.inc:1632
+msgid "Profile mail"
+msgstr "E-mail профиля:"
+
+#: preprocess/preprocess_common.inc:1635
+msgid "This profile is blocked"
+msgstr "Этот профиль заблокирован"
+
+#: preprocess/preprocess_common.inc:1662
+msgid "First name"
+msgstr "Имя"
+
+#: preprocess/preprocess_common.inc:1662
+msgid "Last name"
+msgstr "Фамилия"
+
+#: preprocess/preprocess_common.inc:1662
+msgid "Phone"
+msgstr "Телефон"
+
+#: preprocess/preprocess_common.inc:1662
+msgid "Street address 1"
+msgstr "Адрес улицы 1"
+
+#: preprocess/preprocess_common.inc:1662
+msgid "City"
+msgstr "Город"
+
+#: preprocess/preprocess_common.inc:1662
+msgid "State/Province"
+msgstr "Область"
+
+#: preprocess/preprocess_common.inc:1662
+msgid "ZIP/Postal code"
+msgstr "Почтовый код"
+
+#: preprocess/preprocess_common.inc:1662
+msgid "Country"
+msgstr "Страна"
+
+#: preprocess/preprocess_common.inc:1664
+msgid "My default address"
+msgstr "Мой основной адрес"
+
+#: preprocess/preprocess_common.inc:1670
+msgid "You do not have default address set yet."
+msgstr "У вас пока не установлен адрес по умолчанию."
+
+#: preprocess/preprocess_common.inc:1671
+msgid "Please,provide at least one default address for quicker checkout."
+msgstr "Пожалуйста, укажите заранее данные, которые будут использоваться по умолчанию для платёжного адреса или адреса доставки - это ускорит оформление заказа в будущем."
+
+#: preprocess/preprocess_common.inc:1672
+msgid "You may also enter billing and delivery information during checkout."
+msgstr "Вы также можете указать свои данные для доставки или оплаты непосредственно во время оформления заказа."
+
+#: preprocess/preprocess_common.inc:1684
+msgid "You are currently logged in as:"
+msgstr "Вы вошли как пользователь"
+
+#: preprocess/preprocess_common.inc:55
+msgid "1 basket item"
+msgid_plural "@count basket items"
+msgstr[0] "1 товар"
+msgstr[1] "@count товара"
+msgstr[2] "@count товаров"
+
+#: preprocess/preprocess_common.inc:608
+msgid "1 product kit item"
+msgid_plural "@count product kit items"
+msgstr[0] "1 товар в наборе"
+msgstr[1] "@count товара в наборе"
+msgstr[2] "@count товаров в наборе"
+
+#: preprocess/preprocess_node_form.inc:11;15;19;23;91;95;99;103;107;142;146;150;154;212;251;289;293;297
+msgid "Edit vocabulary terms"
+msgstr "Редактировать термины"
+
+#: preprocess/preprocess_views.inc:16;44;74;101;118;127;136;145;173;182;208
+msgid "No content in this block yet"
+msgstr "В этом блоке пока нет содержимого."
+
+#: preprocess/preprocess_views.inc:17;45;75;102;119;128;137;146;174;183;209
+msgid "To show something in this block you have to do the following:"
+msgstr "Чтобы показать содержимое, нужно сделать следующее:"
+
+#: preprocess/preprocess_views.inc:18;21;46;49;76;79;103;106;147;150
+msgid "Create new document"
+msgstr "Создайте новый документ"
+
+#: preprocess/preprocess_views.inc:28;56;85;157;193
+msgid " - AND / OR - "
+msgstr " - И / ИЛИ - "
+
+#: preprocess/preprocess_views.inc:29;32;57;60;86;89;158;161;194;197
+msgid "Add existing document to block queue"
+msgstr "Добавьте существующий в очередь"
+
+#: preprocess/preprocess_views.inc:38;68;95;112;121;130;139;167;176;203;211
+msgid "Block information can be found here"
+msgstr "Справка по блоку"
+
+#: preprocess/preprocess_views.inc:120
+msgid "You or someone else has to rate any product"
+msgstr "Вы или кто-то другой должен проголосовать за товар"
+
+#: preprocess/preprocess_views.inc:129
+msgid "You or someone else has to order a product in this shop"
+msgstr "Вы или кто-то другой должны заказать товар в этом магазине"
+
+#: preprocess/preprocess_views.inc:138
+msgid "You or someone else has to write a comment to any product"
+msgstr "Вы или кто-то другой должен написать отзыв к товару"
+
+#: preprocess/preprocess_views.inc:175
+msgid "Set list price of the product greater than its sell price"
+msgstr "Установить цену продажи товара меньше цены в прайс-листе"
+
+#: preprocess/preprocess_views.inc:184;187
+msgid "Create new poll"
+msgstr "Создать новый опрос"
+
+#: preprocess/preprocess_views.inc:210
+msgid "You or someone else has to order at least two similar products in this shop"
+msgstr "Вы или кто-то ещё должен заказать 2 или более одинаковых товара."
+
+msgid "Updating translation."
+msgstr "Обновление переводов"
+
+msgid "Importing downloaded translation: %url."
+msgstr "Импорт загруженного перевода %url"
+
+#: user.module:2224
+msgid "Password strength:"
+msgstr "Надёжность пароля:"
+
+#: user.module:2225
+msgid "Low"
+msgstr "Низкая"
+
+#: user.module:2227
+msgid "High"
+msgstr "Высокая"
+
+#: user.module:2228
+msgid "It is recommended to choose a password that contains at least six characters. It should include numbers, punctuation, and both upper and lowercase letters."
+msgstr "Рекомендуется выбирать пароль, состоящий как минимум из 6-ти символов. Это должна быть комбинация из букв,пунктуации и цифр."
+
+#: user.module:2229
+msgid "The password does not include enough variation to be secure. Try:"
+msgstr "Этот пароль недостаточно безопасен. Попробуйте:"
+
+#: user.module:2230
+msgid "Adding both upper and lowercase letters."
+msgstr "добавить символы в нижнем и верхнем регистре."
+
+#: user.module:2231
+msgid "Adding numbers."
+msgstr "добавить цифры."
+
+#: user.module:2232
+msgid "Adding punctuation."
+msgstr "добавить пунктуацию."
+
+#: user.module:2233
+msgid "It is recommended to choose a password different from the username."
+msgstr "Рекомендуется выбрать пароль, отличный от логина."
+
+#: user.module:2236
+msgid "Passwords match:"
+msgstr "Совпадение паролей:"
+
+msgid "Password"
+msgstr "Пароль администратора"
+
+msgid "Confirm password"
+msgstr "Пароль ещё раз"
+
+#: /test/install.php?locale=ru&profile=openstore&id=3&op=do
+msgid "Bookmarks"
+msgstr "Закладки"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Manufacturer"
+msgstr "Производитель"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Trademarks of manufacturers"
+msgstr "Торговые марки производителей"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Common"
+msgstr "Общий"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Different categories for common usage"
+msgstr "Различные категории для общего использования"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Tags for content tagging"
+msgstr "Теги для разметки содержимого сайта"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Promo"
+msgstr "Промо"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Promo actions, hot offers..."
+msgstr "Промо-акции, скидки, горячие предложения..."
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Large carousel"
+msgstr "Большая карусель"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Add to large carousel"
+msgstr "Добавить в большую карусель"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Remove from large carousel"
+msgstr "Удалить из большой карусели"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Featured products"
+msgstr "Рекомендованные товары"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Add to featured"
+msgstr "Добавить в рекомендованные товары"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Remove from featured"
+msgstr "Удалить из рекомендованных товаров"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "SEO category articles"
+msgstr "SEO-статьи в категориях"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Add to SEO article"
+msgstr "Добавить в категорию как SEO-статью"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Remove from SEO article"
+msgstr "Удалить SEO-статью из категории"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Articles in category"
+msgstr "Статьи в категориях"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Add to category"
+msgstr "Добавить в статьи в категориях"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Remove from category"
+msgstr "Удалить статью в категориях"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Banner in category"
+msgstr "Баннер в категориях"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Add to category banner"
+msgstr "Добавить как баннер в категории"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Remove from category banner"
+msgstr "Удалить баннер из категорий"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Hot offers"
+msgstr "Горячие предложения"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Add to hot offers"
+msgstr "Добавить в горячие предложения"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Remove from hot offers"
+msgstr "Удалить из горячих предложений"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Store news"
+msgstr "Новости магазина"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Add to store news"
+msgstr "Добавить в новости"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Remove from store news"
+msgstr "Удалить из новостей"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Poll in block"
+msgstr "Голосование в блоке"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Add to poll block"
+msgstr "Добавить в голосование"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Remove from poll block"
+msgstr "Удалить из голосования"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Customer reviews"
+msgstr "Отзывы"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Add to customer reviews"
+msgstr "Добавить в отзывы"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Remove from customer reviews"
+msgstr "Удалить из отзывов"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Click on the UI Color Picker button to set your color preferences"
+msgstr "Выберите желаемую цветовую схему"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Product specs"
+msgstr "Характеристики товара"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Product media"
+msgstr "Медиа"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=do
+msgid "Product additional"
+msgstr "Дополнительно"
+
+#: /test/install.php?locale=ru&profile=openstore&id=6&op=finished
+msgid "Welcome to OpenStore!"
+msgstr "Добро пожаловать в OpenStore!"
+
+#: /test/
+msgid "Content top"
+msgstr "Верх содержимого"
+
+#: /test/
+msgid "Header 1"
+msgstr "Заголовок 1"
+
+#: /test/
+msgid "Header 2"
+msgstr "Заголовок 2"
+
+#: /test/
+msgid "Top bar"
+msgstr "Верхний бар"
+
+#: /test/
+msgid "First sidebar"
+msgstr "Левый сайдбар"
+
+#: /test/
+msgid "Second sidebar"
+msgstr "Правый сайдбар"
+
+#: /test/
+msgid "Content bottom"
+msgstr "Низ содержимого"
+
+#: /test/
+msgid "Primary menu"
+msgstr "Первичное меню"
+
+#: /test/
+msgid "Product collapsible fields"
+msgstr "Сворачивающиеся блоки товара"
+
+#: /test/
+msgid "Product left region"
+msgstr "Товар. Левый регион"
+
+#: /test/
+msgid "Product right region"
+msgstr "Товар. Правый регион"
+
+#: /test/
+msgid "Profile blocks"
+msgstr "Профиль"
+
+#: /test/
+msgid "Wide blocks"
+msgstr "Широкий регион"
+
+#: /test/admin
+msgid "Content Top"
+msgstr "Верх содержимого"
+
+#: /test/admin
+msgid "Dashboard Left"
+msgstr "Панель управления. Левый регион"
+
+#: /test/admin
+msgid "Dashboard Right"
+msgstr "Панель управления. Правый регион"
+
+#: /test/admin
+msgid "Dashboard Top"
+msgstr "Панель управления. Верхний регион"
+
+#: /test/admin
+msgid "Dashboard Bottom"
+msgstr "Панель управления. Нижний регион"
+
+#: /test/admin
+msgid "Sliding region Left"
+msgstr "Скользящая панель. Левый регион"
+
+#: /test/admin
+msgid "Sliding region Middle"
+msgstr "Скользящая панель. Средний регион"
+
+#: /test/admin
+msgid "Sliding region Right"
+msgstr "Скользящая панель. Правый регион"
+
+#: /test/admin
+msgid "Go Back to Homepage"
+msgstr "На главную"
+
+#: /test/admin
+msgid "Warning! Advanced settings for core. Do not change unless you know what you are doing!"
+msgstr "Внимание! Здесь находятся расширенные настройки ядра и модулей. Не изменяйте их настройки, если не знаете, что вы делаете!"
+
+#: /test/admin
+msgid "Open Panel"
+msgstr "Открыть панель"
+
+#: /test/admin
+msgid "Close Panel"
+msgstr "Закрыть панель"
+
+#: /test/admin
+msgid "Manage store"
+msgstr "Магазин"
+
+#: /test/admin
+msgid "Manage queues"
+msgstr "Очереди"
+
+#: /test/admin
+msgid "Manage orders"
+msgstr "Заказы"
+
+#: /test/admin
+msgid "Manage produsts&pages"
+msgstr "Страницы"
+
+#: /test/admin
+msgid "Logout"
+msgstr "Выход"
+
+msgid "Edit product prices"
+msgstr "Цена товара"
+
+msgid "Edit product categories"
+msgstr "Категории"
+
+msgid "Edit product shipping"
+msgstr "Доставка"
+
+msgid "Other product options"
+msgstr "Другие опции"
+
+msgid "Enter your message"
+msgstr "Напишите своё сообщение"
+
+msgid "Back to main page"
+msgstr "На главную страницу"
+

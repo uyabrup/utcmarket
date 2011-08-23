@@ -1,0 +1,4 @@
+; $Id$ 
+name = AJAX search
+description = AJAX search module
+core = 6.x

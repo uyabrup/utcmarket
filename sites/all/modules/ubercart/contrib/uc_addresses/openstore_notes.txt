@@ -1,0 +1,2 @@
+Закомментированы строки 702-705 (убрана ссылка "Добавить адрес") в uc_addresses.module
+Строка 683 в uc_addresses.module: "No addresses have been saved.<br />" обёрнута в <div class="empty-addresses"></div> 

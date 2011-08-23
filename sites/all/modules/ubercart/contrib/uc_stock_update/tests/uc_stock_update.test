@@ -1,0 +1,31 @@
+<?php
+// $Id: uc_stock_update.test 4479 2010-05-29 11:03:40Z david $ -*-PHP-*-
+/**
+ * Requires Simpletest.
+ *
+ */
+
+// Under construction due to http://drupal.org/node/582942
+
+/*
+class UcStockUpdateTest extends DrupalUnitTestCase {
+
+  function getInfo() {
+    return array(
+		 'name' => t('Stock and price updater tests'),
+		 'description' => t('Tests for the stock and price updater module.'),
+		 'group' => t('Examples'),
+		 );
+  }
+
+
+function testEmptyCsvFile() {
+  $r = ReadCSV(fopen('/dev/null', 'r'), ',');
+
+  $result = $r->get_row();
+  $message = t('Empty file should return NULL.');
+  $this->assertNull($result, $message);
+}
+
+*/
+

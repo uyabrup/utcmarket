@@ -1,0 +1,6 @@
+; $Id: uc_webmoneygate.info,v 1.1 2009/10/15 11:42:46 duke Exp $
+name = "WebMoney"
+description = "Process payments using WebMoney Transfer."
+dependencies[] = uc_payment
+package = Ubercart - payment
+core = 6.x

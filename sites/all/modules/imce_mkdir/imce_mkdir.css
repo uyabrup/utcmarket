@@ -1,0 +1,10 @@
+/* $Id: imce_mkdir.css,v 1.1.2.1 2010/08/14 19:38:20 ufku Exp $ */
+#op-item-mngdir a {
+  background-image: url(dirmanage.png);
+}
+#imce-content #edit-mkdir {
+  background-image: url(diradd.png);
+}
+#imce-content #edit-rmdir {
+  background-image: url(dirremove.png);
+}
