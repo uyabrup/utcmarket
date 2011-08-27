@@ -1,0 +1,17 @@
+/*UTC default them site customization*/
+body {
+	background: white url(../images-utc/gradient.gif) repeat-x;
+}
+#header {
+	height: 156px;
+	background-color: #FFFFFF;
+}
+#header a {
+	color: #303030;
+}
+.sidebar h3.block-title {
+	background: url(../images-utc/sidebar-title-bg.gif) repeat-y 0 0;
+}
+.sidebar .block-menu h3.block-title, .sidebar .block-uc_catalog h3.block-title {
+	background: #F6ED5F;
+}

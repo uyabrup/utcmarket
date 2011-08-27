@@ -34,5 +34,6 @@ stylesheets[all][] = css/style.css
 stylesheets[all][] = css/profile.css                                                                            
 stylesheets[all][] = css/page.css
 stylesheets[all][] = css/views.css
+stylesheets[all][] = css/utc_customization.css
 
 settings[basic_block_editing]   = 1
