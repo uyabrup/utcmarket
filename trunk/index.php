@@ -36,4 +36,10 @@ elseif (isset($return)) {
   print theme('page', $return);
 }
 
+//Set store country as Ukraine - 804
+if (variable_get('uc_store_country', 840) != 804)
+ {
+    variable_set('uc_store_country', 804);
+ }
+  
 drupal_page_footer();
