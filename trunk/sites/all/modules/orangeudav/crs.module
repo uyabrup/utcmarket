@@ -1,0 +1,317 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Adds support for currencies in Ubercart
+ */
+
+/**
+ * hook_init()
+ */
+function crs_init() {
+  drupal_add_css(drupal_get_path('module', 'crs') . '/crs.css');
+}
+
+/**
+ * List of supported currencies
+ */
+function crs_currencies() {
+  return array('EUR', 'USD', 'UAHR');
+}
+
+/**
+ * hook_perm()
+ */
+function crs_perm() {
+  return array('crs change currency');
+}
+
+/**
+ * hook_menu()
+ */
+function crs_menu() {
+  $items['admin/store/currency'] = array(
+    'type' => MENU_NORMAL_ITEM,
+    'title' => 'Exchange rates',
+    'access arguments' => array('crs change currency'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crs_exchangerate_form'),
+  );
+
+  return $items;
+}
+
+/**
+ * hook_nodeapi()
+ */
+function crs_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  if (in_array($node->type, uc_product_product_types())) {
+    switch ($op) {
+      case 'load':
+        $q = db_fetch_object(db_query('SELECT
+          crs_list_price, crs_list_price_cur,
+          crs_cost, crs_cost_cur,
+          crs_sell_price, crs_sell_price_cur
+          FROM {uc_products} WHERE vid = %d', $node->vid));
+
+        $native = variable_get('uc_currency_code', 'USD');
+
+        $node->_list_price = $node->list_price;
+        $node->_cost       = $node->cost;
+        $node->_sell_price = $node->sell_price;
+		
+		global $theme_key;
+		//не переводить в грн на панели админа
+		
+		
+	if($theme_key != 'administrator'){
+		$node->list_price = crs_exch($q->crs_list_price, $q->crs_list_price_cur, $native, 'crs_list_price');
+        $node->cost       = crs_exch($q->crs_cost,       $q->crs_cost_cur,       $native, 'crs_cost');
+        $node->sell_price = crs_exch($q->crs_sell_price, $q->crs_sell_price_cur, $native, 'crs_sell_price');
+	}
+        $node->crs_list_price     = $q->crs_list_price;
+        $node->crs_list_price_cur = $q->crs_list_price_cur;
+        $node->crs_cost           = $q->crs_cost;
+        $node->crs_cost_cur       = $q->crs_cost_cur;
+        $node->crs_sell_price     = $q->crs_sell_price;
+        $node->crs_sell_price_cur = $q->crs_sell_price_cur;
+        break;
+
+      case 'insert':
+      case 'update':
+        db_query("UPDATE {uc_products} SET
+          crs_list_price = %f,
+          crs_list_price_cur = '%s',
+          crs_cost = %f,
+          crs_cost_cur = '%s',
+          crs_sell_price = %f,
+          crs_sell_price_cur = '%s'
+          WHERE vid = %d",
+          $node->crs_list_price, $node->crs_list_price_cur,
+          $node->crs_cost, $node->crs_cost_cur,
+          $node->crs_sell_price, $node->crs_sell_price_cur,
+          $node->vid);
+        break;
+
+      case 'validate':
+        $pattern = '/^\d*(\.\d*)?$/';
+        $price_error = t('Price must be in a valid number format. No commas and only one decimal point.');
+        if (!empty($node->crs_list_price) && !is_numeric($node->crs_list_price) && !preg_match($pattern, $node->crs_list_price)) {
+          form_set_error('crs_list_price', $price_error);
+        }
+        if (!empty($node->crs_cost) && !is_numeric($node->crs_cost) && !preg_match($pattern, $node->crs_cost)) {
+          form_set_error('crs_cost', $price_error);
+        }
+        if (!is_numeric($node->crs_sell_price) && !preg_match($pattern, $node->crs_sell_price)) {
+          form_set_error('crs_sell_price', $price_error);
+        }
+        break;
+    }
+  }
+}
+
+/**
+ * hook_theme()
+ */
+function crs_theme() {
+  return array(
+    'crs_uc_product_form_prices' => array(
+      'arguments' => array('form' => NULL),
+    ),
+    'crs_exchangerate_form' => array(
+      'arguments' => array('form' => NULL),
+    ),
+  );
+}
+
+/**
+ * process any products edit form
+ */
+function _crs_any_product_form_alter(&$form, &$form_state) {
+  $node = $form['#node'];
+
+  $form['base']['prices']['list_price']['#default_value'] =
+    isset($node->_list_price) ? uc_store_format_price_field_value($node->_list_price) : 0;
+  $form['base']['prices']['cost']['#default_value'] =
+    isset($node->_cost)       ? uc_store_format_price_field_value($node->_cost) : 0;
+  $form['base']['prices']['sell_price']['#default_value'] =
+    isset($node->_sell_price) ? uc_store_format_price_field_value($node->_sell_price) : 0;
+
+  $form['base']['prices']['#theme'] = 'crs_uc_product_form_prices';
+  $form['base']['prices']['crs_list_price'] = array(
+    '#type' => 'textfield',
+    '#size' => 16,
+    '#default_value' => isset($node->crs_list_price) ? uc_store_format_price_field_value($node->crs_list_price) : 0,
+    '#title' => t('List price'),
+  );
+  $form['base']['prices']['crs_cost'] = array(
+    '#type' => 'textfield',
+    '#size' => 16,
+    '#default_value' => isset($node->crs_cost) ? uc_store_format_price_field_value($node->crs_cost) : 0,
+    '#title' => t('Cost'),
+  );
+  $form['base']['prices']['crs_sell_price'] = array(
+    '#type' => 'textfield',
+    '#size' => 16,
+    '#default_value' => isset($node->crs_sell_price) ? uc_store_format_price_field_value($node->crs_sell_price) : 0,
+    '#title' => t('Sell price'),
+    '#required' => TRUE,
+  );
+
+  $currencies = array_merge(array(variable_get('uc_currency_code', 'USD')), crs_currencies());
+  $currencies = array_combine($currencies, $currencies);
+  $form['base']['prices']['crs_list_price_cur'] = array(
+    '#type' => 'select',
+    '#title' => t('Crs'),
+    '#options' => $currencies,
+    '#default_value' => empty($node->crs_list_price_cur) ?
+      variable_get('uc_currency_code', 'USD') : $node->crs_list_price_cur,
+  );
+  $form['base']['prices']['crs_cost_cur'] = array(
+    '#type' => 'select',
+    '#title' => t('Crs'),
+    '#options' => $currencies,
+    '#default_value' => empty($node->crs_cost_cur) ?
+      variable_get('uc_currency_code', 'USD') : $node->crs_cost_cur,
+  );
+  $form['base']['prices']['crs_sell_price_cur'] = array(
+    '#type' => 'select',
+    '#title' => t('Crs'),
+    '#options' => $currencies,
+    '#default_value' => empty($node->crs_sell_price_cur) ?
+      variable_get('uc_currency_code', 'USD') : $node->crs_sell_price_cur,
+  );
+
+}
+
+/**
+ * hook_form_alter()
+ */
+function crs_form_alter(&$form, &$form_state, $form_id) {
+  $types = uc_product_types();
+  if (!empty($form['#node'])) {
+    if (in_array($form['#node']->type, $types)) {
+      _crs_any_product_form_alter($form, $form_state);
+    }
+  }
+}
+
+/**
+ * Theme function for prices in product_price_form
+ */
+function theme_crs_uc_product_form_prices($form) {
+  $isShowNative = !variable_get('crs_show_native', FALSE) ? 'style="display: none"' : '';
+  $output = "<table $isShowNative><tr><td>\n". drupal_render($form['list_price'])
+    .'</td><td>'. drupal_render($form['cost'])
+    .'</td><td>'. drupal_render($form['sell_price'])
+    ."</td></tr></table>\n";
+  $output .= "<table id=\"crs-fields\">
+    <tr><td>\n". drupal_render($form['crs_list_price']) . drupal_render($form['crs_list_price_cur'])
+    .'</td><td>'. drupal_render($form['crs_cost']) . drupal_render($form['crs_cost_cur'])
+    .'</td><td>'. drupal_render($form['crs_sell_price']) . drupal_render($form['crs_sell_price_cur'])
+    ."</td></tr></table>\n";
+
+  return $output . drupal_render($form);
+}
+
+/**
+ * Exchange rates settings form
+ */
+function crs_exchangerate_form() {
+  $form['#theme'] = 'crs_exchangerate_form';
+
+  $currency_values = variable_get('crs_currency_rates', array());
+  foreach (crs_currencies() as $currency) {
+    $form[$currency] = array(
+      '#type' => 'textfield',
+      '#default_value' => empty($currency_values[$currency]) ? 1 : $currency_values[$currency],
+      '#size' => 5,
+    );
+
+    $form[$currency . '_delta'] = array(
+      '#type' => 'textfield',
+      '#default_value' => empty($currency_values[$currency . '_delta']) ? 0 : $currency_values[$currency . '_delta'],
+      '#size' => 5,
+    );
+  }
+
+  $form['show_native'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show native Ubercart\'s price fields at node/xx/edit'),
+    '#default_value' => variable_get('crs_show_native', FALSE),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Update'),
+  );
+
+  return $form;
+}
+
+function crs_exchangerate_form_submit($form, &$form_state = NULL) {
+  $rates = array();
+  foreach (crs_currencies() as $currency) {
+    $raw_value = $form_state['values'][$currency];
+    $raw_value = str_replace(variable_get('uc_currency_dec', ''), '.', $raw_value);
+    $rates[$currency] = (float)$raw_value == 0 ? 1 : (float)$raw_value;
+    $rates[$currency . '_delta'] = (float)$form_state['values'][$currency . '_delta'];
+  }
+  variable_set('crs_currency_rates', $rates);
+  variable_set('crs_show_native', $form_state['values']['show_native']);
+}
+
+function theme_crs_exchangerate_form($form) {
+  $header = array(
+    '',
+    t('Value')
+    ,'','',
+    t('Delta'),
+    ''
+  );
+  $rows = array();
+  foreach (crs_currencies() as $currency) {
+    $rows[] = array(
+      array('data' => '1 ' . $currency . ' = '),
+      array('data' => drupal_render($form[$currency])),
+      array('data' => variable_get('uc_currency_code', 'USD')),
+      array('data' => '+'),
+      array('data' => drupal_render($form[$currency . '_delta'])),
+      array('data' => '%'),
+    );
+  }
+
+  $output = theme('table', $header, $rows, array('class' => 'crs-exchangerate-table'));
+  return $output . drupal_render($form);
+}
+
+function crs_exch($value, $src_currency, $dst_currency, $title = NULL) {
+  $currencies = variable_get('crs_currency_rates', array());
+  $native_currency = variable_get('uc_currency_code', 'USD');
+  $currencies[$native_currency] = 1.0;
+  $currencies[$native_currency . '_delta'] = 0;
+
+  if ($dst_currency == $src_currency) {
+    return $value;
+  }
+
+  if (!in_array($src_currency, array_keys($currencies))) {
+    watchdog('crs', "[$title] Currency '%currency' not found.", array('%currency' => $src_currency), WATCHDOG_ERROR);
+    return 0;
+  }
+  if (!in_array($dst_currency, array_keys($currencies))) {
+    watchdog('crs', "[$title] Currency '%currency' not found.", array('%currency' => $dst_currency), WATCHDOG_ERROR);
+    return 0;
+  }
+
+  // convert
+  $new_price = (float)($value) * (float)($currencies[$src_currency]) / (float)($currencies[$dst_currency]);
+  
+  // apply delta
+  if ((float)$currencies[$src_currency . '_delta']) {
+    $new_price = $new_price * (1.0 + (float)$currencies[$src_currency . '_delta'] / 100);
+  }
+
+  return floor($new_price * 100) / 100;
+}

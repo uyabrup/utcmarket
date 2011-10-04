@@ -1,0 +1,351 @@
+# $Id: uc_referrals.pot,v 1.2 2009/03/02 07:12:18 ryangroe Exp $
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  uc_referrals.admin.inc,v 1.2 2009/02/21 19:28:06 ryangroe
+#  uc_referrals.install,v 1.2 2009/02/21 19:28:06 ryangroe
+#  uc_referrals.module,v 1.2 2009/02/21 19:28:06 ryangroe
+#  uc_referrals.info,v 1.2 2009/02/21 19:28:06 ryangroe
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2009-03-01 23:09-0800\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: uc_referrals.admin.inc:16
+msgid "Org Name"
+msgstr ""
+
+#: uc_referrals.admin.inc:17
+msgid "Org Description"
+msgstr ""
+
+#: uc_referrals.admin.inc:18;187;462;551;581
+msgid "User"
+msgstr ""
+
+#: uc_referrals.admin.inc:19
+msgid "Rate"
+msgstr ""
+
+#: uc_referrals.admin.inc:20
+msgid "Code & URL link"
+msgstr ""
+
+#: uc_referrals.admin.inc:21;470;554
+msgid "Operations"
+msgstr ""
+
+#: uc_referrals.admin.inc:40;512;567
+msgid "No User"
+msgstr ""
+
+#: uc_referrals.admin.inc:43;519
+msgid "view usage"
+msgstr ""
+
+#: uc_referrals.admin.inc:44;520;570
+msgid "edit"
+msgstr ""
+
+#: uc_referrals.admin.inc:45;521;571
+msgid "delete"
+msgstr ""
+
+#: uc_referrals.admin.inc:51
+msgid "No referrals."
+msgstr ""
+
+#: uc_referrals.admin.inc:57
+msgid "Create a new referral account."
+msgstr ""
+
+#: uc_referrals.admin.inc:99
+msgid "Calculated line item types"
+msgstr ""
+
+#: uc_referrals.admin.inc:102
+msgid "Line item types to include when calculating referral amount."
+msgstr ""
+
+#: uc_referrals.admin.inc:107
+msgid "Remove referral code after order submit"
+msgstr ""
+
+#: uc_referrals.admin.inc:109
+msgid "Checking this will allow only the first order from a user to count for a referral account."
+msgstr ""
+
+#: uc_referrals.admin.inc:112;123;285;344
+msgid "Submit"
+msgstr ""
+
+#: uc_referrals.admin.inc:138
+msgid "Referral settings have been saved."
+msgstr ""
+
+#: uc_referrals.admin.inc:164
+msgid "Organization Name"
+msgstr ""
+
+#: uc_referrals.admin.inc:165
+msgid "This field will be visible to the associated user (if one exists)."
+msgstr ""
+
+#: uc_referrals.admin.inc:173
+msgid "Organization Description"
+msgstr ""
+
+#: uc_referrals.admin.inc:182
+msgid "<No User>"
+msgstr ""
+
+#: uc_referrals.admin.inc:188
+msgid "User associated with this referral account."
+msgstr ""
+
+#: uc_referrals.admin.inc:195
+msgid "Referral rate"
+msgstr ""
+
+#: uc_referrals.admin.inc:196
+msgid "The rate the referrer receives as a percent or decimal.  6%, .06"
+msgstr ""
+
+#: uc_referrals.admin.inc:218
+msgid "Automatically generate referral code."
+msgstr ""
+
+#: uc_referrals.admin.inc:235
+msgid "Referral code"
+msgstr ""
+
+#: uc_referrals.admin.inc:264
+msgid "Show user message"
+msgstr ""
+
+#: uc_referrals.admin.inc:265
+msgid "Whether or not to show user message during checkout."
+msgstr ""
+
+#: uc_referrals.admin.inc:271
+msgid "User message"
+msgstr ""
+
+#: uc_referrals.admin.inc:272
+msgid "This field is required."
+msgstr ""
+
+#: uc_referrals.admin.inc:273 uc_referrals.install:69
+msgid "Message shown to user during checkout."
+msgstr ""
+
+#: uc_referrals.admin.inc:307
+msgid "Referral rate must be decimal or percentage."
+msgstr ""
+
+#: uc_referrals.admin.inc:328
+msgid "Referral code already exists."
+msgstr ""
+
+#: uc_referrals.admin.inc:410
+msgid "%name settings have been saved."
+msgstr ""
+
+#: uc_referrals.admin.inc:428
+msgid "Delete @row?"
+msgstr ""
+
+#: uc_referrals.admin.inc:429
+msgid "Continue"
+msgstr ""
+
+#: uc_referrals.admin.inc:429
+msgid "Cancel"
+msgstr ""
+
+#: uc_referrals.admin.inc:447
+msgid "Referral deleted."
+msgstr ""
+
+#: uc_referrals.admin.inc:460;550
+msgid "Name"
+msgstr ""
+
+#: uc_referrals.admin.inc:461
+msgid "Description"
+msgstr ""
+
+#: uc_referrals.admin.inc:463;552
+msgid "Uses"
+msgstr ""
+
+#: uc_referrals.admin.inc:464;553
+msgid "Total Amount"
+msgstr ""
+
+#: uc_referrals.admin.inc:528;610
+msgid "No referral data available."
+msgstr ""
+
+#: uc_referrals.admin.inc:542
+msgid "Report for all referrals."
+msgstr ""
+
+#: uc_referrals.admin.inc:582
+msgid "Order"
+msgstr ""
+
+#: uc_referrals.admin.inc:583
+msgid "Code"
+msgstr ""
+
+#: uc_referrals.admin.inc:584
+msgid "Amount"
+msgstr ""
+
+#: uc_referrals.admin.inc:585
+msgid "Date"
+msgstr ""
+
+#: uc_referrals.admin.inc:602
+msgid "no code"
+msgstr ""
+
+#: uc_referrals.module:30
+msgid "Add and review referrals"
+msgstr ""
+
+#: uc_referrals.module:32
+msgid "Update referral global settings"
+msgstr ""
+
+#: uc_referrals.module:136;103
+msgid "Referrals Accounts"
+msgstr ""
+
+#: uc_referrals.module:141
+msgid "Click here to view a summary your referral accounts."
+msgstr ""
+
+#: uc_referrals.module:246
+msgid "Referral"
+msgstr ""
+
+#: uc_referrals.module:42
+msgid "configure referrals"
+msgstr ""
+
+#: uc_referrals.module:53
+msgid "Referral settings"
+msgstr ""
+
+#: uc_referrals.module:54
+msgid "Configure referral settings."
+msgstr ""
+
+#: uc_referrals.module:60
+msgid "List"
+msgstr ""
+
+#: uc_referrals.module:64
+msgid "Edit global settings"
+msgstr ""
+
+#: uc_referrals.module:73
+msgid "Edit referral rule"
+msgstr ""
+
+#: uc_referrals.module:81
+msgid "Delete referral rule"
+msgstr ""
+
+#: uc_referrals.module:89
+msgid "Ubercart referrals usage data"
+msgstr ""
+
+#: uc_referrals.module:90
+msgid "View usage data for each Ubercart referral."
+msgstr ""
+
+#: uc_referrals.module:96
+msgid "Ubercart referral usage data"
+msgstr ""
+
+#: uc_referrals.module:0
+msgid "uc_referrals"
+msgstr ""
+
+#: uc_referrals.install:24
+msgid "Name of referring organization."
+msgstr ""
+
+#: uc_referrals.install:31
+msgid "Description of referring organization."
+msgstr ""
+
+#: uc_referrals.install:36
+msgid "The {users}.uid of the user associated with this referral account (or NULL for no user)."
+msgstr ""
+
+#: uc_referrals.install:42
+msgid "Percentage referrer receives."
+msgstr ""
+
+#: uc_referrals.install:49
+msgid "Whether or not to automatically generate referral code."
+msgstr ""
+
+#: uc_referrals.install:62
+msgid "Whether or not referral has a user message."
+msgstr ""
+
+#: uc_referrals.install:75;153
+msgid "The insert date and time as a unix timestamp."
+msgstr ""
+
+#: uc_referrals.install:93;134
+msgid "The {uc_orders}.order_id of the user's order."
+msgstr ""
+
+#: uc_referrals.install:100
+msgid "The {uc_referrals}.code used for the order."
+msgstr ""
+
+#: uc_referrals.install:122
+msgid "The {uc_referrals}.referral_id of the referral."
+msgstr ""
+
+#: uc_referrals.install:128
+msgid "The {users}.uid of the user who used the referral or (0 if anonymous)."
+msgstr ""
+
+#: uc_referrals.install:141
+msgid "Code used for referral."
+msgstr ""
+
+#: uc_referrals.install:147
+msgid "Amount to credit referral account."
+msgstr ""
+
+#: uc_referrals.info:0
+msgid "Referrals"
+msgstr ""
+
+#: uc_referrals.info:0
+msgid "Defines Ubercart referral system."
+msgstr ""
+
+#: uc_referrals.info:0
+msgid "Ubercart - core (optional)"
+msgstr ""
+
