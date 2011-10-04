@@ -60,6 +60,16 @@ function general_preprocess_product_form(&$vars) {
   $vars['show_edit_form_prices'] = '<div class="edit-form-item prices-form">' . drupal_render($vars['form']['base']['prices']) . '</div>';
   $vars['show_edit_form_list_price'] = '<div class="edit-form-item list-price-item">' . drupal_render($vars['form']['base']['prices']['list_price']) . '</div>';
   $vars['show_edit_form_cost'] = '<div class="edit-form-item cost-item">' . drupal_render($vars['form']['base']['prices']['cost']) . '</div>';
+  /////
+  $vars['show_edit_form_crs_m'] = '<div class="edit-form-item crs-item">'.
+   "<table id=\"crs-fields\">
+    <tr><td>\n". drupal_render($vars['form']['base']['prices']['crs_list_price']) . drupal_render($vars['form']['base']['prices']['crs_list_price_cur'])
+    .'</td><td>'. drupal_render($vars['form']['base']['prices']['crs_cost']) . drupal_render($vars['form']['base']['prices']['crs_cost_cur'])
+    .'</td><td>'. drupal_render($vars['form']['base']['prices']['crs_sell_price']) . drupal_render($vars['form']['base']['prices']['crs_sell_price_cur'])
+    ."</td></tr></table>".
+   '</div>';
+  
+  /////
   $vars['show_edit_form_sell_price'] = '<div class="edit-form-item sell-price-item">' . drupal_render($vars['form']['base']['prices']['sell_price']) . '</div>';
   $vars['show_edit_form_shippable'] = '<div class="edit-form-item shippable-item">' . drupal_render($vars['form']['base']['shippable']) . '</div>';
   $vars['show_edit_form_weight'] = '<div class="edit-form-item weight-item">' . drupal_render($vars['form']['base']['weight']) . '</div>';

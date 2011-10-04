@@ -101,6 +101,8 @@ function administrator_preprocess(&$vars, $hook) {
 
       $path_to_theme = drupal_get_path('theme', 'administrator');
 	  
+	  drupal_add_js($path_to_theme . '/js/tools.js');
+	  
 	   if (module_exists('general')) {
 	  $path_to_lib = drupal_get_path('module', 'general') . '/lib';
 	  }

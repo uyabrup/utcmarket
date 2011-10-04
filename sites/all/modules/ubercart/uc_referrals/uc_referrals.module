@@ -1,0 +1,538 @@
+<?php
+//$Id: uc_referrals.module,v 1.6 2009/06/23 02:09:48 ryangroe Exp $
+
+/**
+ * @file
+ * Referrals module for Ubercart 2.0+.
+ *
+ * Allows referral rules to be set up and applied to orders.
+ */
+
+define("AUTO_GENERATE_CODE_DEFAULT", TRUE);
+define("NO_REFERRAL_USER", "-");
+define("HAS_USER_MESSAGE_DEFAULT", FALSE);
+define("UC_REFERRAL_CODE_URL_KEY", "ucrc");
+define("UC_REFERRAL_CODE_SESSION_KEY", "uc_referral_code");
+define("UC_REFERRALS_CALCULATED_LINE_ITEM_TYPES_KEY", "uc_referrals_calculated_line_item_types");
+define("UC_REFERRALS_REMOVE_REFERRAL_CODE_AFTER_ORDER_SUBMIT_KEY", "uc_referrals_remove_referral_code_after_order_submit");
+
+
+///////////////////////////////////////////////////////////////////
+//Drupal Hooks
+///////////////////////////////////////////////////////////////////
+
+function uc_referrals_help($path, $arg)
+{
+	switch ($path)
+	{
+		case "admin/store/settings/uc_referrals":
+		case "admin/store/settings/uc_referrals/list":
+			return t("Add and review referrals");
+		case "admin/store/settings/uc_referrals/edit_global_settings":
+			return t("Update referral global settings");
+	}
+	return $output;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function uc_referrals_perm()
+{
+	return array("configure referrals");
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function uc_referrals_menu()
+{
+	$items = array();
+
+	$items["admin/store/settings/uc_referrals"] = array(
+		"title" => "Referral settings",
+		"description" => "Configure referral settings.",
+	    "page callback" => "uc_referrals_admin_settings_list",
+		"access arguments" => array("configure referrals"),
+		"file" => "uc_referrals.admin.inc",
+	);
+	$items["admin/store/settings/uc_referrals/list"] = array(
+		"title" => "List",
+		"type" => MENU_DEFAULT_LOCAL_TASK,
+	);
+	$items["admin/store/settings/uc_referrals/edit_global_settings"] = array(
+		"title" => "Edit global settings",
+		"page callback" => "drupal_get_form",
+		"page arguments" => array("uc_referrals_global_settings_form"),
+		"access arguments" => array("configure referrals"),
+		"type" => MENU_LOCAL_TASK,
+		"file" => "uc_referrals.admin.inc",
+		"weight" => 1,
+	);
+	$items["admin/store/settings/uc_referrals/edit"] = array(
+		"title" => "Edit referral rule",
+		"page callback" => "drupal_get_form",
+		"page arguments" => array("uc_referrals_form"),
+		"access arguments" => array("configure referrals"),
+		"type" => MENU_CALLBACK,
+		"file" => "uc_referrals.admin.inc",
+	);
+	$items["admin/store/settings/uc_referrals/delete"] = array(
+		"title" => "Delete referral rule",
+		"page callback" => "drupal_get_form",
+		"page arguments" => array("uc_referrals_delete"),
+		"access arguments" => array("configure referrals"),
+		"type" => MENU_CALLBACK,
+		"file" => "uc_referrals.admin.inc",
+	);
+	$items["admin/reports/uc_referrals/all"] = array(
+		"title" => "Ubercart referrals usage data",
+		"description" => "View usage data for each Ubercart referral.",
+		"page callback" => "uc_referrals_report",
+		"access arguments" => array("access site reports"),
+		"file" => "uc_referrals.admin.inc",
+	);
+	$items["admin/reports/uc_referrals/referral"] = array(
+		"title" => "Ubercart referral usage data",
+		"page callback" => "uc_referrals_report_for_referral",
+		"access arguments" => array("access site reports"),
+	    "type" => MENU_CALLBACK,
+		"file" => "uc_referrals.admin.inc",
+	);
+	$items["user/%user/uc_referrals"] = array(
+		"title" => "Referrals Accounts",
+		"page callback" => "uc_referrals_report",
+		"page arguments" => array(1),
+		"access callback" => '_referrals_user_access',
+		"type" => MENU_LOCAL_TASK,
+		"file" => "uc_referrals.admin.inc",
+	);
+
+	return $items;
+}
+
+function _referrals_user_access()
+{
+	return TRUE;
+}
+
+/**
+ * Implementation of hook_user().
+ */
+function uc_referrals_user($op, &$edit, &$account, $category = NULL)
+{
+	global $user;
+	switch ($op)
+	{
+		case "view":
+			if ( empty($user->uid) )
+				break;
+
+			$links = array();
+			$result = db_query("SELECT * FROM {uc_referrals} WHERE user_id=%d", $user->uid);
+			if ( db_fetch_object($result) )
+			{
+				$account->content["uc_referrals"] = array(
+					"#title" => t("Referrals Accounts"),
+					"#type" => "user_profile_category",
+					"#weight" => 0,
+					"link" => array(
+						"#type" => "user_profile_item",
+						"#value" => l(t("Click here to view a summary your referral accounts."), "user/$user->uid/uc_referrals"),
+					),
+				);
+				break;
+			}
+			break;
+	}
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function uc_referrals_init()
+{
+	//Store referral code from url (if one exists)
+	if ( isset($_GET[UC_REFERRAL_CODE_URL_KEY]) )
+	{
+		$_SESSION[UC_REFERRAL_CODE_SESSION_KEY] = $_GET[UC_REFERRAL_CODE_URL_KEY];
+		uc_referrals_log("uc_referrals_init: url key=" . $_GET[UC_REFERRAL_CODE_URL_KEY]);
+		unset($_GET[UC_REFERRAL_CODE_URL_KEY]);
+	}
+}
+
+/**
+ * Implementation of hook_order().
+ *
+ * Manages order->uc_referrals_code
+ */
+function uc_referrals_order($op, &$arg1, $arg2)
+{
+	switch ($op)
+	{
+		case "load":
+			//Get order's code from database
+			$arg1->uc_referrals_code = uc_referrals_order_codes_get($arg1->order_id);
+			break;
+
+		case "save":
+			//Delete existing order code
+			uc_referrals_order_codes_delete($arg1->order_id);
+
+			//Save order's referral code
+			uc_referrals_order_codes_insert($arg1->order_id, $arg1->uc_referrals_code);
+
+			break;
+
+		case "update":
+			if ($arg2 == "payment_received")
+			{
+				//Insert a uc_referrals_uses row (if necessary)
+				$referral = get_referral_for_code($arg1->uc_referrals_code);
+				if ( !empty($referral) )
+				{
+					$uc_referrals_calculated_line_item_types = 
+						variable_get( UC_REFERRALS_CALCULATED_LINE_ITEM_TYPES_KEY, array() );
+
+					//Create order_total to baes referral rate on (it is based on standard subtotal plus
+					//global line item types)
+					$order_total = 0;
+					foreach ($arg1->products as $product)
+						$order_total += $product->price * $product->qty;
+					foreach ($arg1->line_items as $line_item)
+					{
+						if ( in_array($line_item["type"], $uc_referrals_calculated_line_item_types, TRUE) )
+							$order_total += $line_item["amount"];
+					}
+
+					//Calculate referral amount from order_total and referral rate
+					$amount = $referral->rate * $order_total;
+
+					//Delete existing uses for order and (if any exist)
+					uc_referrals_uses_delete_for_order($arg1->order_id);
+					
+					//Insert use for order
+					uc_referrals_uses_insert($referral->referral_id, $arg1->uid, 
+						$arg1->order_id, $referral->code, $amount);
+						
+					//Add referral message to order
+					uc_order_log_changes(   $arg1->order_id, 
+						array(  sprintf("Referred by '%s' with code '%s' for a total of %s", 
+							$referral->name, $referral->code, uc_currency_format($amount) )  )   );
+				}
+
+				//Clear session referral code (if necessary)
+				if ( variable_get(UC_REFERRALS_REMOVE_REFERRAL_CODE_AFTER_ORDER_SUBMIT_KEY, TRUE) )
+					unset($_SESSION[UC_REFERRAL_CODE_SESSION_KEY]);
+			}
+			
+			//If status changes to "cancelled", delete referral uses
+			if ($arg2 == "cancelled")
+				uc_referrals_uses_delete_for_order($arg1->order_id);
+			break;
+
+		case "delete":
+			//Delete order referral code
+			uc_referrals_order_codes_delete($arg1->order_id);
+			//Delete referral uses for order
+			uc_referrals_uses_delete_for_order($arg1->order_id);
+			break;
+	}
+}
+
+/**
+ * Implementation of hook_checkout_pane().
+ */
+function uc_referrals_checkout_pane()
+{
+//TO DO: find a way to hide pane without javascript in callback
+	$panes[] = array(
+		"id" => "uc_referrals",
+		"title" => t("Referral"),
+		"callback" => "uc_checkout_pane_referrals",
+		"process" => TRUE,
+		"weight" => 10,
+	);
+	return $panes;
+}
+
+/**
+ * Referrals checkout pane callback
+ *
+ * More information at http://www.ubercart.org/docs/developer/245/checkout
+ */
+function uc_checkout_pane_referrals($op, &$arg1, $arg2)
+{
+	switch ($op)
+	{
+		case "view":
+			//Add form to checkout pane
+
+			$code = NULL;
+			//If viewing an existing order, load order's referral code
+			if ( !empty($arg1->order_id) )
+				$code = uc_referrals_order_codes_get($arg1->order_id);
+			elseif ( isset($_SESSION[UC_REFERRAL_CODE_SESSION_KEY]) )
+				$code = $_SESSION[UC_REFERRAL_CODE_SESSION_KEY];
+
+			$contents["uc-referrals-code"] = array(
+				"#type" => "hidden",
+				"#default_value" => $code,
+			);
+
+			//Hide referral pane (if necessary)
+			$referral = get_referral_for_code($code);
+			if (empty($referral) || !$referral->has_user_message)
+				drupal_add_js("$(document).ready(function() { $('#uc_referrals-pane').hide(); });", "inline");
+			else if (!empty($referral) && $referral->has_user_message)
+			{
+				$contents["user-message"] = array(
+					"#type" => "hidden",
+					"#prefix" => "<div class='uc-referral-user-message'>" . $referral->user_message . "</div>"
+				);
+			}
+
+			return array("contents" => $contents);
+
+		case "process":
+			//Save code from checkout pane form ($arg1)
+			$code = $arg2["uc-referrals-code"];
+			$arg1->uc_referrals_code = $code;
+
+			break;
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////
+//Database operations
+///////////////////////////////////////////////////////////////////
+
+/**
+ * Returns array of uc_referrals column names.
+ */
+function get_uc_referrals_column_names()
+{
+	return array("name", "description", "user_id", "rate", "auto_generate_code", "code", "has_user_message", "user_message");
+}
+/**
+ * Returns array of uc_referrals insert column names.
+ */
+function get_uc_referrals_insert_column_names()
+{
+	return array_merge( get_uc_referrals_column_names(), array("insert_timestamp") );
+}
+/**
+ * Returns array of uc_referrals update column names.
+ */
+function get_uc_referrals_update_column_names()
+{
+	return get_uc_referrals_column_names();
+}
+
+/**
+ * Returns array of uc_referrals column printf wildcards.
+ */
+function get_uc_referrals_column_printf_wildcards()
+{
+	//user_id is %s because it is nullable
+	return array("'%s'", "'%s'", "%s", "%f", "%d", "'%s'", "%d", "'%s'");
+}
+/**
+ * Returns array of uc_referrals insert column printf wildcards.
+ */
+function get_uc_referrals_column_insert_printf_wildcards()
+{
+	return array_merge( get_uc_referrals_column_printf_wildcards(), array("%d") );
+}
+/**
+ * Returns array of uc_referrals update column printf wildcards.
+ */
+function get_uc_referrals_column_update_printf_wildcards()
+{
+	return get_uc_referrals_column_printf_wildcards();
+}
+
+/**
+ * Inserts a uc_referrals row and returns its referral_id.
+ */
+function uc_referrals_insert($name, $description, $user_id, $rate, $auto_generate_code, $code, 
+	$has_user_message, $user_message, $insert_timestamp = NULL)
+{
+	if ( is_null($insert_timestamp) )
+		$insert_timestamp = time();
+
+	$query = "INSERT INTO {uc_referrals}(" . join( ",", get_uc_referrals_insert_column_names() ) 
+		. ") VALUES(" . join( ",", get_uc_referrals_column_insert_printf_wildcards() ) . ")";
+
+	if ( is_null($user_id) )
+		$user_id = "NULL";
+
+	uc_referrals_log("query=" . $query);
+	db_query($query, $name, $description, $user_id, $rate, $auto_generate_code, $code, 
+		$has_user_message, $user_message, $insert_timestamp);
+	$referral_id = db_last_insert_id("uc_referrals", "referral_id");
+	uc_referrals_log("new referral_id=" . $referral_id);
+	return $referral_id;
+}
+
+/**
+ * Updates a uc_referrals row.
+ */
+function uc_referrals_update($referral_id, $name, $description, $user_id, $rate, $auto_generate_code, $code, 
+	$has_user_message, $user_message)
+{
+	$query = "UPDATE {uc_referrals} SET ";
+	
+	$column_names = get_uc_referrals_update_column_names();
+	$printf_wildcards = get_uc_referrals_column_update_printf_wildcards();
+
+	if ( is_null($user_id) )
+		$user_id = "NULL";
+	
+	for ($i = 0; $i < count($column_names); $i++)
+	{
+		if ($i != 0)
+			$query .= ", ";
+		$query .= $column_names[$i] . "=" . $printf_wildcards[$i];
+	}
+	
+	$query .= " WHERE referral_id=%d";
+	
+	uc_referrals_log("query=" . $query);
+	db_query($query, $name, $description, $user_id, $rate, $auto_generate_code, $code, $has_user_message, 
+		$user_message, $referral_id);
+}
+
+/**
+ * Inserts a uc_referrals_uses row and returns its referral_use_id.
+ */
+function uc_referrals_uses_insert($referral_id, $user_id, $order_id, $code, $amount, $insert_timestamp = NULL)
+{
+	if ( is_null($insert_timestamp) )
+		$insert_timestamp = time();
+	
+	$query = "INSERT INTO {uc_referrals_uses}(referral_id, user_id, order_id, code, amount, insert_timestamp)"
+		. " VALUES(%d, %d, %d, '%s', %f, %d)";
+	uc_referrals_log("query=" . $query);
+	db_query($query, $referral_id, $user_id, $order_id, $code, $amount, $insert_timestamp);
+	return db_last_insert_id("uc_referrals_uses", "referral_use_id");
+}
+
+/**
+ * Deletes all uc_referrals_uses rows for a referral.
+ */
+function uc_referrals_uses_delete_for_referral($referral_id)
+{
+	$query = "DELETE FROM {uc_referrals_uses} WHERE referral_id=%d";
+	uc_referrals_log("query=" . $query);
+	db_query($query, $referral_id);
+}
+
+/**
+ * Deletes all uc_referrals_uses rows for an order.
+ */
+function uc_referrals_uses_delete_for_order($order_id)
+{
+	$query = "DELETE FROM {uc_referrals_uses} WHERE order_id=%d";
+	uc_referrals_log("query=" . $query);
+	db_query($query, $order_id);
+}
+
+/**
+ * Returns referral object for code.
+ */
+function get_referral($referral_id)
+{
+	//Get referral from database
+	return db_fetch_object( db_query( "SELECT * FROM {uc_referrals} WHERE referral_id=%d", $referral_id) );
+}
+
+/**
+ * Returns referral object for code.
+ */
+function get_referral_for_code($code)
+{
+	//Get referral from database
+	return db_fetch_object( db_query("SELECT * FROM {uc_referrals} WHERE code='%s'", $code) );
+}
+
+/**
+ * Returns referral code for order.
+ */
+function uc_referrals_order_codes_get($order_id)
+{
+	//Get order's codes from database
+	$row = db_fetch_array( db_query(
+		"SELECT code FROM {uc_referrals_order_codes} WHERE order_id=%d", $order_id) );
+	return ( !empty($row) ) ? $row["code"] : NULL;
+}
+
+/**
+ * Inserts a uc_referrals_order_codes row.
+ */
+function uc_referrals_order_codes_insert($order_id, $code)
+{
+	//If code is empty, return
+	$code = trim($code);
+	if ( empty($code) )
+		return;
+
+	$query = "INSERT INTO {uc_referrals_order_codes}(order_id, code) VALUES(%d, '%s')";
+	uc_referrals_log("query=" . $query);
+	db_query($query, $order_id, $code);
+}
+
+/**
+ * Deletes all uc_referrals_order_codes rows for an order.
+ */
+function uc_referrals_order_codes_delete($order_id)
+{
+	$query = "DELETE FROM {uc_referrals_order_codes} WHERE order_id=%d";
+	uc_referrals_log("query=" . $query);
+	db_query($query, $order_id);
+}
+
+/**
+ * Deletes a uc_referrals row and all dependencies.
+ */
+function uc_referrals_delete_all($referral_id)
+{
+	$query = "DELETE FROM {uc_referrals_uses} WHERE referral_id=%d;";
+	uc_referrals_log("query=" . $query);
+	db_query($query, $referral_id, $referral_id);
+
+	$query = "DELETE FROM {uc_referrals} WHERE referral_id=%d;";
+	uc_referrals_log("query=" . $query);
+	db_query($query, $referral_id, $referral_id);
+}
+
+
+///////////////////////////////////////////////////////////////////
+//Misc. helper functions
+///////////////////////////////////////////////////////////////////
+
+function uc_referrals_get_url($code)
+{
+	$url_string = url( NULL, 
+		array(
+			"query" => array(UC_REFERRAL_CODE_URL_KEY => $code),
+			"absolute" => TRUE,
+		)
+	);
+	
+	//Ensure URL is not SSL
+	$url_string = str_replace("https://", "http://", $url_string);
+	
+	return $url_string;
+}
+
+function generate_referral_code()
+{
+	return md5( uniqid(rand(), true) );
+}
+
+function uc_referrals_log($s)
+{
+//	error_log($s);
+}

@@ -29,10 +29,16 @@
         <div class = "prices"> <!-- Блок с ценами -->
             <h3><?php print t('Edit product prices'); ?></h3>
 
+			<?php print $show_edit_form_cost; ?>
+						
+			<input type="button" class="form-submit" onclick="" value="<? print t('Calculate')?>" id="calc_price_btn" />
+			
             <?php print $show_edit_form_sell_price; ?>
 
             <?php print $show_edit_form_list_price; ?>
-
+			
+			<?php print $show_edit_form_crs_m; ?>
+			
             <?php print $show_edit_form_model; ?>
         </div> <!-- /Блок с ценами -->
 

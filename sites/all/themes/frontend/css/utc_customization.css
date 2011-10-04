@@ -15,3 +15,6 @@ body {
 .sidebar .block-menu h3.block-title, .sidebar .block-uc_catalog h3.block-title {
 	background: #F6ED5F;
 }
+#wide-blocks .views-showcase-pager-item {
+ height: 39px;
+}

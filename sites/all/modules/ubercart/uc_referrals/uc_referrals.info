@@ -1,0 +1,20 @@
+; $Id: uc_referrals.info,v 1.3 2009/03/02 07:12:17 ryangroe Exp $
+name = Referrals
+description = Defines Ubercart referral system.
+dependencies[] = uc_store
+package = "Ubercart - core (optional)"
+core = 6.x
+
+; Information added by drupal.org packaging script on 2009-02-21
+version = "6.x-1.0-beta2"
+core = "6.x"
+project = "uc_referrals"
+datestamp = "1235245260"
+
+
+; Information added by drupal.org packaging script on 2009-09-13
+version = "6.x-1.0-beta5"
+core = "6.x"
+project = "uc_referrals"
+datestamp = "1252879291"
+
