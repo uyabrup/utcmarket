@@ -1,8 +1,71 @@
-<!-- Шаблон формы редактирования -->
+<!-- РЁР°Р±Р»РѕРЅ С„РѕСЂРјС‹ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ -->
 
 <div id = "edit-content-form" class = "edit-product">
-    <div id = "left"> <!-- Левая колонка -->
-        <div class = "main"> <!-- Основные опции -->
+    <div id = "left"> <!-- Р›РµРІР°СЏ РєРѕР»РѕРЅРєР° -->
+        <div class = "main"> <!-- РћСЃРЅРѕРІРЅС‹Рµ РѕРїС†РёРё -->
+         <!-- Product Import data form -->
+         <div class="import_data_block">
+            <h3>Import product data (DON'T USE THIS FORM)</h3>
+            <div class="form-item" id="edit-prod-url">
+             <label for="prod_url">Product URL: </label>
+             <span class="field-prefix"></span> <input type="text" class="form-text" value="" id="prod_url"><span class="field-suffix"></span><input type="button" class="form-submit" onclick="" value="Import" id="import_data_call" />
+             <div class="description">Fill Product URL</div>
+            </div>
+            <div class="import-title-block">
+              <div class="edit-form-item" style="float: left; clear: none;">
+               <div class="form-item" id="edit-product-title">
+               <label for="prod_title_val">Product title imported</label>
+               <span class="field-prefix"></span> <input type="text" maxlength="" name="" id="prod_title_val" size="" value="" class="form-text" /> <span class="field-suffix"></span>
+               <div class="description">Product title imported need be updated</div>
+               </div>
+              </div>
+              <div class="edit-form-item" style="float: right; clear: none;">
+               <div class="form-item" id="edit-product-title-2">
+               <label for="prod_title_val_last">Product title corrected <span class="form-required" title="">*</span></label>
+               <span class="field-prefix"></span> <input type="text" maxlength="" name="" id="prod_title_val_last" size="" value="" class="form-text required" /> <span class="field-suffix"></span>
+               <div class="description">Product title after correction</div>
+               </div>
+              </div>
+              <div style="clear:both"></div>
+            </div>
+            <div class="import-price-block">
+              <div class="edit-form-item" style="float: left; clear: none;">
+               <div class="form-item" id="edit-product-price-yuan">
+                <label for="prod_price_yuan">Product price yuan: <span class="form-required" title="">*</span></label>
+                <span class="field-prefix"></span> <input type="text" maxlength="35" name="" id="prod_price_yuan" size="20" value="0" class="form-text required" /> <span class="field-suffix">yuan</span>
+                <div class="description">Product price in yuan imported.</div>
+               </div>
+              </div>
+              <div class="edit-form-item" style="float: right; clear: none;">
+               <div class="form-item" id="edit-product-price-usd">
+                <label for="prod_price_usd">Product price usd: <span class="form-required" title="">*</span></label>
+                <span class="field-prefix"></span> <input type="text" maxlength="35" name="" id="prod_price_usd" size="20" value="0" class="form-text required" /> <span class="field-suffix">$</span>
+                <div class="description">Product price in usd calculated.</div>
+               </div>
+              </div>
+              <div style="clear:both"></div>
+            </div> 
+            <div class="edit-form-item">
+             <div class="form-item" id="edit-product-weight">
+              <label for="prod_weight">Weight: <span class="form-required" title="">*</span></label>
+              <span class="field-prefix"></span> <input type="text" maxlength="35" name="" id="prod_weight" size="20" value="0" class="form-text required" /> <span class="field-suffix">gram</span>
+              <div class="description">Product Weight.</div>
+             </div>
+            </div>						
+            <div class="edit-form-item">
+             <div class="form-item" id="edit-product-image">
+              <label for="prod_image">Main image URL:</label>
+              <span class="field-prefix"></span> <input type="text" maxlength="" name="" id="prod_image" size="" value="" class="form-text" /> <span class="field-suffix"></span>
+              <div class="description">Will be used as the main product image.</div>
+              <img id="prod_image_show" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEHAAEALAAAAAABAAEAAAICTAEAOw==" alt="" />
+             </div>
+            </div>						
+            
+           <input type="button" class="form-submit" onclick="" value="Fill form" id="fill_form" /> 		
+           <hr />
+          </div>
+         <!-- /Product Import data form -->
+                 
             <?php print $show_edit_form_title; ?>
 
             <?php print $show_edit_form_body; ?>
@@ -10,9 +73,9 @@
             <?php print $show_edit_form_taxonomy_tags; ?>
 
             <?php print $show_edit_form_image; ?>
-        </div> <!-- /Основные опции -->
+        </div> <!-- /РћСЃРЅРѕРІРЅС‹Рµ РѕРїС†РёРё -->
 
-        <div class = "additional"> <!-- Дополнительные опции -->
+        <div class = "additional"> <!-- Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РѕРїС†РёРё -->
             <?php print $show_edit_form_specs; ?>
 
             <?php print $show_edit_form_additional; ?>
@@ -22,16 +85,31 @@
             <?php print $show_edit_form_metatags; ?>
 
             <?php print $show_edit_form_domain; ?>
-        </div> <!-- /Дополнительные опции -->
-    </div> <!-- /Левая колонка -->
+        </div> <!-- /Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РѕРїС†РёРё -->
+    </div> <!-- /Р›РµРІР°СЏ РєРѕР»РѕРЅРєР° -->
 
-    <div id = "right"> <!-- Правая колонка -->
-        <div class = "prices"> <!-- Блок с ценами -->
+    <div id = "right"> <!-- РџСЂР°РІР°СЏ РєРѕР»РѕРЅРєР° -->
+		<div class = "shipping"> <!-- Р’СЃС‘, С‡С‚Рѕ РєР°СЃР°РµС‚СЃСЏ РґРѕСЃС‚Р°РІРєРё (РїРµСЂРІРѕРѕС‡РµСЂРµРґРЅРѕРµ) -->
+            <h3><?php print t('Edit product shipping'); ?></h3>
+
+            <?php print $show_edit_form_shippable; ?>
+
+            <?php print $show_edit_form_weight_weight; ?>
+        </div> <!-- Р’СЃС‘, С‡С‚Рѕ РєР°СЃР°РµС‚СЃСЏ РґРѕСЃС‚Р°РІРєРё -->
+		
+        <div class = "prices"> <!-- Р‘Р»РѕРє СЃ С†РµРЅР°РјРё -->
             <h3><?php print t('Edit product prices'); ?></h3>
-
+<!--			<div class="form-item" id="edit-yuan_price">
+			 <label for="yuan_price">Price: </label>
+			 <span class="field-prefix"></span> <input type="text" class="form-text" value="0" id="yuan_price" /><span class="field-suffix">Y</span>
+			 <div class="description">Price in yuan</div>
+			</div>
+			
+			<input type="button" class="form-submit" onclick="" value="<? print t('Calculate')?>" id="calc_price_btn" />-->
+			
 			<?php print $show_edit_form_cost; ?>
 						
-			<input type="button" class="form-submit" onclick="" value="<? print t('Calculate')?>" id="calc_price_btn" />
+			
 			
             <?php print $show_edit_form_sell_price; ?>
 
@@ -40,9 +118,9 @@
 			<?php print $show_edit_form_crs_m; ?>
 			
             <?php print $show_edit_form_model; ?>
-        </div> <!-- /Блок с ценами -->
+        </div> <!-- /Р‘Р»РѕРє СЃ С†РµРЅР°РјРё -->
 
-        <div class = "categories"> <!-- Блок с категориями (таксономия) -->
+        <div class = "categories"> <!-- Р‘Р»РѕРє СЃ РєР°С‚РµРіРѕСЂРёСЏРјРё (С‚Р°РєСЃРѕРЅРѕРјРёСЏ) -->
             <h3><?php print t('Edit product categories'); ?></h3>
 
             <?php print $show_edit_form_taxonomy_categories; ?>
@@ -50,17 +128,11 @@
             <?php print $show_edit_form_taxonomy_manufacturers; ?>
 
             <?php print $show_edit_form_taxonomy_promo; ?>
-        </div> <!-- /Блок с категориями -->
+        </div> <!-- /Р‘Р»РѕРє СЃ РєР°С‚РµРіРѕСЂРёСЏРјРё -->
 
-        <div class = "shipping"> <!-- Всё, что касается доставки (первоочередное) -->
-            <h3><?php print t('Edit product shipping'); ?></h3>
+        
 
-            <?php print $show_edit_form_shippable; ?>
-
-            <?php print $show_edit_form_weight_weight; ?>
-        </div> <!-- Всё, что касается доставки -->
-
-        <div class = "buttons"> <!-- Блок с кнопками -->
+        <div class = "buttons"> <!-- Р‘Р»РѕРє СЃ РєРЅРѕРїРєР°РјРё -->
             <?php print $show_edit_form_submit; ?>
 
             <?php print $show_edit_form_save_continue; ?>
@@ -70,10 +142,10 @@
             <?php print $show_edit_form_submit_preview; ?>
 
             <?php print $show_edit_form_delete; ?>
-        </div> <!-- /Блок с кнопками -->
-    </div> <!-- /Правая колонка -->
+        </div> <!-- /Р‘Р»РѕРє СЃ РєРЅРѕРїРєР°РјРё -->
+    </div> <!-- /РџСЂР°РІР°СЏ РєРѕР»РѕРЅРєР° -->
 
-    <div id = "bottom"> <!-- /Подвал (сюда пихайте всё второстепенное) -->
+    <div id = "bottom"> <!-- /РџРѕРґРІР°Р» (СЃСЋРґР° РїРёС…Р°Р№С‚Рµ РІСЃС‘ РІС‚РѕСЂРѕСЃС‚РµРїРµРЅРЅРѕРµ) -->
         <h3><?php print t('Other product options'); ?></h3>
 
         <?php print $show_edit_form_sitemap; ?>
@@ -95,72 +167,71 @@
         <?php print $show_edit_form_shipping; ?>
     </div>
 </div>
-<!-- Шаблон формы редактирования -->
+<!-- РЁР°Р±Р»РѕРЅ С„РѕСЂРјС‹ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ -->
 
 <?php
 
 /*
-* drupal_render($form) является обязательным в этом шаблоне. 
-Служит для валидации формы.  Мы должны всегда располагать этот код в самом конце страницы, иначе поля, указанные выше, будут отсортированы по своим внутренним настройкам
+* drupal_render($form) СЏРІР»СЏРµС‚СЃСЏ РѕР±СЏР·Р°С‚РµР»СЊРЅС‹Рј РІ СЌС‚РѕРј С€Р°Р±Р»РѕРЅРµ. 
+РЎР»СѓР¶РёС‚ РґР»СЏ РІР°Р»РёРґР°С†РёРё С„РѕСЂРјС‹.  РњС‹ РґРѕР»Р¶РЅС‹ РІСЃРµРіРґР° СЂР°СЃРїРѕР»Р°РіР°С‚СЊ СЌС‚РѕС‚ РєРѕРґ РІ СЃР°РјРѕРј РєРѕРЅС†Рµ СЃС‚СЂР°РЅРёС†С‹, РёРЅР°С‡Рµ РїРѕР»СЏ, СѓРєР°Р·Р°РЅРЅС‹Рµ РІС‹С€Рµ, Р±СѓРґСѓС‚ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅС‹ РїРѕ СЃРІРѕРёРј РІРЅСѓС‚СЂРµРЅРЅРёРј РЅР°СЃС‚СЂРѕР№РєР°Рј
 */
-
 print drupal_render($form);
 ?>
 
 <?php
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Более подробная и свежая информация по доступным переменным может быть найдена здесь: http://openstore.org.ua/node/137 /// 
+/// Р‘РѕР»РµРµ РїРѕРґСЂРѕР±РЅР°СЏ Рё СЃРІРµР¶Р°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ РїРѕ РґРѕСЃС‚СѓРїРЅС‹Рј РїРµСЂРµРјРµРЅРЅС‹Рј РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅР°Р№РґРµРЅР° Р·РґРµСЃСЊ: http://openstore.org.ua/node/137 /// 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-<?php print $show_edit_form_taxonomy; ?> Таксономия (форма)
-<?php print $show_edit_form_taxonomy_tags; ?> Таксономия (теги)
-<?php print $show_edit_form_taxonomy_categories; ?> Таксономия (главная категория товаров)
-<?php print $show_edit_form_taxonomy_manufacturers; ?> Таксономия (Производители)
-<?php print $show_edit_form_taxonomy_promo; ?> Таксономия (Акции)
+<?php print $show_edit_form_taxonomy; ?> РўР°РєСЃРѕРЅРѕРјРёСЏ (С„РѕСЂРјР°)
+<?php print $show_edit_form_taxonomy_tags; ?> РўР°РєСЃРѕРЅРѕРјРёСЏ (С‚РµРіРё)
+<?php print $show_edit_form_taxonomy_categories; ?> РўР°РєСЃРѕРЅРѕРјРёСЏ (РіР»Р°РІРЅР°СЏ РєР°С‚РµРіРѕСЂРёСЏ С‚РѕРІР°СЂРѕРІ)
+<?php print $show_edit_form_taxonomy_manufacturers; ?> РўР°РєСЃРѕРЅРѕРјРёСЏ (РџСЂРѕРёР·РІРѕРґРёС‚РµР»Рё)
+<?php print $show_edit_form_taxonomy_promo; ?> РўР°РєСЃРѕРЅРѕРјРёСЏ (РђРєС†РёРё)
 
-<?php print $show_edit_form_body; ?> Основной текст
-<?php print $show_edit_form_domain; ?> Опции доменов
-<?php print $show_edit_form_menu; ?> Ссылка на документ в меню
-<?php print $show_edit_form_revision; ?> Варианты документа
-<?php print $show_edit_form_author; ?> Автор
-<?php print $show_edit_form_options; ?> Опции публикации
-<?php print $show_edit_form_sitemap; ?> Карта сайта
-<?php print $show_edit_form_metatags; ?> Метатеги
-<?php print $show_edit_form_comment; ?> Настройки комментариев
-<?php print $show_edit_form_path; ?> Адрес страницы
-<?php print $show_edit_form_upload; ?> Вложенные файлы
-<?php print $show_edit_form_buttons; ?> Блок с кнопками формы
-<?php print $show_edit_form_submit; ?> Кнопка "Сохранить"
-<?php print $show_edit_form_submit_preview; ?> Кнопка "Предварительный просмотр"
-<?php print $show_edit_form_submit_again; ?> Кнопка "Сохранить и создать документ снова"
-<?php print $show_edit_form_save_continue; ?> Кнопка "Сохранить и продолжить"
-<?php print $show_edit_form_delete; ?> Кнопка "Удалить"
-<?php print $show_edit_form_title; ?> Заголовок документа
+<?php print $show_edit_form_body; ?> РћСЃРЅРѕРІРЅРѕР№ С‚РµРєСЃС‚
+<?php print $show_edit_form_domain; ?> РћРїС†РёРё РґРѕРјРµРЅРѕРІ
+<?php print $show_edit_form_menu; ?> РЎСЃС‹Р»РєР° РЅР° РґРѕРєСѓРјРµРЅС‚ РІ РјРµРЅСЋ
+<?php print $show_edit_form_revision; ?> Р’Р°СЂРёР°РЅС‚С‹ РґРѕРєСѓРјРµРЅС‚Р°
+<?php print $show_edit_form_author; ?> РђРІС‚РѕСЂ
+<?php print $show_edit_form_options; ?> РћРїС†РёРё РїСѓР±Р»РёРєР°С†РёРё
+<?php print $show_edit_form_sitemap; ?> РљР°СЂС‚Р° СЃР°Р№С‚Р°
+<?php print $show_edit_form_metatags; ?> РњРµС‚Р°С‚РµРіРё
+<?php print $show_edit_form_comment; ?> РќР°СЃС‚СЂРѕР№РєРё РєРѕРјРјРµРЅС‚Р°СЂРёРµРІ
+<?php print $show_edit_form_path; ?> РђРґСЂРµСЃ СЃС‚СЂР°РЅРёС†С‹
+<?php print $show_edit_form_upload; ?> Р’Р»РѕР¶РµРЅРЅС‹Рµ С„Р°Р№Р»С‹
+<?php print $show_edit_form_buttons; ?> Р‘Р»РѕРє СЃ РєРЅРѕРїРєР°РјРё С„РѕСЂРјС‹
+<?php print $show_edit_form_submit; ?> РљРЅРѕРїРєР° "РЎРѕС…СЂР°РЅРёС‚СЊ"
+<?php print $show_edit_form_submit_preview; ?> РљРЅРѕРїРєР° "РџСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ РїСЂРѕСЃРјРѕС‚СЂ"
+<?php print $show_edit_form_submit_again; ?> РљРЅРѕРїРєР° "РЎРѕС…СЂР°РЅРёС‚СЊ Рё СЃРѕР·РґР°С‚СЊ РґРѕРєСѓРјРµРЅС‚ СЃРЅРѕРІР°"
+<?php print $show_edit_form_save_continue; ?> РљРЅРѕРїРєР° "РЎРѕС…СЂР°РЅРёС‚СЊ Рё РїСЂРѕРґРѕР»Р¶РёС‚СЊ"
+<?php print $show_edit_form_delete; ?> РљРЅРѕРїРєР° "РЈРґР°Р»РёС‚СЊ"
+<?php print $show_edit_form_title; ?> Р—Р°РіРѕР»РѕРІРѕРє РґРѕРєСѓРјРµРЅС‚Р°
 
-<?php print $show_edit_form_image; ?> Блок с изображениями товара
-<?php print $show_edit_form_specs; ?> Блок с техническими характеристиками
-<?php print $show_edit_form_googlecheck; ?> Настройки Google Checkout
-<?php print $show_edit_form_additional; ?> Блок с дополнительными опциями
-<?php print $show_edit_form_shipping; ?> Блок с настройки доставки
-<?php print $show_edit_form_product; ?> Блок с настроками товара
-<?php print $show_edit_form_prices; ?> Блок с ценами
-<?php print $show_edit_form_list_price; ?> Цена прайс-листа
-<?php print $show_edit_form_cost; ?> Стоимость товара
-<?php print $show_edit_form_sell_price; ?> Цена продажи
-<?php print $show_edit_form_shippable; ?> Товар доставляется или нет
-<?php print $show_edit_form_weight; ?> Блок с весом товара
-<?php print $show_edit_form_weight_weight; ?> Значение веса
-<?php print $show_edit_form_weight_units; ?> Единица измерения веса
-<?php print $show_edit_form_dimensions; ?> Блок с размерами товара
-<?php print $show_edit_form_length_units; ?> Единица измерения длины
-<?php print $show_edit_form_dim_length; ?> Значение длины
-<?php print $show_edit_form_dim_width; ?> Значение ширины
-<?php print $show_edit_form_dim_height; ?> Значение высоты
-<?php print $show_edit_form_pkg_qty; ?> Количество
-<?php print $show_edit_form_default_qty; ?> Количество по умолчанию
-<?php print $show_edit_form_ordering; ?> Сортировка
-<?php print $show_edit_form_model; ?> Артикул
+<?php print $show_edit_form_image; ?> Р‘Р»РѕРє СЃ РёР·РѕР±СЂР°Р¶РµРЅРёСЏРјРё С‚РѕРІР°СЂР°
+<?php print $show_edit_form_specs; ?> Р‘Р»РѕРє СЃ С‚РµС…РЅРёС‡РµСЃРєРёРјРё С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєР°РјРё
+<?php print $show_edit_form_googlecheck; ?> РќР°СЃС‚СЂРѕР№РєРё Google Checkout
+<?php print $show_edit_form_additional; ?> Р‘Р»РѕРє СЃ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹РјРё РѕРїС†РёСЏРјРё
+<?php print $show_edit_form_shipping; ?> Р‘Р»РѕРє СЃ РЅР°СЃС‚СЂРѕР№РєРё РґРѕСЃС‚Р°РІРєРё
+<?php print $show_edit_form_product; ?> Р‘Р»РѕРє СЃ РЅР°СЃС‚СЂРѕРєР°РјРё С‚РѕРІР°СЂР°
+<?php print $show_edit_form_prices; ?> Р‘Р»РѕРє СЃ С†РµРЅР°РјРё
+<?php print $show_edit_form_list_price; ?> Р¦РµРЅР° РїСЂР°Р№СЃ-Р»РёСЃС‚Р°
+<?php print $show_edit_form_cost; ?> РЎС‚РѕРёРјРѕСЃС‚СЊ С‚РѕРІР°СЂР°
+<?php print $show_edit_form_sell_price; ?> Р¦РµРЅР° РїСЂРѕРґР°Р¶Рё
+<?php print $show_edit_form_shippable; ?> РўРѕРІР°СЂ РґРѕСЃС‚Р°РІР»СЏРµС‚СЃСЏ РёР»Рё РЅРµС‚
+<?php print $show_edit_form_weight; ?> Р‘Р»РѕРє СЃ РІРµСЃРѕРј С‚РѕРІР°СЂР°
+<?php print $show_edit_form_weight_weight; ?> Р—РЅР°С‡РµРЅРёРµ РІРµСЃР°
+<?php print $show_edit_form_weight_units; ?> Р•РґРёРЅРёС†Р° РёР·РјРµСЂРµРЅРёСЏ РІРµСЃР°
+<?php print $show_edit_form_dimensions; ?> Р‘Р»РѕРє СЃ СЂР°Р·РјРµСЂР°РјРё С‚РѕРІР°СЂР°
+<?php print $show_edit_form_length_units; ?> Р•РґРёРЅРёС†Р° РёР·РјРµСЂРµРЅРёСЏ РґР»РёРЅС‹
+<?php print $show_edit_form_dim_length; ?> Р—РЅР°С‡РµРЅРёРµ РґР»РёРЅС‹
+<?php print $show_edit_form_dim_width; ?> Р—РЅР°С‡РµРЅРёРµ С€РёСЂРёРЅС‹
+<?php print $show_edit_form_dim_height; ?> Р—РЅР°С‡РµРЅРёРµ РІС‹СЃРѕС‚С‹
+<?php print $show_edit_form_pkg_qty; ?> РљРѕР»РёС‡РµСЃС‚РІРѕ
+<?php print $show_edit_form_default_qty; ?> РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+<?php print $show_edit_form_ordering; ?> РЎРѕСЂС‚РёСЂРѕРІРєР°
+<?php print $show_edit_form_model; ?> РђСЂС‚РёРєСѓР»
 
 
 */

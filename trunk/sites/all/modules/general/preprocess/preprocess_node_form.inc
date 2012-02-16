@@ -1,8 +1,9 @@
-<?php
+п»ї<?php
 
 /**
- * Препроцесс полей формы редактирования документа "product"
+ * РџСЂРµРїСЂРѕС†РµСЃСЃ РїРѕР»РµР№ С„РѕСЂРјС‹ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ РґРѕРєСѓРјРµРЅС‚Р° "product"
  */
+ 
 function general_preprocess_product_form(&$vars) {
   
   //$vars['show_edit_form_taxonomy'] = '<div class="edit-form-item taxonomy-form">' . drupal_render($vars['form']['taxonomy']) . '</div>';
@@ -10,7 +11,7 @@ function general_preprocess_product_form(&$vars) {
   if (user_access('administer taxonomy')) {
     $vars['show_edit_form_taxonomy_tags'] .= '<div class="voc-edit-link">' . l(t('Edit vocabulary terms'), 'admin/content/taxonomy/5', array('attributes' => array('target' => '_blank'))) . '</div>';
   }
-  $vars['show_edit_form_taxonomy_categories'] = '<div class="edit-form-item categories-form">' . drupal_render($vars['form']['taxonomy'][1]) . '</div>'; // [1] - номер словаря
+  $vars['show_edit_form_taxonomy_categories'] = '<div class="edit-form-item categories-form">' . drupal_render($vars['form']['taxonomy'][1]) . '</div>'; // [1] - РЅРѕРјРµСЂ СЃР»РѕРІР°СЂСЏ
   if (user_access('administer taxonomy')) {
     $vars['show_edit_form_taxonomy_categories'] .= '<div class="voc-edit-link">' . l(t('Edit vocabulary terms'), 'admin/content/taxonomy/1', array('attributes' => array('target' => '_blank'))) . '</div>';
   }
@@ -34,7 +35,7 @@ function general_preprocess_product_form(&$vars) {
   $vars['show_edit_form_path'] = '<div class="edit-form-item path-form">' . drupal_render($vars['form']['path']) . '</div>';
   $vars['show_edit_form_upload'] = '<div class="edit-form-item upload-form">' . drupal_render($vars['form']['attachments']) . '</div>';
   
-  /* Если раскомментировать, будет выведен весь блок с кнопками, но исчезнет вывод отдельных элементов блока, так как  drupal_render() не проходит родительский уровень массива 2 раза
+  /* Р•СЃР»Рё СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ, Р±СѓРґРµС‚ РІС‹РІРµРґРµРЅ РІРµСЃСЊ Р±Р»РѕРє СЃ РєРЅРѕРїРєР°РјРё, РЅРѕ РёСЃС‡РµР·РЅРµС‚ РІС‹РІРѕРґ РѕС‚РґРµР»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ Р±Р»РѕРєР°, С‚Р°Рє РєР°Рє  drupal_render() РЅРµ РїСЂРѕС…РѕРґРёС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓСЂРѕРІРµРЅСЊ РјР°СЃСЃРёРІР° 2 СЂР°Р·Р°
    $vars['show_edit_form_buttons'] = '<div class="edit-form-item buttons-form">' . drupal_render($vars['form']['buttons']) . '</div>';
    */
   
@@ -52,15 +53,15 @@ function general_preprocess_product_form(&$vars) {
   $vars['show_edit_form_media'] = '<div class="edit-form-item media-form">' . drupal_render($vars['form']['group_media']) . '</div>';
   $vars['show_edit_form_shipping'] = '<div class="edit-form-item shipping-form">' . drupal_render($vars['form']['shipping']) . '</div>';
 
-  /* Если раскомментировать, будет выведен весь блок с параметрами товара, но исчезнет вывод отдельных элементов блока, так как  drupal_render() не проходит родительский уровень массива 2 раза
+  /* Р•СЃР»Рё СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ, Р±СѓРґРµС‚ РІС‹РІРµРґРµРЅ РІРµСЃСЊ Р±Р»РѕРє СЃ РїР°СЂР°РјРµС‚СЂР°РјРё С‚РѕРІР°СЂР°, РЅРѕ РёСЃС‡РµР·РЅРµС‚ РІС‹РІРѕРґ РѕС‚РґРµР»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ Р±Р»РѕРєР°, С‚Р°Рє РєР°Рє  drupal_render() РЅРµ РїСЂРѕС…РѕРґРёС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓСЂРѕРІРµРЅСЊ РјР°СЃСЃРёРІР° 2 СЂР°Р·Р°
    $vars['show_edit_form_product'] = '<div class="edit-form-item product-form">' . drupal_render($vars['form']['base']) . '</div>';
    */
   
-  $vars['form']['base']['#type'] = 'markup'; // Убираем пустой fieldset для блока с настройками товара. Закомментируйте, если у вас раскомментирован код выше.
+  $vars['form']['base']['#type'] = 'markup'; // РЈР±РёСЂР°РµРј РїСѓСЃС‚РѕР№ fieldset РґР»СЏ Р±Р»РѕРєР° СЃ РЅР°СЃС‚СЂРѕР№РєР°РјРё С‚РѕРІР°СЂР°. Р—Р°РєРѕРјРјРµРЅС‚РёСЂСѓР№С‚Рµ, РµСЃР»Рё Сѓ РІР°СЃ СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°РЅ РєРѕРґ РІС‹С€Рµ.
   $vars['show_edit_form_prices'] = '<div class="edit-form-item prices-form">' . drupal_render($vars['form']['base']['prices']) . '</div>';
   $vars['show_edit_form_list_price'] = '<div class="edit-form-item list-price-item">' . drupal_render($vars['form']['base']['prices']['list_price']) . '</div>';
   $vars['show_edit_form_cost'] = '<div class="edit-form-item cost-item">' . drupal_render($vars['form']['base']['prices']['cost']) . '</div>';
-  /////
+  
   $vars['show_edit_form_crs_m'] = '<div class="edit-form-item crs-item">'.
    "<table id=\"crs-fields\">
     <tr><td>\n". drupal_render($vars['form']['base']['prices']['crs_list_price']) . drupal_render($vars['form']['base']['prices']['crs_list_price_cur'])
@@ -69,18 +70,18 @@ function general_preprocess_product_form(&$vars) {
     ."</td></tr></table>".
    '</div>';
   
-  /////
+  
   $vars['show_edit_form_sell_price'] = '<div class="edit-form-item sell-price-item">' . drupal_render($vars['form']['base']['prices']['sell_price']) . '</div>';
   $vars['show_edit_form_shippable'] = '<div class="edit-form-item shippable-item">' . drupal_render($vars['form']['base']['shippable']) . '</div>';
   $vars['show_edit_form_weight'] = '<div class="edit-form-item weight-item">' . drupal_render($vars['form']['base']['weight']) . '</div>';
   $vars['show_edit_form_weight_weight'] = '<div class="edit-form-item weight-item">' . drupal_render($vars['form']['base']['weight']['weight']) . '</div>';
   $vars['show_edit_form_weight_units'] = '<div class="edit-form-item weight-units-item">' . drupal_render($vars['form']['base']['weight']['weight_units']) . '</div>';
 
-  /* Если раскомментировать, будет выведен весь блок с параметрами размеров, но исчезнет вывод отдельных элементов блока, так как  drupal_render() не проходит родительский уровень массива 2 раза
+  /* Р•СЃР»Рё СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ, Р±СѓРґРµС‚ РІС‹РІРµРґРµРЅ РІРµСЃСЊ Р±Р»РѕРє СЃ РїР°СЂР°РјРµС‚СЂР°РјРё СЂР°Р·РјРµСЂРѕРІ, РЅРѕ РёСЃС‡РµР·РЅРµС‚ РІС‹РІРѕРґ РѕС‚РґРµР»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ Р±Р»РѕРєР°, С‚Р°Рє РєР°Рє  drupal_render() РЅРµ РїСЂРѕС…РѕРґРёС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓСЂРѕРІРµРЅСЊ РјР°СЃСЃРёРІР° 2 СЂР°Р·Р°
    $vars['show_edit_form_dimensions'] = '<div class="edit-form-item dimensions-item">' . drupal_render($vars['form']['base']['dimensions']) . '</div>';
    */
   
-  $vars['form']['base']['dimensions']['#type'] = 'markup'; // Убираем пустой fieldset для блока с настройками размеров. Закомментируйте, если у вас раскомментирован код выше.
+  $vars['form']['base']['dimensions']['#type'] = 'markup'; // РЈР±РёСЂР°РµРј РїСѓСЃС‚РѕР№ fieldset РґР»СЏ Р±Р»РѕРєР° СЃ РЅР°СЃС‚СЂРѕР№РєР°РјРё СЂР°Р·РјРµСЂРѕРІ. Р—Р°РєРѕРјРјРµРЅС‚РёСЂСѓР№С‚Рµ, РµСЃР»Рё Сѓ РІР°СЃ СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°РЅ РєРѕРґ РІС‹С€Рµ.
   $vars['show_edit_form_length_units'] = '<div class="edit-form-item length-units-item">' . drupal_render($vars['form']['base']['dimensions']['length_units']) . '</div>';
   $vars['show_edit_form_dim_length'] = '<div class="edit-form-item dim-length-item">' . drupal_render($vars['form']['base']['dimensions']['dim_length']) . '</div>';
   $vars['show_edit_form_dim_width'] = '<div class="edit-form-item dim-width-item">' . drupal_render($vars['form']['base']['dimensions']['dim_width']) . '</div>';
@@ -92,7 +93,7 @@ function general_preprocess_product_form(&$vars) {
 }
 
 /**
- * Препроцесс полей формы редактирования документа "page"
+ * РџСЂРµРїСЂРѕС†РµСЃСЃ РїРѕР»РµР№ С„РѕСЂРјС‹ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ РґРѕРєСѓРјРµРЅС‚Р° "page"
  */
 function general_preprocess_page_form(&$vars) {
   //$vars['show_edit_form_taxonomy'] = '<div class="edit-form-item taxonomy-form">' . drupal_render($vars['form']['taxonomy']) . '</div>';
@@ -100,11 +101,11 @@ function general_preprocess_page_form(&$vars) {
   if (user_access('administer taxonomy')) {
     $vars['show_edit_form_taxonomy_tags'] .= '<div class="voc-edit-link">' . l(t('Edit vocabulary terms'), 'admin/content/taxonomy/5', array('attributes' => array('target' => '_blank'))) . '</div>';
   }
-  $vars['show_edit_form_taxonomy_categories'] = '<div class="edit-form-item categories-form">' . drupal_render($vars['form']['taxonomy'][1]) . '</div>'; // [1] - номер словаря
+  $vars['show_edit_form_taxonomy_categories'] = '<div class="edit-form-item categories-form">' . drupal_render($vars['form']['taxonomy'][1]) . '</div>'; // [1] - РЅРѕРјРµСЂ СЃР»РѕРІР°СЂСЏ
   if (user_access('administer taxonomy')) {
     $vars['show_edit_form_taxonomy_categories'] .= '<div class="voc-edit-link">' . l(t('Edit vocabulary terms'), 'admin/content/taxonomy/1', array('attributes' => array('target' => '_blank'))) . '</div>';
   }
-  $vars['show_edit_form_taxonomy_common'] = '<div class="edit-form-item common-categories-form">' . drupal_render($vars['form']['taxonomy'][4]) . '</div>'; // [1] - номер словаря
+  $vars['show_edit_form_taxonomy_common'] = '<div class="edit-form-item common-categories-form">' . drupal_render($vars['form']['taxonomy'][4]) . '</div>'; // [1] - РЅРѕРјРµСЂ СЃР»РѕРІР°СЂСЏ
   if (user_access('administer taxonomy')) {
     $vars['show_edit_form_taxonomy_common'] .= '<div class="voc-edit-link">' . l(t('Edit vocabulary terms'), 'admin/content/taxonomy/4', array('attributes' => array('target' => '_blank'))) . '</div>';
   }
@@ -128,7 +129,7 @@ function general_preprocess_page_form(&$vars) {
   $vars['show_edit_form_path'] = '<div class="edit-form-item path-form">' . drupal_render($vars['form']['path']) . '</div>';
   $vars['show_edit_form_upload'] = '<div class="edit-form-item upload-form">' . drupal_render($vars['form']['attachments']) . '</div>';
 
-  /* Если раскомментировать, будет выведен весь блок с кнопками, но исчезнет вывод отдельных элементов блока, так как  drupal_render() не проходит родительский уровень массива 2 раза
+  /* Р•СЃР»Рё СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ, Р±СѓРґРµС‚ РІС‹РІРµРґРµРЅ РІРµСЃСЊ Р±Р»РѕРє СЃ РєРЅРѕРїРєР°РјРё, РЅРѕ РёСЃС‡РµР·РЅРµС‚ РІС‹РІРѕРґ РѕС‚РґРµР»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ Р±Р»РѕРєР°, С‚Р°Рє РєР°Рє  drupal_render() РЅРµ РїСЂРѕС…РѕРґРёС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓСЂРѕРІРµРЅСЊ РјР°СЃСЃРёРІР° 2 СЂР°Р·Р°
    $vars['show_edit_form_buttons'] = '<div class="edit-form-item buttons-form">' . drupal_render($vars['form']['buttons']) . '</div>';
    */
   
@@ -142,16 +143,16 @@ function general_preprocess_page_form(&$vars) {
 }
 
 /**
- * Препроцесс полей формы редактирования документа "banner"
+ * РџСЂРµРїСЂРѕС†РµСЃСЃ РїРѕР»РµР№ С„РѕСЂРјС‹ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ РґРѕРєСѓРјРµРЅС‚Р° "banner"
  */
 function general_preprocess_banner_form(&$vars) {
   
   //$vars['show_edit_form_taxonomy'] = '<div class="edit-form-item taxonomy-form">' . drupal_render($vars['form']['taxonomy']) . '</div>';
-  $vars['show_edit_form_taxonomy_categories'] = '<div class="edit-form-item categories-form">' . drupal_render($vars['form']['taxonomy'][1]) . '</div>'; // [1] - номер словаря
+  $vars['show_edit_form_taxonomy_categories'] = '<div class="edit-form-item categories-form">' . drupal_render($vars['form']['taxonomy'][1]) . '</div>'; // [1] - РЅРѕРјРµСЂ СЃР»РѕРІР°СЂСЏ
   if (user_access('administer taxonomy')) {
     $vars['show_edit_form_taxonomy_categories'] .= '<div class="voc-edit-link">' . l(t('Edit vocabulary terms'), 'admin/content/taxonomy/1', array('attributes' => array('target' => '_blank'))) . '</div>';
   }
-  $vars['show_edit_form_taxonomy_common'] = '<div class="edit-form-item common-categories-form">' . drupal_render($vars['form']['taxonomy'][4]) . '</div>'; // [1] - номер словаря
+  $vars['show_edit_form_taxonomy_common'] = '<div class="edit-form-item common-categories-form">' . drupal_render($vars['form']['taxonomy'][4]) . '</div>'; // [1] - РЅРѕРјРµСЂ СЃР»РѕРІР°СЂСЏ
   if (user_access('administer taxonomy')) {
     $vars['show_edit_form_taxonomy_common'] .= '<div class="voc-edit-link">' . l(t('Edit vocabulary terms'), 'admin/content/taxonomy/4', array('attributes' => array('target' => '_blank'))) . '</div>';
   }
@@ -175,7 +176,7 @@ function general_preprocess_banner_form(&$vars) {
   $vars['show_edit_form_path'] = '<div class="edit-form-item path-form">' . drupal_render($vars['form']['path']) . '</div>';
   $vars['show_edit_form_upload'] = '<div class="edit-form-item upload-form">' . drupal_render($vars['form']['attachments']) . '</div>';
   
-  /* Если раскомментировать, будет выведен весь блок с кнопками, но исчезнет вывод отдельных элементов блока, так как  drupal_render() не проходит родительский уровень массива 2 раза
+  /* Р•СЃР»Рё СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ, Р±СѓРґРµС‚ РІС‹РІРµРґРµРЅ РІРµСЃСЊ Р±Р»РѕРє СЃ РєРЅРѕРїРєР°РјРё, РЅРѕ РёСЃС‡РµР·РЅРµС‚ РІС‹РІРѕРґ РѕС‚РґРµР»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ Р±Р»РѕРєР°, С‚Р°Рє РєР°Рє  drupal_render() РЅРµ РїСЂРѕС…РѕРґРёС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓСЂРѕРІРµРЅСЊ РјР°СЃСЃРёРІР° 2 СЂР°Р·Р°
    $vars['show_edit_form_buttons'] = '<div class="edit-form-item buttons-form">' . drupal_render($vars['form']['buttons']) . '</div>';
    */
   
@@ -186,38 +187,38 @@ function general_preprocess_banner_form(&$vars) {
   $vars['show_edit_form_save_continue'] = '<div class="edit-form-item save-continue-item">' . drupal_render($vars['form']['buttons']['save_continue']) . '</div>';
   $vars['show_edit_form_title'] = '<div class="edit-form-item title-item">' . drupal_render($vars['form']['title']) . '</div>';
   
-  /* Если раскомментировать, будет выведен весь fieldset, но исчезнет вывод отдельных элементов, так как  drupal_render() не проходит родительский уровень массива 2 раза
+  /* Р•СЃР»Рё СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ, Р±СѓРґРµС‚ РІС‹РІРµРґРµРЅ РІРµСЃСЊ fieldset, РЅРѕ РёСЃС‡РµР·РЅРµС‚ РІС‹РІРѕРґ РѕС‚РґРµР»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ, С‚Р°Рє РєР°Рє  drupal_render() РЅРµ РїСЂРѕС…РѕРґРёС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓСЂРѕРІРµРЅСЊ РјР°СЃСЃРёРІР° 2 СЂР°Р·Р°
    $vars['show_edit_form_banners'] = '<div class="edit-form-item group-banners-item">' . drupal_render($vars['form']['group_banners']) . '</div>';
    */
   
-  $vars['form']['group_banners']['#type'] = 'markup'; // Убираем пустой fieldset. Закомментируйте, если у вас раскомментирован код выше.
+  $vars['form']['group_banners']['#type'] = 'markup'; // РЈР±РёСЂР°РµРј РїСѓСЃС‚РѕР№ fieldset. Р—Р°РєРѕРјРјРµРЅС‚РёСЂСѓР№С‚Рµ, РµСЃР»Рё Сѓ РІР°СЃ СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°РЅ РєРѕРґ РІС‹С€Рµ.
   $vars['show_edit_form_banner'] = '<div class="edit-form-item field-banner-item">' . drupal_render($vars['form']['group_banners']['field_banner']) . '</div>';
   
-  /* Если раскомментировать, будет выведен весь fieldset, но исчезнет вывод отдельных элементов, так как  drupal_render() не проходит родительский уровень массива 2 раза
+  /* Р•СЃР»Рё СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ, Р±СѓРґРµС‚ РІС‹РІРµРґРµРЅ РІРµСЃСЊ fieldset, РЅРѕ РёСЃС‡РµР·РЅРµС‚ РІС‹РІРѕРґ РѕС‚РґРµР»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ, С‚Р°Рє РєР°Рє  drupal_render() РЅРµ РїСЂРѕС…РѕРґРёС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓСЂРѕРІРµРЅСЊ РјР°СЃСЃРёРІР° 2 СЂР°Р·Р°
    $vars['show_edit_form_links'] = '<div class="edit-form-item group-banners-item">' . drupal_render($vars['form']['group_banner_link']) . '</div>';
    */
   
-  $vars['form']['group_banner_link']['#type'] = 'markup'; // Убираем пустой fieldset. Закомментируйте, если у вас раскомментирован код выше.
+  $vars['form']['group_banner_link']['#type'] = 'markup'; // РЈР±РёСЂР°РµРј РїСѓСЃС‚РѕР№ fieldset. Р—Р°РєРѕРјРјРµРЅС‚РёСЂСѓР№С‚Рµ, РµСЃР»Рё Сѓ РІР°СЃ СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°РЅ РєРѕРґ РІС‹С€Рµ.
   $vars['show_edit_form_link'] = '<div class="edit-form-item-contentedit-form-item field-banner-link-item">' . drupal_render($vars['form']['group_banner_link']['field_banner_link']) . '</div>';
   $vars['show_edit_form_ref'] = '<div class="edit-form-item field-banner-ref-item">' . drupal_render($vars['form']['group_banner_link']['field_banner_ref']) . '</div>';
   
-  /* Если раскомментировать, будет выведен весь fieldset, но исчезнет вывод отдельных элементов, так как  drupal_render() не проходит родительский уровень массива 2 раза
+  /* Р•СЃР»Рё СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ, Р±СѓРґРµС‚ РІС‹РІРµРґРµРЅ РІРµСЃСЊ fieldset, РЅРѕ РёСЃС‡РµР·РЅРµС‚ РІС‹РІРѕРґ РѕС‚РґРµР»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ, С‚Р°Рє РєР°Рє  drupal_render() РЅРµ РїСЂРѕС…РѕРґРёС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓСЂРѕРІРµРЅСЊ РјР°СЃСЃРёРІР° 2 СЂР°Р·Р°
    */
   
   $vars['show_edit_form_other'] = '<div class="edit-form-item banner-other-item">' . drupal_render($vars['form']['group_banner_other']) . '</div>';
-  // $vars['form']['group_banner_other']['#type'] = 'markup'; // Убираем пустой fieldset. Закомментируйте, если у вас раскомментирован код выше.
+  // $vars['form']['group_banner_other']['#type'] = 'markup'; // РЈР±РёСЂР°РµРј РїСѓСЃС‚РѕР№ fieldset. Р—Р°РєРѕРјРјРµРЅС‚РёСЂСѓР№С‚Рµ, РµСЃР»Рё Сѓ РІР°СЃ СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°РЅ РєРѕРґ РІС‹С€Рµ.
   $vars['show_edit_form_ribbon'] = '<div class="edit-form-item banner-ribbon-item">' . drupal_render($vars['form']['group_banners']['field_banner_ribbon']) . '</div>';
   $vars['show_edit_form_pager'] = '<div class="edit-form-item banner-pager-item">' . drupal_render($vars['form']['group_banner_other']['field_banner_pager']) . '</div>';
   $vars['show_edit_form_pager_txt'] = '<div class="edit-form-item banner-pager-txt-item">' . drupal_render($vars['form']['group_banner_other']['field_banner_pager_txt']) . '</div>';
 }
 
 /**
- * Препроцесс полей формы редактирования документа "simplenews"
+ * РџСЂРµРїСЂРѕС†РµСЃСЃ РїРѕР»РµР№ С„РѕСЂРјС‹ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ РґРѕРєСѓРјРµРЅС‚Р° "simplenews"
  */
 function general_preprocess_simplenews_form(&$vars) {
   
   //$vars['show_edit_form_taxonomy'] = '<div class="edit-form-item taxonomy-form">' . drupal_render($vars['form']['taxonomy']) . '</div>';
-  $vars['show_edit_form_taxonomy_newsletter'] = '<div class="edit-form-item newsletter-categories-form">' . drupal_render($vars['form']['taxonomy'][2]) . '</div>'; // [1] - номер словаря
+  $vars['show_edit_form_taxonomy_newsletter'] = '<div class="edit-form-item newsletter-categories-form">' . drupal_render($vars['form']['taxonomy'][2]) . '</div>'; // [1] - РЅРѕРјРµСЂ СЃР»РѕРІР°СЂСЏ
   if (user_access('administer taxonomy')) {
     $vars['show_edit_form_taxonomy_newsletter'] .= '<div class="voc-edit-link">' . l(t('Edit vocabulary terms'), 'admin/content/taxonomy/2', array('attributes' => array('target' => '_blank'))) . '</div>';
   }
@@ -233,7 +234,7 @@ function general_preprocess_simplenews_form(&$vars) {
   $vars['show_edit_form_path'] = '<div class="edit-form-item path-form">' . drupal_render($vars['form']['path']) . '</div>';
   $vars['show_edit_form_upload'] = '<div class="edit-form-item upload-form">' . drupal_render($vars['form']['attachments']) . '</div>';
   
-  /* Если раскомментировать, будет выведен весь блок с кнопками, но исчезнет вывод отдельных элементов блока, так как  drupal_render() не проходит родительский уровень массива 2 раза
+  /* Р•СЃР»Рё СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ, Р±СѓРґРµС‚ РІС‹РІРµРґРµРЅ РІРµСЃСЊ Р±Р»РѕРє СЃ РєРЅРѕРїРєР°РјРё, РЅРѕ РёСЃС‡РµР·РЅРµС‚ РІС‹РІРѕРґ РѕС‚РґРµР»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ Р±Р»РѕРєР°, С‚Р°Рє РєР°Рє  drupal_render() РЅРµ РїСЂРѕС…РѕРґРёС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓСЂРѕРІРµРЅСЊ РјР°СЃСЃРёРІР° 2 СЂР°Р·Р°
    $vars['show_edit_form_buttons'] = '<div class="edit-form-item buttons-form">' . drupal_render($vars['form']['buttons']) . '</div>';
    */
   
@@ -251,12 +252,12 @@ function general_preprocess_simplenews_form(&$vars) {
 }
 
 /**
- * Препроцесс полей формы редактирования документа "poll"
+ * РџСЂРµРїСЂРѕС†РµСЃСЃ РїРѕР»РµР№ С„РѕСЂРјС‹ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ РґРѕРєСѓРјРµРЅС‚Р° "poll"
  */
 function general_preprocess_poll_form(&$vars) {
   
   //$vars['show_edit_form_taxonomy'] = '<div class="edit-form-item taxonomy-form">' . drupal_render($vars['form']['taxonomy']) . '</div>';
-  $vars['show_edit_form_taxonomy_common'] = '<div class="edit-form-item common-categories-form">' . drupal_render($vars['form']['taxonomy'][4]) . '</div>'; // [1] - номер словаря
+  $vars['show_edit_form_taxonomy_common'] = '<div class="edit-form-item common-categories-form">' . drupal_render($vars['form']['taxonomy'][4]) . '</div>'; // [1] - РЅРѕРјРµСЂ СЃР»РѕРІР°СЂСЏ
   if (user_access('administer taxonomy')) {
     $vars['show_edit_form_taxonomy_common'] .= '<div class="voc-edit-link">' . l(t('Edit vocabulary terms'), 'admin/content/taxonomy/4', array('attributes' => array('target' => '_blank'))) . '</div>';
   }
@@ -272,7 +273,7 @@ function general_preprocess_poll_form(&$vars) {
   $vars['show_edit_form_path'] = '<div class="edit-form-item path-form">' . drupal_render($vars['form']['path']) . '</div>';
   $vars['show_edit_form_upload'] = '<div class="edit-form-item upload-form">' . drupal_render($vars['form']['attachments']) . '</div>';
   
-  /* Если раскомментировать, будет выведен весь блок с кнопками, но исчезнет вывод отдельных элементов блока, так как  drupal_render() не проходит родительский уровень массива 2 раза
+  /* Р•СЃР»Рё СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ, Р±СѓРґРµС‚ РІС‹РІРµРґРµРЅ РІРµСЃСЊ Р±Р»РѕРє СЃ РєРЅРѕРїРєР°РјРё, РЅРѕ РёСЃС‡РµР·РЅРµС‚ РІС‹РІРѕРґ РѕС‚РґРµР»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ Р±Р»РѕРєР°, С‚Р°Рє РєР°Рє  drupal_render() РЅРµ РїСЂРѕС…РѕРґРёС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓСЂРѕРІРµРЅСЊ РјР°СЃСЃРёРІР° 2 СЂР°Р·Р°
    $vars['show_edit_form_buttons'] = '<div class="edit-form-item buttons-form">' . drupal_render($vars['form']['buttons']) . '</div>';
    */
   
@@ -286,11 +287,11 @@ function general_preprocess_poll_form(&$vars) {
   $vars['show_edit_form_addpoll'] = '<div class="edit-form-item addpoll-item">' . drupal_render($vars['form']['choice_wrapper']['poll_more']) . '</div>';
   $vars['show_edit_form_state'] .= '<div class="edit-form-item pollstate-item">' . drupal_render($vars['form']['settings']['active']) . '</div>';
   $vars['show_edit_form_runtime'] = '<div class="edit-form-item runtime-item">' . drupal_render($vars['form']['settings']['runtime']) . '</div>';
-  $vars['form']['settings']['#type'] = 'markup'; // Убираем пустой fieldset
+  $vars['form']['settings']['#type'] = 'markup'; // РЈР±РёСЂР°РµРј РїСѓСЃС‚РѕР№ fieldset
 }
 
 /**
- * Препроцесс полей формы редактирования документа "product_kit"
+ * РџСЂРµРїСЂРѕС†РµСЃСЃ РїРѕР»РµР№ С„РѕСЂРјС‹ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ РґРѕРєСѓРјРµРЅС‚Р° "product_kit"
  */
 function general_preprocess_product_kit_form(&$vars) {
   //$vars['show_edit_form_taxonomy'] = '<div class="edit-form-item taxonomy-form">' . drupal_render($vars['form']['taxonomy']) . '</div>';
@@ -298,7 +299,7 @@ function general_preprocess_product_kit_form(&$vars) {
   if (user_access('administer taxonomy')) {
     $vars['show_edit_form_taxonomy_tags'] .= '<div class="voc-edit-link">' . l(t('Edit vocabulary terms'), 'admin/content/taxonomy/5', array('attributes' => array('target' => '_blank'))) . '</div>';
   }
-  $vars['show_edit_form_taxonomy_categories'] = '<div class="edit-form-item categories-form">' . drupal_render($vars['form']['taxonomy'][1]) . '</div>'; // [1] - номер словаря
+  $vars['show_edit_form_taxonomy_categories'] = '<div class="edit-form-item categories-form">' . drupal_render($vars['form']['taxonomy'][1]) . '</div>'; // [1] - РЅРѕРјРµСЂ СЃР»РѕРІР°СЂСЏ
   if (user_access('administer taxonomy')) {
     $vars['show_edit_form_taxonomy_categories'] .= '<div class="voc-edit-link">' . l(t('Edit vocabulary terms'), 'admin/content/taxonomy/1', array('attributes' => array('target' => '_blank'))) . '</div>';
   }
@@ -318,7 +319,7 @@ function general_preprocess_product_kit_form(&$vars) {
   $vars['show_edit_form_path'] = '<div class="edit-form-item path-form">' . drupal_render($vars['form']['path']) . '</div>';
   $vars['show_edit_form_upload'] = '<div class="edit-form-item upload-form">' . drupal_render($vars['form']['attachments']) . '</div>';
   
-  /* Если раскомментировать, будет выведен весь блок с кнопками, но исчезнет вывод отдельных элементов блока, так как  drupal_render() не проходит родительский уровень массива 2 раза
+  /* Р•СЃР»Рё СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ, Р±СѓРґРµС‚ РІС‹РІРµРґРµРЅ РІРµСЃСЊ Р±Р»РѕРє СЃ РєРЅРѕРїРєР°РјРё, РЅРѕ РёСЃС‡РµР·РЅРµС‚ РІС‹РІРѕРґ РѕС‚РґРµР»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ Р±Р»РѕРєР°, С‚Р°Рє РєР°Рє  drupal_render() РЅРµ РїСЂРѕС…РѕРґРёС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓСЂРѕРІРµРЅСЊ РјР°СЃСЃРёРІР° 2 СЂР°Р·Р°
    $vars['show_edit_form_buttons'] = '<div class="edit-form-item buttons-form">' . drupal_render($vars['form']['buttons']) . '</div>';
    */
    
@@ -336,10 +337,10 @@ function general_preprocess_product_kit_form(&$vars) {
   $vars['show_edit_form_ordering'] = '<div class="edit-form-item ordering-item">' . drupal_render($vars['form']['base']['ordering']) . '</div>';
   $vars['show_edit_form_ordering'] = '<div class="edit-form-item ordering-item">' . drupal_render($vars['form']['base']['ordering']) . '</div>';
   $vars['show_edit_form_shipping'] .= '<div class="edit-form-item shipping-item">' . drupal_render($vars['form']['shipping']) . '</div>';
-  $vars['form']['base']['#type'] = 'markup'; // Убираем пустой fieldset для блока с настройками товара. Закомментируйте, если у вас раскомментирован код выше.
+  $vars['form']['base']['#type'] = 'markup'; // РЈР±РёСЂР°РµРј РїСѓСЃС‚РѕР№ fieldset РґР»СЏ Р±Р»РѕРєР° СЃ РЅР°СЃС‚СЂРѕР№РєР°РјРё С‚РѕРІР°СЂР°. Р—Р°РєРѕРјРјРµРЅС‚РёСЂСѓР№С‚Рµ, РµСЃР»Рё Сѓ РІР°СЃ СЂР°СЃРєРѕРјРјРµРЅС‚РёСЂРѕРІР°РЅ РєРѕРґ РІС‹С€Рµ.
   $vars['show_edit_form_googlecheck'] = '<div class="edit-form-item googlecheck-item">' . drupal_render($vars['form']['google_checkout']) . '</div>';
   
-  foreach ($vars['form']['base']['items'] as $key => $value) { // Добавляем картинки для товаров из набора
+  foreach ($vars['form']['base']['items'] as $key => $value) { // Р”РѕР±Р°РІР»СЏРµРј РєР°СЂС‚РёРЅРєРё РґР»СЏ С‚РѕРІР°СЂРѕРІ РёР· РЅР°Р±РѕСЂР°
     if (is_numeric($key)) {
       $node = node_load($key);
       $vars['form']['base']['items'][$key]['image'] = array(
