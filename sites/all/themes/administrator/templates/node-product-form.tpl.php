@@ -38,8 +38,8 @@
               </div>
               <div class="edit-form-item" style="float: right; clear: none;">
                <div class="form-item" id="edit-product-price-usd">
-                <label for="prod_price_usd">Product price usd: <span class="form-required" title="">*</span></label>
-                <span class="field-prefix"></span> <input type="text" maxlength="35" name="" id="prod_price_usd" size="20" value="0" class="form-text required" /> <span class="field-suffix">$</span>
+                <label for="prod_price_usd">Product price usd: </label>
+                <span class="field-prefix"></span> <input type="text" maxlength="35" name="" id="prod_price_usd" size="20" value="0" class="form-text" /> <span class="field-suffix">$</span>
                 <div class="description">Product price in usd calculated.</div>
                </div>
               </div>

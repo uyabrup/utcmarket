@@ -29,6 +29,11 @@ $(document).ready(function() {
 
 	$("#import_data_call").click(function() {
 		var prod_url = $("#prod_url").val();
+  if($.trim(prod_url) == '')
+   {
+    alert('Заполните URL продукта!');
+    return;
+   }
 		var startIndex = prod_url.indexOf("id=");
 		var endIndex = prod_url.indexOf("&", startIndex);
 		var productId = -1;
@@ -45,16 +50,29 @@ $(document).ready(function() {
 
 	$("#fill_form").click(function() {
 
-		var title = $("#prod_title_val").val();
+		var title = $("#prod_title_val_last").val();
 		var prod_url = $("#prod_url").val();
 		var img_url = $("#prod_image").val();
 		var prod_weight = $("#prod_weight").val();
+  var prod_price = $("#prod_price_yuan").val();
+   
+  if(   ($.trim(title) == '')
+     || (prod_price  == '' || prod_price <= 0)
+     || (prod_weight == '' || prod_weight <= 0))
+   {
+    alert('Заполните обязательные поля формы');
+    return;
+   }
 
-		var cost = $("#prod_price_usd").val();
+	// Calculate a cost
+		var cost = Math.ceil(dollar_curs * prod_price * prod_weight/1000); // CHANGE THIS FORMULA
+	
 		var revenue_delta = cost * (dealer_profit + store_profit);
 		var price = revenue_delta + parseInt(cost);
 		price = Math.ceil(price);
-
+ 
+  $("#prod_price_usd").val(cost);
+		$("#edit-cost").val(cost);
 		$("#edit-sell-price").val(price);
 		$("#edit-list-price").val(price);
 		$("#edit-crs-cost").val(cost);
@@ -64,7 +82,7 @@ $(document).ready(function() {
 		$("#edit-field-product-store-url-0-value").val(prod_url);
 		$("#edit-field-image-cache-0-filefield-remote-url").val(img_url);
 		$("#edit-weight").val(prod_weight);
-
+  
 	});
 
 	function fillImportedData(data) {
@@ -72,6 +90,7 @@ $(document).ready(function() {
 		var item = jsonData.taobaoke_item_details.taobaoke_item_detail.item;
 		var prod_title = item.title;
 		var prod_price = item.price;
+  console.log(prod_price);
 		var prod_weight = 0;//item.weight;
 		var prod_image = item.pic_url;
 
@@ -80,13 +99,6 @@ $(document).ready(function() {
 		$("#prod_weight").val(prod_weight);
 		$("#prod_image").val(prod_image);
 		$("#prod_image_show").attr("src", prod_image);
-
-		// Calculate a cost
-		var cost = Math.ceil(dollar_curs * prod_price * prod_weight); // CHANGE
-		// THIS
-		// FORMULA
-		$("#prod_price_usd").val(cost);
-		$("#edit-cost").val(cost);
 	}
 
 });
