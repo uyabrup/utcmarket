@@ -1,29 +1,29 @@
-<!-- Шаблон формы редактирования -->
+﻿<!-- Шаблон формы редактирования -->
 
 <div id = "edit-content-form" class = "edit-product">
     <div id = "left"> <!-- Левая колонка -->
         <div class = "main"> <!-- Основные опции -->
          <!-- Product Import data form -->
          <div class="import_data_block">
-            <h3>Import product data (DON'T USE THIS FORM)</h3>
+            <h3><?=t('Import product data')?></h3>
             <div class="form-item" id="edit-prod-url">
-             <label for="prod_url">Product URL: </label>
-             <span class="field-prefix"></span> <input type="text" class="form-text" value="" id="prod_url"><span class="field-suffix"></span><input type="button" class="form-submit" onclick="" value="Import" id="import_data_call" />
-             <div class="description">Fill Product URL</div>
+             <label for="prod_url"><?=t('Product URL')?>: </label>
+             <span class="field-prefix"></span> <input type="text" class="form-text" value="" id="prod_url"><span class="field-suffix"></span><input type="button" class="form-submit" onclick="" value="<?=t('Import')?>" id="import_data_call" />
+             <div class="description"><?=t('Fill Product URL')?></div>
             </div>
             <div class="import-title-block">
-              <div class="edit-form-item" style="float: left; clear: none;">
+              <div class="edit-form-item" style="float: left; clear: none; width: 45%;">
                <div class="form-item" id="edit-product-title">
-               <label for="prod_title_val">Product title imported</label>
-               <span class="field-prefix"></span> <input type="text" maxlength="" name="" id="prod_title_val" size="" value="" class="form-text" /> <span class="field-suffix"></span>
-               <div class="description">Product title imported need be updated</div>
+               <label for="prod_title_val"><?=t('Product title imported')?></label>
+               <span class="field-prefix"></span> <input type="text" style="width: 100%;" maxlength="" name="" id="prod_title_val" size="" value="" class="form-text" /> <span class="field-suffix"></span>
+               <div class="description"><?=t('Product title imported need be updated')?></div>
                </div>
               </div>
-              <div class="edit-form-item" style="float: right; clear: none;">
+              <div class="edit-form-item" style="float: right; clear: none; width: 45%;">
                <div class="form-item" id="edit-product-title-2">
-               <label for="prod_title_val_last">Product title corrected <span class="form-required" title="">*</span></label>
-               <span class="field-prefix"></span> <input type="text" maxlength="" name="" id="prod_title_val_last" size="" value="" class="form-text required" /> <span class="field-suffix"></span>
-               <div class="description">Product title after correction</div>
+               <label for="prod_title_val_last"><?=t('Product title corrected')?> <span class="form-required" title="">*</span></label>
+               <span class="field-prefix"></span> <input type="text" style="width: 100%;" maxlength="" name="" id="prod_title_val_last" size="" value="" class="form-text required" /> <span class="field-suffix"></span>
+               <div class="description"><?=t('Product title after correction')?></div>
                </div>
               </div>
               <div style="clear:both"></div>
@@ -31,37 +31,37 @@
             <div class="import-price-block">
               <div class="edit-form-item" style="float: left; clear: none;">
                <div class="form-item" id="edit-product-price-yuan">
-                <label for="prod_price_yuan">Product price yuan: <span class="form-required" title="">*</span></label>
-                <span class="field-prefix"></span> <input type="text" maxlength="35" name="" id="prod_price_yuan" size="20" value="0" class="form-text required" /> <span class="field-suffix">yuan</span>
-                <div class="description">Product price in yuan imported.</div>
+                <label for="prod_price_yuan"><?=t('Product price yuan')?>: <span class="form-required" title="">*</span></label>
+                <span class="field-prefix"></span> <input type="text" maxlength="35" name="" id="prod_price_yuan" size="20" value="0" class="form-text required" /> <span class="field-suffix"><?=t('yuan')?></span>
+                <div class="description"><?=t('Product price in yuan imported')?>.</div>
                </div>
               </div>
               <div class="edit-form-item" style="float: right; clear: none;">
                <div class="form-item" id="edit-product-price-usd">
-                <label for="prod_price_usd">Product price usd: </label>
+                <label for="prod_price_usd"><?=t('Product price USD')?>: </label>
                 <span class="field-prefix"></span> <input type="text" maxlength="35" name="" id="prod_price_usd" size="20" value="0" class="form-text" /> <span class="field-suffix">$</span>
-                <div class="description">Product price in usd calculated.</div>
+                <div class="description"><?=t('Product price in usd calculated')?>.</div>
                </div>
               </div>
               <div style="clear:both"></div>
             </div> 
             <div class="edit-form-item">
              <div class="form-item" id="edit-product-weight">
-              <label for="prod_weight">Weight: <span class="form-required" title="">*</span></label>
-              <span class="field-prefix"></span> <input type="text" maxlength="35" name="" id="prod_weight" size="20" value="0" class="form-text required" /> <span class="field-suffix">gram</span>
-              <div class="description">Product Weight.</div>
+              <label for="prod_weight"><?=t('Weight')?>: <span class="form-required" title="">*</span></label>
+              <span class="field-prefix"></span> <input type="text" maxlength="35" name="" id="prod_weight" size="20" value="0" class="form-text required" /> <span class="field-suffix"><?=t('gram')?></span>
+              <div class="description"><?=t('Product Weight')?>.</div>
              </div>
             </div>						
             <div class="edit-form-item">
              <div class="form-item" id="edit-product-image">
-              <label for="prod_image">Main image URL:</label>
+              <label for="prod_image"><?=t('Main image URL')?>:</label>
               <span class="field-prefix"></span> <input type="text" maxlength="" name="" id="prod_image" size="" value="" class="form-text" /> <span class="field-suffix"></span>
-              <div class="description">Will be used as the main product image.</div>
+              <div class="description"><?=t('Will be used as the main product image')?>.</div>
               <img id="prod_image_show" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEHAAEALAAAAAABAAEAAAICTAEAOw==" alt="" />
              </div>
             </div>						
             
-           <input type="button" class="form-submit" onclick="" value="Fill form" id="fill_form" /> 		
+           <input type="button" class="form-submit" onclick="" value="<?=t('Fill form')?>" id="fill_form" /> 		
            <hr />
           </div>
          <!-- /Product Import data form -->
@@ -108,6 +108,7 @@
 			<input type="button" class="form-submit" onclick="" value="<? print t('Calculate')?>" id="calc_price_btn" />-->
 			
 			<?php print $show_edit_form_cost; ?>
+			
 						
 			
 			

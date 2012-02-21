@@ -1,4 +1,4 @@
-$(document).ready(function() {
+﻿$(document).ready(function() {
 	var dealer_profit = 5 / 100;
 	var store_profit = 15 / 100;
 	var dollar_curs = 6.7;
@@ -23,17 +23,17 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-	var dealer_profit = 5 / 100;
-	var store_profit = 15 / 100;
-	var dollar_curs = 6.7;
+	var dealer_profit = 5/100;
+	var store_profit = 15/100;
+	var dollar_curs = 6.27;
 
 	$("#import_data_call").click(function() {
 		var prod_url = $("#prod_url").val();
-  if($.trim(prod_url) == '')
-   {
-    alert('Заполните URL продукта!');
-    return;
-   }
+	    if($.trim(prod_url) == '')
+	     {
+		  alert('Заполните URL продукта!');
+		  return;
+	     }
 		var startIndex = prod_url.indexOf("id=");
 		var endIndex = prod_url.indexOf("&", startIndex);
 		var productId = -1;
@@ -50,28 +50,28 @@ $(document).ready(function() {
 
 	$("#fill_form").click(function() {
 
-		var title = $("#prod_title_val_last").val();
-		var prod_url = $("#prod_url").val();
+	    var title = $("#prod_title_val_last").val();
+	    var prod_url = $("#prod_url").val();
 		var img_url = $("#prod_image").val();
 		var prod_weight = $("#prod_weight").val();
-  var prod_price = $("#prod_price_yuan").val();
+        var prod_price = $("#prod_price_yuan").val();
    
-  if(   ($.trim(title) == '')
-     || (prod_price  == '' || prod_price <= 0)
-     || (prod_weight == '' || prod_weight <= 0))
-   {
-    alert('Заполните обязательные поля формы');
-    return;
-   }
+	   if(   ($.trim(title) == '')
+		 || (prod_price  == '' || prod_price <= 0)
+		 || (prod_weight == '' || prod_weight <= 0))
+	    {
+		 alert('Заполните обязательные поля формы');
+	 	 return;
+	    }
 
-	// Calculate a cost
-		var cost = Math.ceil(dollar_curs * prod_price * prod_weight/1000); // CHANGE THIS FORMULA
+	// Calculate a cost (цена + 15)*1,1/6,27+вес/1000*20
+		var cost = Math.ceil((prod_price+15) * (1.1/dollar_curs) + ((prod_weight/1000)*20)); // CHANGE THIS FORMULA
 	
 		var revenue_delta = cost * (dealer_profit + store_profit);
 		var price = revenue_delta + parseInt(cost);
 		price = Math.ceil(price);
  
-  $("#prod_price_usd").val(cost);
+        $("#prod_price_usd").val(cost);
 		$("#edit-cost").val(cost);
 		$("#edit-sell-price").val(price);
 		$("#edit-list-price").val(price);
@@ -82,15 +82,16 @@ $(document).ready(function() {
 		$("#edit-field-product-store-url-0-value").val(prod_url);
 		$("#edit-field-image-cache-0-filefield-remote-url").val(img_url);
 		$("#edit-weight").val(prod_weight);
-  
-	});
+		$("#edit-shippable").attr('checked', true);
+
+  	});
 
 	function fillImportedData(data) {
 		var jsonData = Drupal.parseJson(data);
 		var item = jsonData.taobaoke_item_details.taobaoke_item_detail.item;
 		var prod_title = item.title;
 		var prod_price = item.price;
-  console.log(prod_price);
+       
 		var prod_weight = 0;//item.weight;
 		var prod_image = item.pic_url;
 
